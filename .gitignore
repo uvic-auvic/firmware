@@ -1,4 +1,9 @@
-*.cfg
+# Build Output
+# Let's explicitly ignore build output folders
+*/MOTORCONTROLLER_APP/*
+*/MOTORCONTROLLER_BOOTLOADER/*
+*/POWERBOARD_APP/*
+*/POWERBOARD_BOOTLOADER/*
 
 # Object files
 *.o
@@ -11,10 +16,11 @@
 *.pch
 
 # Libraries
-*.lib
-*.a
-*.la
-*.lo
+# Leave library files in
+
+# System Workbench
+*.cfg
+STM32*.xml
 
 # Shared objects (inc. Windows DLLs)
 *.dll

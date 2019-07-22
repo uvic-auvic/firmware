@@ -11,5 +11,6 @@
 void LED_init(void);
 void LED_run15(void);
 void LED_run14(void);
-
+void LED_run13(void);
+void LED_run12(void);
 #endif /* MOTORCONTROLLER2_CODE_APP_LED_H_ */

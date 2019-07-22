@@ -5,9 +5,9 @@
  *      Author: Poornachander
  */
 
-extern void RTOS_init(void);
+extern void RTOS_launch(void);
 int main()
 {
-	RTOS_init();
+	RTOS_launch();
 	return 0;
 }

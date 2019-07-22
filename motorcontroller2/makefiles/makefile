@@ -1,10 +1,15 @@
 
-REPO_ROOT:=../..
+REPO_ROOT=../..
 COMPONENT_DIR=$(REPO_ROOT)/motorcontroller2
-OUTPUT_DIR:=$(COMPONENT_DIR)/MOTORCONTROLLER_APP
 COMPONENT_SHARED_CODE_DIR=$(COMPONENT_DIR)/code/shared
 SHARED_CODE_DIR=$(REPO_ROOT)/shared/code
-CODE_DIR=$(COMPONENT_DIR)/code/app
+CODE_DIR=$(COMPONENT_DIR)/code/$(ARG1)
+
+ifeq ($(ARG1),clean)
+	OUTPUT_DIR=$(COMPONENT_DIR)/MOTORCONTROLLER
+else
+	OUTPUT_DIR=$(COMPONENT_DIR)/MOTORCONTROLLER/$(ARG1)
+endif
 
 DEVICE_DEFINES+= \
 -DSTM32 \
@@ -18,30 +23,45 @@ OTHER_DEFINES+= \
 
 INCLUDE_PATH+= \
 -I$(COMPONENT_SHARED_CODE_DIR)/config \
--I$(CODE_DIR)
+-I$(CODE_DIR) \
+-I$(CODE_DIR)/RTOS
 
 -include STMLib.mk
 -include FreeRTOSlib.mk
 -include app.mk
--include startup.mk
+-include appStartup.mk
+-include bootloader.mk
+-include bootloaderStartup.mk
 
 LINKER_SCRIPT= $(CODE_DIR)/STM32F411RETx_FLASH.ld
-TARGET_ELF=$(OUTPUT_DIR)/motorcontroller_app.elf
-TARGET_BIN=$(OUTPUT_DIR)/motorcontroller_app.bin
-TARGET_HEX=$(OUTPUT_DIR)/motorcontroller_app.hex
-TARGET_MAP=$(OUTPUT_DIR)/motorcontroller_app.map
+TARGET_ELF=$(OUTPUT_DIR)/motorcontroller_$(ARG1).elf
+TARGET_BIN=$(OUTPUT_DIR)/motorcontroller_$(ARG1).bin
+TARGET_HEX=$(OUTPUT_DIR)/motorcontroller_$(ARG1).hex
+TARGET_MAP=$(OUTPUT_DIR)/motorcontroller_$(ARG1).map
 
-app: $(OBJS) $(LINKER_SCRIPT)
+APP_LINKER_FLAGS+= \
+--nmagic
+
+app: $(LIB_OBJS) $(APP_OBJS) $(LINKER_SCRIPT)
 	@echo Building Motor Controller App
 	@echo 'Building $(TARGET_ELF): $@'
 	@echo 'Invoking: MCU GCC Linker'
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -T"$(LINKER_SCRIPT)" -Wl,-Map=$(TARGET_MAP) -Wl,--gc-sections -o "$(TARGET_ELF)" $(OBJS) -lm
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -T"$(LINKER_SCRIPT)" -Wl,-Map=$(TARGET_MAP) -Wl,--gc-sections -o "$(TARGET_ELF)" $(LIB_OBJS) $(APP_OBJS) -lm -Xlinker $(APP_LINKER_FLAGS)
 	@echo 'Finished building $(TARGET_ELF): $@'
 	@echo ' '
 	$(MAKE) --no-print-directory post-build
 
-bootloader:
+BOOTLOADER_LINKER_FLAGS+= \
+
+
+bootloader: $(LIB_OBJS) $(BOOTLOADER_OBJS) $(LINKER_SCRIPT)
 	@echo Building Motor Controller Bootloader
+	@echo 'Building $(TARGET_ELF): $@'
+	@echo 'Invoking: MCU GCC Linker'
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -T"$(LINKER_SCRIPT)" -Wl,-Map=$(TARGET_MAP) -Wl,--gc-sections -o "$(TARGET_ELF)" $(LIB_OBJS) $(BOOTLOADER_OBJS) -lm $(BOOTLOADER_LINKER_FLAGS)
+	@echo 'Finished building $(TARGET_ELF): $@'
+	@echo ' '
+	$(MAKE) --no-print-directory post-build
 
 all: app bootloader
 

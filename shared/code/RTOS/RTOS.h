@@ -9,9 +9,11 @@
 #define MOTORCONTROLLER2_CODE_APP_RTOS_RTOS_H_
 
 #include "RTOS_componentSpecific.h"
-#include "FreeRTOS.h"
 
-typedef void (*RTOS_task)(void);
+#define RTOS_TASK_1000MS_PRIORITY	(tskIDLE_PRIORITY + 1U)
+#define RTOS_TASK_100MS_PRIORITY	(RTOS_TASK_1000MS_PRIORITY + 1U)
+#define RTOS_TASK_10MS_PRIORITY     (RTOS_TASK_100MS_PRIORITY + 1U)
+#define RTOS_TASK_1MS_PRIORITY		(RTOS_TASK_10MS_PRIORITY + 1U)
 
 typedef enum
 {
@@ -22,22 +24,5 @@ typedef enum
 
 	RTOS_TASK_COUNT
 } RTOS_task_E;
-
-typedef struct
-{
-	RTOS_task initFunction;
-	RTOS_task runFunction;
-} RTOS_taskRunFunctions_S;
-
-typedef struct
-{
-	const RTOS_taskRunFunctions_S * taskRunFunctions;
-	const uint8_t					countOfTaskRunFunctions;
-} RTOS_taskConfig_S;
-
-typedef struct
-{
-	RTOS_taskConfig_S	taskConfig[RTOS_TASK_COUNT];
-} RTOS_config_S;
 
 #endif /* MOTORCONTROLLER2_CODE_APP_RTOS_RTOS_H_ */

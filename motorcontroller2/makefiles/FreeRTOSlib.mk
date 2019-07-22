@@ -1,7 +1,7 @@
 
 FREE_RTOS_DIR=$(REPO_ROOT)/libs/FreeRTOS/FreeRTOSv10.2.1/FreeRTOS
 
-OBJS += \
+LIB_OBJS += \
 $(OUTPUT_DIR)/obj/FreeRTOS/croutine.o \
 $(OUTPUT_DIR)/obj/FreeRTOS/event_groups.o \
 $(OUTPUT_DIR)/obj/FreeRTOS/list.o \
@@ -11,7 +11,7 @@ $(OUTPUT_DIR)/obj/FreeRTOS/timers.o \
 $(OUTPUT_DIR)/obj/FreeRTOS/port.o \
 $(OUTPUT_DIR)/obj/FreeRTOS/heap_2.o
 
-C_DEPS += \
+LIB_C_DEPS += \
 $(OUTPUT_DIR)/obj/FreeRTOS/croutine.d \
 $(OUTPUT_DIR)/obj/FreeRTOS/event_groups.d \
 $(OUTPUT_DIR)/obj/FreeRTOS/list.d \

@@ -1,13 +1,15 @@
 
-APP_OBJS += \
-$(OUTPUT_DIR)/obj/app/RTOS/RTOS.o \
-$(OUTPUT_DIR)/obj/app/RTOS/RTOS_componentSpecific.o \
-$(OUTPUT_DIR)/obj/app/LED.o
+BOOTLOADER_OBJS += \
+$(OUTPUT_DIR)/obj/bootloader/UART.o \
+$(OUTPUT_DIR)/obj/bootloader/UART_componentSpecific.o \
+$(OUTPUT_DIR)/obj/bootloader/bootloader/Bootloader.o \
+$(OUTPUT_DIR)/obj/bootloader/bootloader/Flash_Interface.o
 
-APP_C_DEFS += \
-$(OUTPUT_DIR)/obj/app/RTOS/RTOS.d \
-$(OUTPUT_DIR)/obj/app/RTOS/RTOS_componentSpecific.d \
-$(OUTPUT_DIR)/obj/app/LED.d
+BOOTLOADER_C_DEFS += \
+$(OUTPUT_DIR)/obj/bootloader/UART.d \
+$(OUTPUT_DIR)/obj/bootloader/UART_componentSpecific.d \
+$(OUTPUT_DIR)/obj/bootloader/bootloader/Bootloader.d \
+$(OUTPUT_DIR)/obj/bootloader/bootloader/Flash_Interface.d
 
 COMPILE_FLAGS= \
 -O0 \
@@ -18,13 +20,14 @@ COMPILE_FLAGS= \
 INCLUDE_PATH+= \
 -I$(SHARED_CODE_DIR) \
 -I$(SHARED_CODE_DIR)/RTOS \
+-I$(SHARED_CODE_DIR)/bootloader
 
-
-$(shell mkdir -p $(OUTPUT_DIR)/obj/app)
-$(shell mkdir -p $(OUTPUT_DIR)/obj/app/RTOS)
+$(shell mkdir -p $(OUTPUT_DIR)/obj/bootloader)
+$(shell mkdir -p $(OUTPUT_DIR)/obj/bootloader/bootloader)
+$(shell mkdir -p $(OUTPUT_DIR)/obj/bootloader/RTOS)
 
 # Each subdirectory must supply rules for building sources it contributes
-$(OUTPUT_DIR)/obj/app/%.o: $(CODE_DIR)/%.c
+$(OUTPUT_DIR)/obj/bootloader/%.o: $(CODE_DIR)/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: MCU GCC Compiler'
 	@echo $(PWD)
@@ -33,7 +36,7 @@ $(OUTPUT_DIR)/obj/app/%.o: $(CODE_DIR)/%.c
 	@echo ' '
 
 # Each subdirectory must supply rules for building sources it contributes
-$(OUTPUT_DIR)/obj/app/%.o: $(SHARED_CODE_DIR)/%.c
+$(OUTPUT_DIR)/obj/bootloader/%.o: $(SHARED_CODE_DIR)/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: MCU GCC Compiler'
 	@echo $(PWD)

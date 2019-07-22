@@ -16,63 +16,43 @@
 #define RTOS_TASK_10MS_PRIORITY     (RTOS_TASK_100MS_PRIORITY + 1U)
 #define RTOS_TASK_1MS_PRIORITY		(RTOS_TASK_10MS_PRIORITY + 1U)
 
+static void RTOS_task1ms(void);
+static void RTOS_task10ms(void);
+static void RTOS_task100ms(void);
+static void RTOS_task1000ms(void);
 
-static void RTOS_runTask(RTOS_task_E RTOSTask);
-static void RTOS_run1ms(void);
-static void RTOS_run10ms(void);
-static void RTOS_run100ms(void);
-static void RTOS_run1000ms(void);
-
-// Configs
-extern const RTOS_taskConfig_S RTOS_taskConfig[RTOS_TASK_COUNT];
-
-extern void RTOS_init(void);
-void RTOS_init(void)
+extern void RTOS_launch(void);
+void RTOS_launch(void)
 {
-	(void)xTaskCreate((TaskFunction_t)RTOS_run1ms,       /* Function that implements the task. */
+	(void)xTaskCreate((TaskFunction_t)RTOS_task1ms,       /* Function that implements the task. */
 					  "1msTask",          /* Text name for the task. */
 					  configMINIMAL_STACK_SIZE,      /* Stack size in words, not bytes. */
 					  NULL,    /* Parameter passed into the task. */
 					  RTOS_TASK_1MS_PRIORITY,/* Priority at which the task is created. */
 					  NULL);      /* Used to pass out the created task's handle. */
 
-
-	(void)xTaskCreate((TaskFunction_t)RTOS_run10ms,       /* Function that implements the task. */
+	(void)xTaskCreate((TaskFunction_t)RTOS_task10ms,       /* Function that implements the task. */
 					  "10msTask",          /* Text name for the task. */
 					  configMINIMAL_STACK_SIZE,      /* Stack size in words, not bytes. */
 					  NULL,    /* Parameter passed into the task. */
 					  RTOS_TASK_10MS_PRIORITY,/* Priority at which the task is created. */
 					  NULL);      /* Used to pass out the created task's handle. */
 
-
-	(void)xTaskCreate((TaskFunction_t)RTOS_run100ms,       /* Function that implements the task. */
+	(void)xTaskCreate((TaskFunction_t)RTOS_task100ms,       /* Function that implements the task. */
 					  "100msTask",          /* Text name for the task. */
 					  configMINIMAL_STACK_SIZE,      /* Stack size in words, not bytes. */
 					  NULL,    /* Parameter passed into the task. */
 					  RTOS_TASK_100MS_PRIORITY,/* Priority at which the task is created. */
 					  NULL);      /* Used to pass out the created task's handle. */
 
-
-	(void)xTaskCreate((TaskFunction_t)RTOS_run1000ms,       /* Function that implements the task. */
+	(void)xTaskCreate((TaskFunction_t)RTOS_task1000ms,       /* Function that implements the task. */
 					  "1000msTask",          /* Text name for the task. */
 					  configMINIMAL_STACK_SIZE,      /* Stack size in words, not bytes. */
 					  NULL,    /* Parameter passed into the task. */
 					  RTOS_TASK_1000MS_PRIORITY,/* Priority at which the task is created. */
 					  NULL);      /* Used to pass out the created task's handle. */
 
-	for(RTOS_task_E RTOSTask = (RTOS_task_E)0U; RTOSTask < RTOS_TASK_COUNT; RTOSTask++)
-	{
-		if(RTOS_taskConfig[RTOSTask].taskRunFunctions != NULL)
-		{
-			for(uint8_t task = 0U; task < RTOS_taskConfig[RTOSTask].countOfTaskRunFunctions; task++)
-			{
-				if(RTOS_taskConfig[RTOSTask].taskRunFunctions[task].initFunction != NULL)
-				{
-					RTOS_taskConfig[RTOSTask].taskRunFunctions[task].initFunction();
-				}
-			}
-		}
-	}
+	RTOS_init();
 
 	/* Start the scheduler. */
 	vTaskStartScheduler();
@@ -85,57 +65,45 @@ void RTOS_init(void)
 	for( ;; );
 }
 
-static void RTOS_runTask(RTOS_task_E RTOSTask)
+static void RTOS_task1ms(void)
 {
-	if(RTOSTask < RTOS_TASK_COUNT)
-	{
-		for(RTOS_task100ms_E task = (RTOS_task100ms_E)0U; task < RTOS_taskConfig[RTOSTask].countOfTaskRunFunctions; task++)
-		{
-			if((RTOS_taskConfig[RTOSTask].taskRunFunctions != NULL) && (RTOS_taskConfig[RTOSTask].taskRunFunctions[task].runFunction != NULL))
-			{
-				RTOS_taskConfig[RTOSTask].taskRunFunctions[task].runFunction();
-			}
-		}
-	}
-}
-
-
-static void RTOS_run1ms(void)
-{
+	TickType_t lastRunTime = xTaskGetTickCount();
 	while(1)
 	{
-		RTOS_runTask(RTOS_TASK_1MS);
-		vTaskDelay(pdMS_TO_TICKS(1U));
+		RTOS_run1ms();
+		vTaskDelayUntil(&lastRunTime, pdMS_TO_TICKS(1U));
 	}
 }
 
-static void RTOS_run10ms(void)
+static void RTOS_task10ms(void)
 {
+	TickType_t lastRunTime = xTaskGetTickCount();
 	while(1)
 	{
-		RTOS_runTask(RTOS_TASK_10MS);
-		vTaskDelay(pdMS_TO_TICKS(10U));
+		RTOS_run10ms();
+		vTaskDelayUntil(&lastRunTime, pdMS_TO_TICKS(10U));
 	}
 }
 
-static void RTOS_run100ms(void)
+static void RTOS_task100ms(void)
 {
+	TickType_t lastRunTime = xTaskGetTickCount();
 	while(1)
 	{
-		RTOS_runTask(RTOS_TASK_100MS);
-		vTaskDelay(pdMS_TO_TICKS(100U));
+		RTOS_run100ms();
+		vTaskDelayUntil(&lastRunTime, pdMS_TO_TICKS(100U));
 	}
 }
 
-static void RTOS_run1000ms(void)
+static void RTOS_task1000ms(void)
 {
+	TickType_t lastRunTime = xTaskGetTickCount();
 	while(1)
 	{
-		RTOS_runTask(RTOS_TASK_1000MS);
-		vTaskDelay(pdMS_TO_TICKS(1000U));
+		RTOS_run1000ms();
+		vTaskDelayUntil(&lastRunTime, pdMS_TO_TICKS(1000U));
 	}
 }
-
 
 void vApplicationTickHook(void)
 {

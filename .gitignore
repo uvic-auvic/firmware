@@ -1,9 +1,7 @@
 # Build Output
 # Let's explicitly ignore build output folders
-*/MOTORCONTROLLER_APP/*
-*/MOTORCONTROLLER_BOOTLOADER/*
-*/POWERBOARD_APP/*
-*/POWERBOARD_BOOTLOADER/*
+*/MOTORCONTROLLER/*
+*/POWERBOARD/*
 
 # Object files
 *.o
@@ -19,7 +17,7 @@
 # Leave library files in
 
 # System Workbench
-*.cfg
+#*.cfg We need this file for the debugger settings
 STM32*.xml
 
 # Shared objects (inc. Windows DLLs)
@@ -37,6 +35,8 @@ STM32*.xml
 *.i*86
 *.x86_64
 *.hex
+*.bin
+*.map
 
 # Debug files
 *.dSYM/

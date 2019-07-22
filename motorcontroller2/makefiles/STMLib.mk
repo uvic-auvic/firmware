@@ -4,7 +4,7 @@ STM32F4_STD_PERIPH_DIR:=$(STM32F4_LIB_DIR)/Libraries/STM32F4xx_StdPeriph_Driver
 CMSIS_DIR=$(STM32F4_LIB_DIR)/Libraries/CMSIS
 STM32F4_CMISS_DIR:=$(CMSIS_DIR)/Device/ST/STM32F4xx
 
-OBJS += \
+LIB_OBJS += \
 $(OUTPUT_DIR)/obj/STM_Std_Periph/misc.o \
 $(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_adc.o \
 $(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_can.o \
@@ -47,7 +47,7 @@ $(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_tim.o \
 $(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_usart.o \
 $(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_wwdg.o \
 
-C_DEPS += \
+LIB_C_DEPS += \
 $(OUTPUT_DIR)/obj/STM_Std_Periph/misc.d \
 $(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_adc.d \
 $(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_can.d \

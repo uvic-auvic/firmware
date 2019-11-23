@@ -1,5 +1,5 @@
 
-REPO_ROOT=../..
+REPO_ROOT=/root/firmware
 COMPONENT_DIR=$(REPO_ROOT)/motorcontroller2
 COMPONENT_SHARED_CODE_DIR=$(COMPONENT_DIR)/code/shared
 SHARED_CODE_DIR=$(REPO_ROOT)/shared/code

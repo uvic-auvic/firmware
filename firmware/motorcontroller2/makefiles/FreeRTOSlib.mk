@@ -1,5 +1,5 @@
 
-FREE_RTOS_DIR=$(REPO_ROOT)/libs/FreeRTOS/FreeRTOSv10.2.1/FreeRTOS
+FREE_RTOS_DIR=$(REPO_ROOT)/libs/FreeRTOS-Kernel/FreeRTOS
 
 LIB_OBJS += \
 $(OUTPUT_DIR)/obj/FreeRTOS/croutine.o \

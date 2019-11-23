@@ -1,7 +1,7 @@
 # Build Output
 # Let's explicitly ignore build output folders
-*/MOTORCONTROLLER/*
-*/POWERBOARD/*
+firmware/motorcontroller2/MOTORCONTROLLER/*
+firmware/powerboard/POWERBOARD/*
 
 # Object files
 *.o

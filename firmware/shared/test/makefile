@@ -1,22 +1,32 @@
 
 OUTPUT_DIR=SHARED_TEST
-CODE_DIR=code
+TEST_CODE_DIR=code
+CODE_DIR=../code
 
-TEST_OBJS += \
-$(OUTPUT_DIR)/obj/test/my_first_test.o
+
+TEST_TARGETS += \
+$(OUTPUT_DIR)/test/my_first_test \
+$(OUTPUT_DIR)/test/test_circBuffer1D
+
+test_circBuffer1D: 
+
+
 
 #TEST_C_DEPS += $(TEST_OBJS:%.o=%.d)
 
-$(shell mkdir -p $(OUTPUT_DIR)/obj/test)
+$(shell mkdir -p $(OUTPUT_DIR)/test)
+$(shell mkdir -p $(OUTPUT_DIR)/obj)
 
-$(OUTPUT_DIR)/obj/test/%.o: $(CODE_DIR)/%.c
+
+
+$(OUTPUT_DIR)/obj/%.o: $(TEST_CODE_DIR)/%.c
 	gcc -c $< -o $@
 
-$(OUTPUT_DIR)/shared_test: $(TEST_OBJS)
+$(OUTPUT_DIR)/test/%: $(OUTPUT_DIR)/obj/%.o
 	gcc $< -lcgreen -o $@
+	./$@
 
-test: $(OUTPUT_DIR)/shared_test
-	./$(OUTPUT_DIR)/shared_test
+test: $(TEST_TARGETS)
 
 clean:
 	rm -rf $(OUTPUT_DIR)

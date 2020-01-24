@@ -11,7 +11,7 @@
 #include "stm32f4xx.h"
 #include "User_Defines.h"
 #include "FreeRTOS.h"
-#include "Task.h"
+#include "task.h"
 
 //Register bit for enabling TXEIE bit. This is used instead of the definitions in stm32f4xx_usart.h
 #define USART_TXEIE		0b10000000

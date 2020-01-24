@@ -1,2 +1,2 @@
 
-#define USE_PROTOBUFS   (1U)
+#define USE_PROTOBUFS   (0U)

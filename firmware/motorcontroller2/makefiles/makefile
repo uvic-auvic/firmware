@@ -1,5 +1,5 @@
 
-REPO_ROOT=/root/firmware
+REPO_ROOT=../..
 COMPONENT_DIR=$(REPO_ROOT)/motorcontroller2
 COMPONENT_SHARED_CODE_DIR=$(COMPONENT_DIR)/code/shared
 SHARED_DIR=$(REPO_ROOT)/shared
@@ -28,7 +28,7 @@ INCLUDE_PATH+= \
 
 -include STMLib.mk
 -include FreeRTOSlib.mk
--include protobuf.mk
+#-include protobuf.mk
 -include app.mk
 -include appStartup.mk
 -include bootloader.mk

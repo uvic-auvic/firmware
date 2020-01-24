@@ -2,6 +2,9 @@
 # Let's explicitly ignore build output folders
 firmware/motorcontroller2/MOTORCONTROLLER/*
 firmware/powerboard/POWERBOARD/*
+firmware/motorcontroller2/test/MC_TEST/*
+firmware/shared/test/SHARED_TEST/*
+
 
 # Object files
 *.o

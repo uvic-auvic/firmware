@@ -1,0 +1,24 @@
+name: C/C++ CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-16.04
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup
+      run: |
+        ./provision.sh
+        apt-cache policy gcc-arm-none-eabi
+
+    - name: Build all firmware
+      run: |
+        make all
+
+    - name: Test
+      run: |
+        make test

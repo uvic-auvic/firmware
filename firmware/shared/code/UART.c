@@ -7,12 +7,10 @@
 #include <stdbool.h>
 #include "stm32f4xx.h"
 #include "FreeRTOS.h"
-#include "Task.h"
+#include "task.h"
 #include <string.h>
 #include "circBuffer2D.h"
 #include "circBuffer1D.h"
-#include "pb_common.h"
-#include "pb_decode.h"
 
 // Move to common units
 #define BITVALUE(x) ( 1U << (x))

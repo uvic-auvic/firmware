@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="fr.ac6.mcu.debug.config.launchConfigurationType">
-<stringAttribute key="DEBBUGER_BOARD_NAME" value="STM32F411E-DISCO"/>
+<stringAttribute key="DEBBUGER_BOARD_NAME" value="NUCLEO-F413ZH"/>
 <stringAttribute key="DEBBUGER_CORE_NAME" value=""/>
-<stringAttribute key="DEBBUGER_MCU_NAME" value="STM32F411VETx"/>
+<stringAttribute key="DEBBUGER_MCU_NAME" value="STM32F413ZHTx"/>
 <stringAttribute key="fr.ac6.mcu.ide.DBG_DEVICE" value="ST-Link"/>
 <stringAttribute key="fr.ac6.mcu.ide.DBG_DEVICE_SHAREABLE_ALLOWED" value="false"/>
 <stringAttribute key="fr.ac6.mcu.ide.DBG_INTERFACE" value="SWD"/>

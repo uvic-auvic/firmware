@@ -47,48 +47,7 @@ $(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_tim.o \
 $(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_usart.o \
 $(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_wwdg.o \
 
-LIB_C_DEPS += \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/misc.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_adc.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_can.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_cec.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_crc.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_cryp.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_cryp_aes.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_cryp_des.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_cryp_tdes.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_dac.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_dbgmcu.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_dcmi.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_dfsdm.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_dma.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_dma2d.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_dsi.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_exti.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_flash.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_flash_ramfunc.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_fmpi2c.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_gpio.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_hash.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_hash_md5.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_hash_sha1.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_i2c.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_iwdg.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_lptim.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_ltdc.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_pwr.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_qspi.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_rcc.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_rng.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_rtc.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_sai.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_sdio.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_spdifrx.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_spi.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_syscfg.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_tim.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_usart.d \
-$(OUTPUT_DIR)/obj/STM_Std_Periph/stm32f4xx_wwdg.d \
+LIB_C_DEPS += $(LIB_OBJS:%.o=%.d)
 
 INCLUDE_PATH += \
 -I$(STM32F4_STD_PERIPH_DIR)/inc \
@@ -97,10 +56,10 @@ INCLUDE_PATH += \
 
 $(shell mkdir -p $(OUTPUT_DIR)/obj/STM_Std_Periph)
 
+ARM_TOOLS_COMPILER_FLAGS := \
+-O0 \
+-g3 \
+-Wall
+
 $(OUTPUT_DIR)/obj/STM_Std_Periph/%.o: $(STM32F4_STD_PERIPH_DIR)/src/%.c
-	@echo 'Building file: $<'
-	@echo 'Invoking: MCU GCC Compiler'
-	@echo $(PWD)
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 $(DEVICE_DEFINES) $(OTHER_DEFINES) $(INCLUDE_PATH) -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MT"$@" -o "$@" "$<"
-	@echo 'Finished building: $<'
-	@echo ' '
+	@$(MAKE) --no-print-directory arm-complier ARM_TOOLS_COMPILER_SOURCE_FILE=$< ARM_TOOLS_COMPILER_OBJECT_FILE=$@ ARM_TOOLS_COMPILER_DEFS_FILE=$(@:%.o=%.d)

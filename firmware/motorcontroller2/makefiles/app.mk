@@ -2,42 +2,36 @@
 APP_OBJS += \
 $(OUTPUT_DIR)/obj/app/RTOS/RTOS.o \
 $(OUTPUT_DIR)/obj/app/RTOS/RTOS_componentSpecific.o \
-$(OUTPUT_DIR)/obj/app/LED.o
+$(OUTPUT_DIR)/obj/app/LED.o \
+$(OUTPUT_DIR)/obj/app/circBuffer1D.o \
+$(OUTPUT_DIR)/obj/app/circBuffer1D_componentSpecific.o \
+$(OUTPUT_DIR)/obj/app/UART.o \
+$(OUTPUT_DIR)/obj/app/UART_componentSpecific.o \
+$(OUTPUT_DIR)/obj/app/circBuffer2D.o \
+$(OUTPUT_DIR)/obj/app/circBuffer2D_componentSpecific.o
 
-APP_C_DEFS += \
-$(OUTPUT_DIR)/obj/app/RTOS/RTOS.d \
-$(OUTPUT_DIR)/obj/app/RTOS/RTOS_componentSpecific.d \
-$(OUTPUT_DIR)/obj/app/LED.d
-
-COMPILE_FLAGS= \
--O0 \
--g3 \
--Wall \
--Werror
+APP_C_DEPS += $(APP_OBJS:%.o=%.d)
 
 INCLUDE_PATH+= \
 -I$(SHARED_CODE_DIR) \
 -I$(SHARED_CODE_DIR)/RTOS \
-
+-I$(SHARED_DIR)/data/protocol
 
 $(shell mkdir -p $(OUTPUT_DIR)/obj/app)
 $(shell mkdir -p $(OUTPUT_DIR)/obj/app/RTOS)
 
+APP_COMPILER_FLAGS := \
+-O0 \
+-g3 \
+-Wall \
+-Werror \
+-Wswitch-enum \
+-Wswitch-default
+
 # Each subdirectory must supply rules for building sources it contributes
 $(OUTPUT_DIR)/obj/app/%.o: $(CODE_DIR)/%.c
-	@echo 'Building file: $<'
-	@echo 'Invoking: MCU GCC Compiler'
-	@echo $(PWD)
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 $(DEVICE_DEFINES) $(OTHER_DEFINES) $(INCLUDE_PATH) $(COMPILE_FLAGS) -fmessage-length=0 -ffunction-sections -c -MMD -MP -MT"$@" -o "$@" "$<"
-	@echo 'Finished building: $<'
-	@echo ' '
+	@$(MAKE) --no-print-directory arm-complier ARM_TOOLS_COMPILER_FLAGS="$(APP_COMPILER_FLAGS)" ARM_TOOLS_COMPILER_SOURCE_FILE=$< ARM_TOOLS_COMPILER_OBJECT_FILE=$@ ARM_TOOLS_COMPILER_DEFS_FILE=$(@:%.o=%.d)
 
 # Each subdirectory must supply rules for building sources it contributes
 $(OUTPUT_DIR)/obj/app/%.o: $(SHARED_CODE_DIR)/%.c
-	@echo 'Building file: $<'
-	@echo 'Invoking: MCU GCC Compiler'
-	@echo $(PWD)
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 $(DEVICE_DEFINES) $(OTHER_DEFINES) $(INCLUDE_PATH) $(COMPILE_FLAGS) -fmessage-length=0 -ffunction-sections -c -MMD -MP -MT"$@" -o "$@" "$<"
-	@echo 'Finished building: $<'
-	@echo ' '
-	
+	@$(MAKE) --no-print-directory arm-complier ARM_TOOLS_COMPILER_FLAGS="$(APP_COMPILER_FLAGS)" ARM_TOOLS_COMPILER_SOURCE_FILE=$< ARM_TOOLS_COMPILER_OBJECT_FILE=$@ ARM_TOOLS_COMPILER_DEFS_FILE=$(@:%.o=%.d)

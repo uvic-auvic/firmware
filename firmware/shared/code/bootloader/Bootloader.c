@@ -18,7 +18,8 @@
 
 #include "User_Defines.h"
 #include "Bootloader.h"
-#include "UART.h"
+
+#include "../UARTDma.h"
 #include "Flash_Interface.h"
 
 /* DEFINES */

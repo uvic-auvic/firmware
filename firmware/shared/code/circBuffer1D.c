@@ -39,9 +39,9 @@ void circBuffer1D_init(void)
 			circBuffer1D_data.channelData[channel].endIndex = bufferSize - 1U;
 		}
 
-		if(bufferSize > sizeof(circBuffer1D_data.buffer))
+		if(bufferSize != sizeof(circBuffer1D_data.buffer))
 		{
-			// ASSERT?
+
 		}
 	}
 }
@@ -53,12 +53,12 @@ uint8_t circBuffer1D_getSpaceAvailable(const circBuffer1D_channel_E channel)
 	{
 		circBuffer1D_channelData_S * channelData = &circBuffer1D_data.channelData[channel];
 
-		if(channelData->head > channelData->tail)
+		if(channelData->head >= channelData->tail)
 		{
-			ret = channelData->head - channelData->tail;
+			ret = channelData->size - (channelData->head - channelData->tail);
 		} else
 		{
-			ret = (channelData->head + channelData->size) - channelData->tail;
+			ret = (channelData->tail - channelData->head) - 1U;
 		}
 	}
 
@@ -71,7 +71,7 @@ bool circBuffer1D_popByte(const circBuffer1D_channel_E channel, uint8_t * const 
 	if((channel < CIRCBUFFER1D_CHANNEL_COUNT) && (returnData != NULL))
 	{
 		circBuffer1D_channelData_S * channelData = &circBuffer1D_data.channelData[channel];
-		if(channelData->head != channelData->tail)
+		if(circBuffer1D_getSpaceAvailable(channel) < channelData->size)
 		{
 			*returnData = circBuffer1D_data.buffer[channelData->tail + channelData->startIndex];
 			channelData->tail = (channelData->tail + 1U) % channelData->size;
@@ -87,10 +87,11 @@ bool circBuffer1D_pushByte(const circBuffer1D_channel_E channel, const uint8_t d
 	bool ret = false;
 	if(channel < CIRCBUFFER1D_CHANNEL_COUNT)
 	{
-		if(((circBuffer1D_data.channelData[channel].head + 1U) % (circBuffer1D_data.channelData[channel].size)) != circBuffer1D_data.channelData[channel].tail)
+		circBuffer1D_channelData_S * channelData = &circBuffer1D_data.channelData[channel];
+		if(circBuffer1D_getSpaceAvailable(channel) > 0U)
 		{
-			circBuffer1D_data.buffer[circBuffer1D_data.channelData[channel].startIndex + circBuffer1D_data.channelData[channel].head] = data;
-			circBuffer1D_data.channelData[channel].head += 1U;
+			circBuffer1D_data.buffer[channelData->startIndex + channelData->head] = data;
+			channelData->head = (channelData->head + 1U) % channelData->size;
 			ret = true;
 		}
 	}
@@ -102,15 +103,18 @@ bool circBuffer1D_push(const circBuffer1D_channel_E channel, const uint8_t * con
 {
 	bool ret = false;
 
-	if((channel < CIRCBUFFER1D_CHANNEL_COUNT) && (data != NULL) && (size > 0U) && (circBuffer1D_getSpaceAvailable(channel) >= size))
+	if((channel < CIRCBUFFER1D_CHANNEL_COUNT) && (data != NULL) && (size > 0U))
 	{
-		ret = true;
-		for(uint8_t index = 0U; index < size; index++)
+		if(circBuffer1D_getSpaceAvailable(channel) >= size)
 		{
-			if(circBuffer1D_pushByte(channel, data[index]) == false)
+			ret = true;
+			for(uint8_t index = 0U; index < size; index++)
 			{
-				ret = false;
-				break;
+				if(circBuffer1D_pushByte(channel, data[index]) == false)
+				{
+					ret = false;
+					break;
+				}
 			}
 		}
 	}

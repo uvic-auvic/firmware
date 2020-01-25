@@ -3,30 +3,33 @@ OUTPUT_DIR=SHARED_TEST
 TEST_CODE_DIR=code
 CODE_DIR=../code
 
+# TEST_CIRCBUFFER1D
+$(shell mkdir -p $(OUTPUT_DIR)/test_circBuffer1D)
+$(shell mkdir -p $(OUTPUT_DIR)/test_circBuffer1D/code)
 
-TEST_TARGETS += \
-$(OUTPUT_DIR)/test/my_first_test \
-$(OUTPUT_DIR)/test/test_circBuffer1D
+TEST_CIRCBUFFER1D_INCLUDE_PATHS := \
+-I$(TEST_CODE_DIR)/test_circBuffer1D \
+-I$(CODE_DIR) \
 
-test_circBuffer1D: 
+TEST_CIRCBUFFER1D_OBJS += \
+$(OUTPUT_DIR)/test_circBuffer1D/test_circBuffer1D.o \
+$(OUTPUT_DIR)/test_circBuffer1D/code/circBuffer1D.o \
+$(OUTPUT_DIR)/test_circBuffer1D/circBuffer1D_componentSpecific.o
 
+test_circBuffer1D: $(TEST_CIRCBUFFER1D_OBJS)
+	gcc $^ -lcgreen -o $(OUTPUT_DIR)/test_circBuffer1D/test
+	./$(OUTPUT_DIR)/test_circBuffer1D/test
 
+# Create object file for test
+$(OUTPUT_DIR)/%.o: $(TEST_CODE_DIR)/%.c
+	gcc -c $< -o $@ $(TEST_CIRCBUFFER1D_INCLUDE_PATHS)
 
-#TEST_C_DEPS += $(TEST_OBJS:%.o=%.d)
+# Create the object file for the file being tested
+$(OUTPUT_DIR)/test_circBuffer1D/code/%.o: $(CODE_DIR)/%.c
+	gcc -c $< -o $@ $(TEST_CIRCBUFFER1D_INCLUDE_PATHS)
 
-$(shell mkdir -p $(OUTPUT_DIR)/test)
-$(shell mkdir -p $(OUTPUT_DIR)/obj)
-
-
-
-$(OUTPUT_DIR)/obj/%.o: $(TEST_CODE_DIR)/%.c
-	gcc -c $< -o $@
-
-$(OUTPUT_DIR)/test/%: $(OUTPUT_DIR)/obj/%.o
-	gcc $< -lcgreen -o $@
-	./$@
-
-test: $(TEST_TARGETS)
+test:
+	$(MAKE) test_circBuffer1D
 
 clean:
 	rm -rf $(OUTPUT_DIR)

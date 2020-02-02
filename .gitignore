@@ -44,6 +44,12 @@ STM32*.xml
 # Debug files
 *.dSYM/
 
+# VIM
+*.swp
+
+# Cgreen build
+firmware/libs/cgreen/build/*
+
 # =========================
 # Operating System Files
 # =========================

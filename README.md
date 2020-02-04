@@ -1,9 +1,9 @@
 # AUVIC Firmware
 Repo for all AUVIC firmware
 
-### Getting started:
+## Getting started
 
-Ubuntu 16.04
+### Ubuntu 16.04
 1) Run `sudo provision.sh`. This will install all required dependencies.
 2) In the repo root directory, run `make -C firmware all -j4`. This will build firmware for all components. Ensure no failuers occur.
 3) Run `make test`. This will run all unit tests. Ensure no failues occur.
@@ -12,7 +12,10 @@ Ubuntu 16.04
 
 Note: The `-C firmware` argument is required since the main makefile is in a subfolder from the repo root. You can alternatively cd into firmware and just run `make all -j4`
 
-Windows and MacOS (No unit tests)
+### Ubuntu 18.04
+Not supported yet
+
+### Windows and MacOS (No unit tests)
 1) Download and install System Workbench from [here](https://www.openstm32.org/Downloading%2Bthe%2BSystem%2BWorkbench%2Bfor%2BSTM32%2Binstaller).
 2) Open System Workbench. Click `File->Import`.
 3) Click `Browse` and select the firmware subfolder.

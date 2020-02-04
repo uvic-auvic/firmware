@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: auvic-firmware-build
 
 on: [push]
 

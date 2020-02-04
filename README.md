@@ -24,5 +24,5 @@ Not supported yet
 
 ## Builds
 Master:
-![Builds](https://github.com/uvic-auvic/firmware/workflows/.github/workflows/ccpp.yml/badge.svg)
+![](https://github.com/uvic-auvic/firmware/workflows/auvic-firmware-build/ccpp.yml/badge.svg)
 

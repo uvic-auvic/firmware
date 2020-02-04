@@ -17,8 +17,8 @@ jobs:
 
     - name: Build all firmware
       run: |
-        make all
+        make -C firmware all
 
     - name: Test
       run: |
-        make test
+        make -C firmware test

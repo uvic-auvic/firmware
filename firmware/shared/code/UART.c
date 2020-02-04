@@ -216,7 +216,8 @@ extern void UART_init()
  */
 extern bool UART_write(char const * const data)
 {
-	return UART_writeLen((uint8_t const * const)data, strnlen(data, UART_TX_BUFFER_SIZE));
+//	return UART_writeLen((uint8_t const * const)data, strnlen(data, UART_TX_BUFFER_SIZE));
+	return false;
 }
 
 extern bool UART_writeLen(uint8_t const * const data, const uint8_t dataLength)

@@ -23,6 +23,6 @@ Not supported yet
 5) Find the Hammer icon(build button) in the toolbar and select `all`. Ensure no failures occur.
 
 ## Builds
-Master:
-![](https://github.com/uvic-auvic/firmware/workflows/auvic-firmware-build/ccpp.yml/badge.svg)
+
+![auvic-firmware-build](https://github.com/uvic-auvic/firmware/workflows/auvic-firmware-build/badge.svg)
 

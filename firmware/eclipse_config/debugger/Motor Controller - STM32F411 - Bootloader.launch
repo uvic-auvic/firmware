@@ -10,14 +10,15 @@
 <stringAttribute key="fr.ac6.mcu.ide.DBG_RESET_MODE" value="connect_under_reset"/>
 <stringAttribute key="fr.ac6.mcu.ide.DBG_STOP_WATCHDOG_THEN_HALTED_ALLOWED" value="true"/>
 <booleanAttribute key="fr.ac6.mcu.ide.OPENOCD_GENERATOR_OPTION" value="false"/>
+<booleanAttribute key="fr.ac6.mcu.ide.OPENOCD_LAUNCH" value="true"/>
 <stringAttribute key="fr.ac6.mcu.ide.OPENOCD_NAME" value="&quot;${openstm32_openocd_path}\openocd.exe&quot;"/>
 <stringAttribute key="fr.ac6.mcu.ide.OPENOCD_OTHER_OPTIONS" value=""/>
 <stringAttribute key="fr.ac6.mcu.ide.OPENOCD_SCRIPT" value="${ProjDirPath}\eclipse_config\debugger\Motor Controller - STM32F411 - Bootloader.cfg"/>
 <stringAttribute key="fr.ac6.mcu.ide.OPENOCD_SCRIPT_CHOICE" value="provided"/>
 <stringAttribute key="fr.ac6.mcu.ide.OPENOCD_SCRIPT_IS_LEGACY" value="false"/>
 <intAttribute key="org.eclipse.cdt.debug.gdbjtag.core.delay" value="3"/>
-<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.doHalt" value="true"/>
-<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.doReset" value="true"/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.doHalt" value="false"/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.doReset" value="false"/>
 <stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.imageFileName" value=""/>
 <stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.imageOffset" value=""/>
 <stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.initCommands" value="monitor reset halt"/>
@@ -43,6 +44,7 @@
 <intAttribute key="org.eclipse.cdt.launch.ATTR_BUILD_BEFORE_LAUNCH_ATTR" value="2"/>
 <stringAttribute key="org.eclipse.cdt.launch.COREFILE_PATH" value=""/>
 <stringAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME" value="motorcontroller2/MOTORCONTROLLER/bootloader/STM32F411/motorcontroller_bootloader.elf"/>
+<booleanAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME_ACTIVATED" value="true"/>
 <stringAttribute key="org.eclipse.cdt.launch.PROJECT_ATTR" value="firmware"/>
 <booleanAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_AUTO_ATTR" value="false"/>
 <stringAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_ID_ATTR" value="fr.ac6.managedbuild.toolchain.gnu.cross.base.680406637"/>

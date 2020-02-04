@@ -1,0 +1,52 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "make all",
+            "type": "shell",
+            "command": "./scripts/make.sh",
+            "windows": {
+                "command": ".\\scripts\\make.cmd"
+            },
+            "args": [
+                "-C",
+                "firmware",
+                "-j12",
+                "all"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": ["absolute"]
+
+            }
+        },
+        {
+            "label": "make mc2 app F411",
+            "type": "shell",
+            "command": "./scripts/make.sh",
+            "windows": {
+                "command": ".\\scripts\\make.cmd"
+            },
+            "args": [
+                "-C",
+                "firmware",
+                "-j12",
+                "motorcontroller2",
+                "TARGET=app",
+                "DEVICE=STM32F411"
+            ],
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": ["absolute"]
+
+            },
+            "group": "build"
+        }
+    ]
+}

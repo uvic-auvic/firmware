@@ -5,18 +5,14 @@
 #include "UART.h"
 
 #include <stdbool.h>
-#include "stm32f4xx.h"
+#include <string.h>
+#include "utils.h"
 #include "FreeRTOS.h"
 #include "task.h"
-#include <string.h>
 #include "circBuffer2D.h"
 #include "circBuffer1D.h"
 
-// Move to common units
-#define BITVALUE(x) ( 1U << (x))
-#define PAYLOAD_LENGTH_FIELD_SIZE	(2U)
-
-//Register bit for enabling TXEIE bit. This is used instead of the definitions in stm32f4xx_usart.h
+/* TYPEDEFS */
 
 typedef enum
 {
@@ -24,47 +20,26 @@ typedef enum
 	UART_START_PROCESS_RECEIVED_DATA
 } UART_state_E;
 
-typedef enum
-{
-	UART_TX_STATE_IDLE,
-	UART_TX_STATE_TRANSMIT,
-} UART_TXState_E;
-
-typedef enum
-{
-	UART_RX_STATE_RECEIVE_PAYLOAD_SIZE,
-	UART_RX_STATE_RECEIVE_PAYLOAD,
-	UART_RX_STATE_RECEIVE_PAYLOAD_CRC,
-} UART_RXState_E;
-
-typedef enum
-{
-	UART_RX_DMA_STATE_RECEIVE_PAYLOAD_SIZE,
-	UART_RX_DMA_STATE_RECEIVE_PAYLOAD_AND_CRC,
-} UART_RXDMAState_E;
-
-typedef struct
-{
-	uint16_t payloadSize;
-	uint8_t payload[UART_RX_BUFFER_LENGTH];
-	uint32_t crc;
-} UART_RXBuffer_S;
-
 typedef struct
 {
 	TaskHandle_t taskHandle;
 	UART_state_E state;
-	UART_TXState_E TXState;
-	UART_RXState_E RXState;
-	UART_RXDMAState_E RXDMAState;
-	UART_RXBuffer_S RXBuffer;
-	uint16_t bytesReceived; 
 } UART_data_S;
+
+/* PRIVATE DATA */
 
 static UART_data_S UART_data;
 extern UART_config_S UART_config;
 
-static void UART_configureGPIO(void)
+/* PRIVATE FUNCTIONS DECLARATION */
+
+static void UART_private_configureGPIO(void);
+static void UART_private_configureUARTPeriph(void);
+static void UART_private_run(void);
+
+/* PRIVATE FUNCTION DEFINITION */
+
+static void UART_private_configureGPIO(void)
 {
 	// Check that all configs are valid
 	configASSERT(IS_GPIO_PIN_SOURCE(UART_config.HWConfig->rxPin));
@@ -84,12 +59,12 @@ static void UART_configureGPIO(void)
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
 	GPIO_Init(UART_config.HWConfig->GPIOPort, &GPIO_InitStructure);
 
-	// Attatch GPIO AF to UART. This section needs to change if UART6 needs to be used
+	// Attach GPIO AF to UART. This section needs to change if UART6 needs to be used
 	GPIO_PinAFConfig(UART_config.HWConfig->GPIOPort, UART_config.HWConfig->rxPin, GPIO_AF_USART1);
 	GPIO_PinAFConfig(UART_config.HWConfig->GPIOPort, UART_config.HWConfig->txPin, GPIO_AF_USART1);
 }
 
-static void UART_configureUARTPeriph(void)
+static void UART_private_configureUARTPeriph(void)
 {
 	configASSERT(IS_USART_1236_PERIPH(UART_config.HWConfig->UARTPeriph)); // Switch to `IS_USART_APP_PERIPH` if needed
 
@@ -114,43 +89,7 @@ static void UART_configureUARTPeriph(void)
 	USART_Cmd(UART_config.HWConfig->UARTPeriph, ENABLE);
 }
 
-// static void UART_configureDMAPeriph(void)
-// {
-// 	configASSERT(IS_DMA_ALL_PERIPH(UART_config.HWConfig->DMAStream));
-// 	configASSERT(IS_DMA_CHANNEL(UART_config.HWConfig->DMAChannel));
-
-// 	DMA_InitTypeDef DMA_init;
-// 	DMA_StructInit(&DMA_init);
-
-// 	DMA_init.DMA_Channel = UART_config.HWConfig->DMAChannel;
-// 	DMA_init.DMA_PeripheralBaseAddr = (uint32_t)&UART_config.HWConfig->UARTPeriph->DR;
-// 	DMA_init.DMA_Memory0BaseAddr = (uint32_t)&UART_data.RXBuffer;
-// 	DMA_init.DMA_DIR = DMA_DIR_PeripheralToMemory;
-// 	DMA_init.DMA_BufferSize = PAYLOAD_LENGTH_FIELD_SIZE;
-// 	DMA_init.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-// 	DMA_init.DMA_MemoryInc = DMA_MemoryInc_Enable;
-// 	DMA_init.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
-// 	DMA_init.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
-// 	DMA_init.DMA_Mode = DMA_Mode_Normal;
-// 	DMA_init.DMA_Priority = DMA_Priority_High;
-// 	DMA_init.DMA_FIFOMode = DMA_FIFOMode_Disable;
-// 	// DMA_init.DMA_FIFOThreshold  Leave as default
-// 	// DMA_init.DMA_MemoryBurst  Leave as default
-// 	// DMA_init.DMA_PeripheralBurst  Leave as deefault
-
-// 	DMA_Init(UART_config.HWConfig->DMAStream, &DMA_init);
-
-// 	DMA_ITConfig(UART_config.HWConfig->DMAStream, DMA_IT_TC, ENABLE);
-
-// 	NVIC_SetPriority(UART_config.HWConfig->DMAInterruptNumber, 7);
-// 	NVIC_EnableIRQ(UART_config.HWConfig->DMAInterruptNumber);
-
-// 	USART_DMACmd(UART_config.HWConfig->UARTPeriph, USART_DMAReq_Rx, ENABLE);
-
-// 	DMA_Cmd(UART_config.HWConfig->DMAStream, ENABLE);
-// }
-
-static void UART_run(void)
+static void UART_private_run(void)
 {
 	while(1)
 	{
@@ -159,10 +98,13 @@ static void UART_run(void)
 			case UART_START_PROCESS_RECEIVED_DATA:
 			{
 				uint8_t receivedData[UART_RX_BUFFER_LENGTH] = {};
-				circBuffer2D_pop(CIRCBUFFER2D_CHANNEL_UART_RX, receivedData);
-				if(UART_config.receiveCallback != NULL)
+				const uint8_t bytesReceived = circBuffer2D_pop(CIRCBUFFER2D_CHANNEL_UART_RX, receivedData);
+				if(bytesReceived != 0U)
 				{
-					UART_config.receiveCallback(receivedData, UART_RX_BUFFER_LENGTH);
+					if(UART_config.receiveCallback != NULL)
+					{
+						UART_config.receiveCallback(receivedData, bytesReceived);
+					}
 				}
 
 				UART_data.state = UART_STATE_IDLE;
@@ -182,6 +124,8 @@ static void UART_run(void)
 	}
 }
 
+/* PUBLIC FUNCTIONS */
+
 extern void UART_init()
 {
 	if(UART_config.HWConfig->enablePeripheralsClockCallback != NULL)
@@ -193,13 +137,12 @@ extern void UART_init()
 		configASSERT(0U);
 	}
 
-	UART_configureGPIO();
-	UART_configureUARTPeriph();
-	// UART_configureDMAPeriph();
+	UART_private_configureGPIO();
+	UART_private_configureUARTPeriph();
 
 	UART_data.state = UART_STATE_IDLE;
 
-	(void)xTaskCreate((TaskFunction_t)UART_run,       /* Function that implements the task. */
+	(void)xTaskCreate((TaskFunction_t)UART_private_run,       /* Function that implements the task. */
 					  "UARTTask",          /* Text name for the task. */
 					  configMINIMAL_STACK_SIZE,      /* Stack size in words, not bytes. */
 					  NULL,    /* Parameter passed into the task. */
@@ -232,65 +175,33 @@ extern bool UART_writeLen(uint8_t const * const data, const uint8_t dataLength)
 	return ret;
 }
 
+/* INTERRUPT HANDLER */
+
 // This is handling two cases. The interrupt will run if a character is received
 // and when data is moved out from the transmit buffer and the transmit buffer is empty
 static inline void UART_commonInterruptHandler(void)
 {
 	if((UART_config.HWConfig->UARTPeriph->SR & USART_FLAG_RXNE) == USART_FLAG_RXNE) //If character is received
 	{
-		uint8_t tempInput = UART_config.HWConfig->UARTPeriph->DR;
+		const uint8_t receivedByte = UART_config.HWConfig->UARTPeriph->DR;
 
-		switch(UART_data.RXState)
+		if((receivedByte == '\n') || (receivedByte == '\r'))
 		{
-			case UART_RX_STATE_RECEIVE_PAYLOAD_SIZE:
+			uint8_t dataInInputBuffer[UART_RX_BUFFER_LENGTH];
+			const uint8_t bytesInBuffer = circBuffer1D_pop(CIRCBUFFER1D_CHANNEL_UART_RX, dataInInputBuffer);
+
+			if(bytesInBuffer > 0U)
 			{
-				UART_data.RXBuffer.payloadSize = (UART_data.RXBuffer.payloadSize << 8U) | tempInput; // Need to switch endianess
-				UART_data.bytesReceived += 1U;
-
-				if(UART_data.bytesReceived >= 2U)
+				if(circBuffer2D_push(CIRCBUFFER2D_CHANNEL_UART_RX, dataInInputBuffer, bytesInBuffer))
 				{
-					UART_data.RXBuffer.payloadSize = ((UART_data.RXBuffer.payloadSize & 0x00FFU) << 8U) | ((UART_data.RXBuffer.payloadSize & 0xFF00U) >> 8U);
-					UART_data.bytesReceived = 0U;
-					UART_data.RXState = UART_RX_STATE_RECEIVE_PAYLOAD;
-				}
-				break;
-			}
-			case UART_RX_STATE_RECEIVE_PAYLOAD:
-			{
-				UART_data.RXBuffer.payload[UART_data.bytesReceived] = tempInput;
-				UART_data.bytesReceived += 1U;
-
-				if(UART_data.bytesReceived >= UART_data.RXBuffer.payloadSize)
-				{
-					UART_data.bytesReceived = 0U;
-					UART_data.RXState = UART_RX_STATE_RECEIVE_PAYLOAD_CRC;
-				}
-				break;
-			}
-			case UART_RX_STATE_RECEIVE_PAYLOAD_CRC:
-			{
-				UART_data.RXBuffer.crc = (UART_data.RXBuffer.crc << 8U) | tempInput; // Need to switch endianess
-				UART_data.bytesReceived += 1U;
-
-				if(UART_data.bytesReceived >= 4U)
-				{
-					//Verify CRC
-					UART_data.bytesReceived = 0U;
-
-					// Notify task if CRC okay
-					circBuffer2D_push(CIRCBUFFER2D_CHANNEL_UART_RX, UART_data.RXBuffer.payload, UART_data.RXBuffer.payloadSize);
-					memset(&UART_data.RXBuffer, 0U, sizeof(UART_data.RXBuffer));
 					BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 					vTaskNotifyGiveFromISR(UART_data.taskHandle, &xHigherPriorityTaskWoken);
-
-					UART_data.RXState = UART_RX_STATE_RECEIVE_PAYLOAD_SIZE;
 				}
-				break;
 			}
-			default:
-			{
-				break;
-			}
+		}
+		else
+		{
+			(void)circBuffer1D_pushByte(CIRCBUFFER1D_CHANNEL_UART_RX, receivedByte);
 		}
 	}
 	else if ((UART_config.HWConfig->UARTPeriph->SR & USART_FLAG_TXE) == USART_FLAG_TXE) // If Transmission is complete
@@ -308,25 +219,6 @@ static inline void UART_commonInterruptHandler(void)
 	else
 	{
 		// Unexpected interrupt. handle it
-	}
-}
-
-void UART_DMAInterruptHandler(void)
-{
-	switch(UART_data.RXDMAState)
-	{
-		case UART_RX_DMA_STATE_RECEIVE_PAYLOAD_SIZE:
-		{
-			break;
-		}
-		case UART_RX_DMA_STATE_RECEIVE_PAYLOAD_AND_CRC:
-		{
-			break;
-		}
-		default:
-		{
-			break;
-		}
 	}
 }
 

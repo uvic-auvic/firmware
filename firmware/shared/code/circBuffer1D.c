@@ -121,3 +121,8 @@ bool circBuffer1D_push(const circBuffer1D_channel_E channel, const uint8_t * con
 
 	return ret;
 }
+
+uint8_t circBuffer1D_pop(const circBuffer1D_channel_E channel, uint8_t * const dataToReturn)
+{
+	return 0U;
+}

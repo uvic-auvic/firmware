@@ -22,3 +22,7 @@ Not supported yet
 4) Uncheck the `Search for nested projects` checkbox. Select the project available and click `Finish`.
 5) Find the Hammer icon(build button) in the toolbar and select `all`. Ensure no failures occur.
 
+## Builds
+Master:
+![Builds](https://github.com/uvic-auvic/firmware/workflows/.github/workflows/ccpp.yml/badge.svg)
+

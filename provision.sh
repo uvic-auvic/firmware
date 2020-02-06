@@ -8,7 +8,7 @@ make \
 cmake \
 gcc \
 g++ \
-gcc-arm-none-eabi=15:4.9.3+svn231177-1
+gcc-arm-none-eabi
 
 #make cgreen
 cd firmware/libs/cgreen

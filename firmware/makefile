@@ -1,4 +1,7 @@
 
+export REPO_ROOT=$(CURDIR)
+# export REPO_ROOT=$(CURDIR)
+
 motorcontroller2: _motorcontroller2
 _motorcontroller2:
 	@echo "Building Motor Controller 1 - $(TARGET) - $(DEVICE)"

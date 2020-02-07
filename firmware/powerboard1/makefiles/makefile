@@ -17,6 +17,8 @@ ifeq ($(DEVICE), STM32F051)
 
 	DEVICE=STM32F051
 
+	MCU_ARCHITECTURE=M0
+
 else # STM32F091
 	LINKER_SCRIPT= $(CODE_DIR)/startup/STM32F091CC_FLASH.ld
 
@@ -28,6 +30,8 @@ else # STM32F091
 	-DDEVICE_STM32F091=1
 
 	DEVICE=STM32F091
+
+	MCU_ARCHITECTURE=M0
 
 endif
 
@@ -45,7 +49,7 @@ INCLUDE_PATH+= \
 -I$(CODE_DIR) \
 -I$(CODE_DIR)/RTOS
 
-#-include $(SHARED_MAKEFILES)/FreeRTOSlib.mk
+-include $(SHARED_MAKEFILES)/FreeRTOSlib.mk
 -include STMLib.mk
 -include app.mk
 -include appStartup.mk

@@ -1,5 +1,7 @@
 
 APP_OBJS += \
+$(OUTPUT_DIR)/obj/app/RTOS/RTOS.o \
+$(OUTPUT_DIR)/obj/app/RTOS/RTOS_componentSpecific.o \
 
 APP_C_DEPS += $(APP_OBJS:%.o=%.d)
 

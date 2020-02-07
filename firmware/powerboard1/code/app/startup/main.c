@@ -1,17 +1,13 @@
 /*
  * hello_world.c
  *
- *  Created on: Jul 18, 2019
+ *  Created on: Feb 7, 2020
  *      Author: Poornachander
  */
 
-#include "stm32f0xx.h"
-
+extern void RTOS_launch(void);
 int main()
 {
-	RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
-	GPIOC->MODER |= GPIO_MODER_MODER8_0;
-	GPIOC->ODR |= GPIO_Pin_8;
-	for(;;);
+	RTOS_launch();
 	return 0;
 }

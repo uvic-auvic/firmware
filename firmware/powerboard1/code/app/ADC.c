@@ -23,7 +23,7 @@ static ADC_data_S ADC_data;
 static const uint32_t ADC_softwareChannelToADCChannelMapping[ADC_CHANNEL_COUNT] =
 {
     [ADC_CHANNEL_WATER_SENSOR] 			= ADC_Channel_0,
-    [ADC_CHANNEL_PRESSURE_SENSOR] 		= ADC_Channel_1,
+    [ADC_CHANNEL_EXTERNAL_PRESSURE] 	= ADC_Channel_1,
     [ADC_CHANNEL_LEFT_BATT_VOLTAGE] 	= ADC_Channel_2,
     [ADC_CHANNEL_RIGHT_BATT_VOLTAGE] 	= ADC_Channel_3,
     [ADC_CHANNEL_RIGHT_BATT_CURRENT] 	= ADC_Channel_4,
@@ -57,7 +57,7 @@ static void ADC_private_initADC(void)
 	ADC_InitStructure.ADC_Resolution 		 	= ADC_Resolution_12b;
 	ADC_InitStructure.ADC_ContinuousConvMode 	= ENABLE;
 	ADC_InitStructure.ADC_ExternalTrigConvEdge 	= ADC_ExternalTrigConvEdge_None;
-	ADC_InitStructure.ADC_DataAlign 			= ADC_DataAlign_Right;
+	ADC_InitStructure.ADC_DataAlign 			= ADC_DataAlign_Left;
 	ADC_InitStructure.ADC_ScanDirection 		= ADC_ScanDirection_Upward;
 
 	// Writes the settings above into the the ADC config registers

@@ -3,8 +3,8 @@
 **
 **  File        : stm32_flash.ld
 **
-**  Abstract    : Linker script for STM32F091CC Device with
-**                256KByte FLASH, 32KByte RAM
+**  Abstract    : Linker script for STM32F051R8 Device with
+**                64KByte FLASH, 8KByte RAM
 **
 **                Set heap size, stack size and stack location according
 **                to application requirements.
@@ -13,9 +13,16 @@
 **
 **  Target      : STMicroelectronics STM32
 **
+**  Environment : Atollic TrueSTUDIO(R)
+**
 **  Distribution: The file is distributed �as is,� without any warranty
 **                of any kind.
 **
+**  (c)Copyright Atollic AB.
+**  You may use this file as-is or modify it according to the needs of your
+**  project. This file may only be built (assembled or compiled and linked)
+**  using the Atollic TrueSTUDIO(R) product. The use of this file together
+**  with other tools than Atollic TrueSTUDIO(R) is not permitted.
 **
 *****************************************************************************
 */
@@ -24,7 +31,7 @@
 ENTRY(Reset_Handler)
 
 /* Highest address of the user mode stack */
-_estack = 0x20007FFF;    /* end of RAM */
+_estack = 0x20001FFF;    /* end of RAM */
 
 /* Generate a link error if heap and stack don't fit into RAM */
 _Min_Heap_Size = 0x200;      /* required amount of heap  */
@@ -33,22 +40,22 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 /* Specify the memory areas */
 MEMORY
 {
-RAM (xrw)            : ORIGIN = 0x20000000, LENGTH = 32K
-BOOTLOADER (rx)      : ORIGIN = 0x8000000, LENGTH = 0x8000
+FLASH (rx)      : ORIGIN = 0x8000000, LENGTH = 64K
+RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 8K
 }
 
 /* Define output sections */
 SECTIONS
 {
-  /* The startup code goes first into BOOTLOADER */
+  /* The startup code goes first into FLASH */
   .isr_vector :
   {
     . = ALIGN(4);
     KEEP(*(.isr_vector)) /* Startup code */
     . = ALIGN(4);
-  } >BOOTLOADER
+  } >FLASH
 
-  /* The program code and other data goes into BOOTLOADER */
+  /* The program code and other data goes into FLASH */
   .text :
   {
     . = ALIGN(4);
@@ -63,44 +70,44 @@ SECTIONS
 
     . = ALIGN(4);
     _etext = .;        /* define a global symbols at end of code */
-  } >BOOTLOADER
+  } >FLASH
 
-  /* Constant data goes into BOOTLOADER */
+  /* Constant data goes into FLASH */
   .rodata :
   {
     . = ALIGN(4);
     *(.rodata)         /* .rodata sections (constants, strings, etc.) */
     *(.rodata*)        /* .rodata* sections (constants, strings, etc.) */
     . = ALIGN(4);
-  } >BOOTLOADER
+  } >FLASH
 
-  .ARM.extab   : { *(.ARM.extab* .gnu.linkonce.armextab.*) } >BOOTLOADER
+  .ARM.extab   : { *(.ARM.extab* .gnu.linkonce.armextab.*) } >FLASH
   .ARM : {
     __exidx_start = .;
     *(.ARM.exidx*)
     __exidx_end = .;
-  } >BOOTLOADER
+  } >FLASH
 
   .preinit_array     :
   {
     PROVIDE_HIDDEN (__preinit_array_start = .);
     KEEP (*(.preinit_array*))
     PROVIDE_HIDDEN (__preinit_array_end = .);
-  } >BOOTLOADER
+  } >FLASH
   .init_array :
   {
     PROVIDE_HIDDEN (__init_array_start = .);
     KEEP (*(SORT(.init_array.*)))
     KEEP (*(.init_array*))
     PROVIDE_HIDDEN (__init_array_end = .);
-  } >BOOTLOADER
+  } >FLASH
   .fini_array :
   {
     PROVIDE_HIDDEN (__fini_array_start = .);
     KEEP (*(SORT(.fini_array.*)))
     KEEP (*(.fini_array*))
     PROVIDE_HIDDEN (__fini_array_end = .);
-  } >BOOTLOADER
+  } >FLASH
 
   /* used by the startup to initialize data */
   _sidata = LOADADDR(.data);
@@ -115,7 +122,7 @@ SECTIONS
 
     . = ALIGN(4);
     _edata = .;        /* define a global symbol at data end */
-  } >RAM AT> BOOTLOADER
+  } >RAM AT> FLASH
 
   
   /* Uninitialized data section */

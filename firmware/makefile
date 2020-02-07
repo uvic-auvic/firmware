@@ -10,19 +10,27 @@ _powerboard1:
 	$(MAKE) -C powerboard1/makefiles $(TARGET)
 
 all:
+	# Motor Controller
 	$(MAKE) motorcontroller2 TARGET=app DEVICE=STM32F411
 	$(MAKE) motorcontroller2 TARGET=bootloader DEVICE=STM32F411
 	$(MAKE) motorcontroller2 TARGET=app DEVICE=STM32F413
 	$(MAKE) motorcontroller2 TARGET=bootloader DEVICE=STM32F413
-	$(MAKE) powerboard1 TARGET=app
-	$(MAKE) powerboard1 TARGET=bootloader
+
+	# Power Board
+	$(MAKE) powerboard1 TARGET=app DEVICE=STM32F091
+	$(MAKE) powerboard1 TARGET=app DEVICE=STM32F051
 
 clean:
+	# Motor Controller
 	$(MAKE) motorcontroller2 TARGET=clean
 	$(MAKE) -C motorcontroller2/test clean
+
+	# Power Board
+	$(MAKE) powerboard1 TARGET=clean
+
+	# Shared Test
 	$(MAKE) -C shared/test clean
 
-	$(MAKE) powerboard1 TARGET=clean
 	
 help:
 	@echo Component: motorcontroller2

@@ -6,7 +6,8 @@ _motorcontroller2:
 
 powerboard1: _powerboard1
 _powerboard1:
-	@echo "Building Power Board 1 - $(TARGET)"
+	@echo "Building Power Board 1 - $(TARGET) - $(DEVICE)"
+	$(MAKE) -C powerboard1/makefiles $(TARGET)
 
 all:
 	$(MAKE) motorcontroller2 TARGET=app DEVICE=STM32F411
@@ -20,6 +21,8 @@ clean:
 	$(MAKE) motorcontroller2 TARGET=clean
 	$(MAKE) -C motorcontroller2/test clean
 	$(MAKE) -C shared/test clean
+
+	$(MAKE) powerboard1 TARGET=clean
 	
 help:
 	@echo Component: motorcontroller2

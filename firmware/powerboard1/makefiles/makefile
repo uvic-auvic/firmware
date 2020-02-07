@@ -1,40 +1,33 @@
 REPO_ROOT=$(CURDIR)/../..
-COMPONENT_DIR=$(REPO_ROOT)/motorcontroller2
+COMPONENT_DIR=$(REPO_ROOT)/powerboard1
 COMPONENT_SHARED_CODE_DIR=$(COMPONENT_DIR)/code/shared
 SHARED_DIR=$(REPO_ROOT)/shared
 SHARED_CODE_DIR=$(REPO_ROOT)/shared/code
 CODE_DIR=$(COMPONENT_DIR)/code/$(TARGET)
 SHARED_MAKEFILES=$(REPO_ROOT)/shared/makefiles
 
-ifeq ($(DEVICE), STM32F413)
-	LINKER_SCRIPT= $(CODE_DIR)/startup/STM32F413ZHTx_FLASH.ld
+ifeq ($(DEVICE), NONE)
+
+
+else # STM32F091
+	LINKER_SCRIPT= $(CODE_DIR)/startup/STM32F091CC_FLASH.ld
 
 	DEVICE_DEFINES+= \
 	-DSTM32 \
-	-DSTM32F4 \
-	-DSTM32F413_423xx \
-	-DDEVICE_STM32F413=1
+	-DSTM32F0 \
+	-DSTM32F091 \
+	-DSTM32F091RCTx \
+	-DDEVICE_STM32F091=1
 
-else # STM32F411
-	LINKER_SCRIPT= $(CODE_DIR)/startup/STM32F411RETx_FLASH.ld
+	DEVICE=STM32F091
 
-	DEVICE_DEFINES+= \
-	-DSTM32 \
-	-DSTM32F4 \
-	-DSTM32F411VETx \
-	-DSTM32F411E_DISCO \
-	-DSTM32F411xE \
-	-DDEVICE_STM32F411=1
-
-	DEVICE=STM32F411
 endif
 
 ifeq ($(TARGET),clean)
-        OUTPUT_DIR=$(COMPONENT_DIR)/MOTORCONTROLLER
+        OUTPUT_DIR=$(COMPONENT_DIR)/POWERBOARD1
 else
-        OUTPUT_DIR=$(COMPONENT_DIR)/MOTORCONTROLLER/$(TARGET)/$(DEVICE)
+        OUTPUT_DIR=$(COMPONENT_DIR)/POWERBOARD1/$(TARGET)/$(DEVICE)
 endif
-
 
 OTHER_DEFINES+= \
 -DUSE_STDPERIPH_DRIVER
@@ -44,23 +37,21 @@ INCLUDE_PATH+= \
 -I$(CODE_DIR) \
 -I$(CODE_DIR)/RTOS
 
--include $(SHARED_MAKEFILES)/FreeRTOSlib.mk
+#-include $(SHARED_MAKEFILES)/FreeRTOSlib.mk
 -include STMLib.mk
 -include app.mk
 -include appStartup.mk
--include bootloader.mk
--include bootloaderStartup.mk
 
-ARM_TOOLS_COMPILER_MCU_SETTINGS := -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
+ARM_TOOLS_COMPILER_MCU_SETTINGS := -mcpu=cortex-m0 -mthumb -mfloat-abi=soft
 ARM_TOOLS_COMPILER_DEFINES := $(DEVICE_DEFINES) $(OTHER_DEFINES)
 ARM_TOOLS_COMPILER_INCLUDE_PATH := $(INCLUDE_PATH)
 
 -include $(SHARED_MAKEFILES)/armTools.mk
 
-TARGET_ELF=$(OUTPUT_DIR)/motorcontroller_$(TARGET).elf
-TARGET_BIN=$(OUTPUT_DIR)/motorcontroller_$(TARGET).bin
-TARGET_HEX=$(OUTPUT_DIR)/motorcontroller_$(TARGET).hex
-TARGET_MAP=$(OUTPUT_DIR)/motorcontroller_$(TARGET).map
+TARGET_ELF=$(OUTPUT_DIR)/powerboard1_$(TARGET).elf
+TARGET_BIN=$(OUTPUT_DIR)/powerboard1_$(TARGET).bin
+TARGET_HEX=$(OUTPUT_DIR)/powerboard1_$(TARGET).hex
+TARGET_MAP=$(OUTPUT_DIR)/powerboard1_$(TARGET).map
 
 APP_LINKER_OPTIONS:=\
 -Xlinker -nmagic
@@ -78,11 +69,7 @@ app: $(LIB_OBJS) $(APP_OBJS) $(LINKER_SCRIPT)
 	@$(MAKE) arm-linker ARM_TOOLS_LINKER_OBJECT_FILES="$(LIB_OBJS) $(PROTO_OBJS) $(APP_OBJS)" ARM_TOOL_LINKER_OPTIONS="$(APP_LINKER_OPTIONS)" ARM_TOOL_LINKER_LIBRARIES="$(ARM_TOOL_LINKER_LIBRARIES)"
 	@$(MAKE) --no-print-directory post-build
 
-bootloader: $(LIB_OBJS) $(BOOTLOADER_OBJS) $(LINKER_SCRIPT)
-	@$(MAKE) arm-linker ARM_TOOLS_LINKER_OBJECT_FILES="$(LIB_OBJS) $(PROTO_OBJS) $(BOOTLOADER_OBJS)" ARM_TOOL_LINKER_OPTIONS="$(BOOTLOADER_LINKER_OPTIONS)" ARM_TOOL_LINKER_LIBRARIES="$(ARM_TOOL_LINKER_LIBRARIES)"
-	@$(MAKE) --no-print-directory post-build
-
-all: app bootloader
+all: app
 
 post-build: $(TARGET_ELF)
 	-@echo 'Generating binary and Printing size information:'
@@ -98,6 +85,5 @@ clean:
 .SECONDARY: post-build
 
 -include $(LIB_C_DEPS)
--include $(PROTO_C_DEPS)
 -include $(APP_C_DEPS)
 -include $(BOOTLOADER_C_DEPS)

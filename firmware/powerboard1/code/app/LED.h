@@ -5,9 +5,9 @@
  *      Author: Poornachander
  */
 
-#ifndef MOTORCONTROLLER2_CODE_APP_LED_H_
-#define MOTORCONTROLLER2_CODE_APP_LED_H_
+#ifndef POWERBOARD1CODE_APP_LED_H_
+#define POWERBOARD1CODE_APP_LED_H_
 
 void LED_init(void);
 void LED_run100ms(void);
-#endif /* MOTORCONTROLLER2_CODE_APP_LED_H_ */
+#endif /* POWERBOARD1CODE_APP_LED_H_ */

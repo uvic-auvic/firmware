@@ -28,5 +28,7 @@ bool circBuffer1D_popByte(const circBuffer1D_channel_E channel, uint8_t * const 
 bool circBuffer1D_pushByte(const circBuffer1D_channel_E channel, const uint8_t data);
 bool circBuffer1D_push(const circBuffer1D_channel_E channel, const uint8_t * const data, const uint8_t size);
 
+uint8_t circBuffer1D_pop(const circBuffer1D_channel_E channel, uint8_t * const dataToReturn);
+
 
 #endif /* SHARED_CODE_CIRCBUFFER1D_H_ */

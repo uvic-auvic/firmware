@@ -14,13 +14,13 @@ static void UART_enablePeripheralsClockCallback(void);
 
 static const UART_HWConfig_S UART_HWConfig = 
 {
-	.rxPin = GPIO_PinSource6,
-	.txPin = GPIO_PinSource5,
-	.GPIOPort = GPIOD,
+	.rxPin = GPIO_PinSource7,
+	.txPin = GPIO_PinSource6,
+	.GPIOPort = GPIOB,
 
-	.UARTPeriph = USART2,
-	.UARTInterruptNumber = USART2_IRQn,
-	.baudRate = 115200,
+	.UARTPeriph = USART1,
+	.UARTInterruptNumber = USART1_IRQn,
+	.baudRate = 9600,
 
 	.enablePeripheralsClockCallback = UART_enablePeripheralsClockCallback
 };
@@ -34,57 +34,14 @@ UART_config_S UART_config =
 
 static void UART_enablePeripheralsClockCallback(void)
 {
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
 }
 
 static void UART_receiveCallback(uint8_t const * const receiveData, const uint8_t receiveDataLength)
 {
-#if USE_PROTOBUFS
-#error "Protobufs not supported yet"
-	pb_istream_t istream = pb_istream_from_buffer(receiveData, UART_RX_BUFFER_LENGTH);
-	UART_TO_BOARD_MESSAGE_TYPE decodedMessage;
-	if(pb_decode(&istream, UART_TO_BOARD_MESSAGE_FIELDS, &decodedMessage))
-	{
-		
-	}
-#else
-
 	if(receiveData != NULL)
 	{
-		const protocol_message_S * const message = (protocol_message_S *)receiveData;
-		switch(message->messageID)
-		{
-			case protocol_MID_POLARIS_motorSetSpeed:
-			{
-				
-				break;
-			}
-
-			//Can't receive message sent by this board
-			case protocol_MID_MC_deviceName:
-			{
-				break;
-			}
-
-			// unexpected and unhandled message
-			case protocol_RESERVED:
-			case protocol_MID_POLARIS_deviceName:
-			case protocol_MID_PB_deviceName:
-			default:
-			{
-				break;
-			}
-			
-		}
-
 		UART_writeLen(receiveData, receiveDataLength);
 	}
-
-#endif
-}
-
-void DMA2_Stream5_IRQHandler(void)
-{
-	UART_DMAInterruptHandler();
 }

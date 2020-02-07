@@ -50,6 +50,10 @@ STM32*.xml
 # Cgreen build
 firmware/libs/cgreen/build/*
 
+#VSCode
+.vscode/c_cpp_properties.json
+.vscode/settings.json
+
 # =========================
 # Operating System Files
 # =========================

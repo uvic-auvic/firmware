@@ -36,6 +36,8 @@ void RTOS_run10ms(void)
 
 void RTOS_run100ms(void)
 {
+	const uint8_t data[] = "hello";
+	UART_writeLen(data, 5U);
 	LED_run14();
 }
 

@@ -19,7 +19,7 @@
 #include "User_Defines.h"
 #include "Bootloader.h"
 
-#include "../UARTDma.h"
+#include "UARTDma.h"
 #include "Flash_Interface.h"
 
 /* DEFINES */
@@ -35,6 +35,19 @@ flashBuffer_t * flashBuffer_ptr = &flashBuffer_var;
 static firmwareInfo_t firmwareInfo_var;
 firmwareInfo_t * firmwareInfo_ptr = &firmwareInfo_var;
 
+
+/**
+ * Local implementation of itoa
+ */
+void itoa(uint32_t value, char* buf, uint8_t base){
+	
+	int i = 30;
+	
+	buf = "";
+	
+	for(; value && i ; --i, value /= base) buf = "0123456789abcdef"[value % base] + buf;
+}
+	
 /**
  * Initialize flash buffer
  */
@@ -51,7 +64,7 @@ static void init_flash_buffer() {
  */
 static int8_t is_app_sector_valid() {
 	//Do checksum
-#pragma message "TO DO:Need to do app integrity checking on startup"
+// #pragma message "TO DO:Need to do app integrity checking on startup"
 	return 1;
 }
 
@@ -69,7 +82,7 @@ static int8_t program_code_in_buffer() {
 	 	for(uint16_t i = 0; i < flashBuffer_ptr->length; i += 4) {
 			if(write_word(flashBuffer_ptr->startingAddress + i, *(uint32_t *)(flashBuffer_ptr->data + i)) == -1) {
 				//ERROR: Accessing restricted flash sector
-#pragma message "TO DO:Return error through UART"
+// #pragma message "TO DO:Return error through UART"
 				xSemaphoreGive(flashBuffer_ptr->mutex);
 				return -1;
 			}
@@ -80,7 +93,7 @@ static int8_t program_code_in_buffer() {
 
 			if(read_word(flashBuffer_ptr->startingAddress + i) != *(uint32_t *)(flashBuffer_ptr->data + i)) {
 				//ERROR: Flash data does not match expected data
-#pragma message "TO DO:Return error through UART"
+// #pragma message "TO DO:Return error through UART"
 				xSemaphoreGive(flashBuffer_ptr->mutex);
 				return -2;
 			}
@@ -88,7 +101,7 @@ static int8_t program_code_in_buffer() {
 
 	} else {
 		//Could not get mutex
-#pragma message "TO DO:Return error through UART"
+// #pragma message "TO DO:Return error through UART"
 		return -3;
 	}
 
@@ -189,7 +202,7 @@ static void Bootloader_Main_Task() {
 
 				startApplication();
 			} else {
-#pragma message "TO DO:Return error through UART"
+// #pragma message "TO DO:Return error through UART"
 				//ERROR: App sector corrupt. Cannot boot.
 			}
 		}
@@ -209,7 +222,7 @@ static void Bootloader_Main_Task() {
 	}
 
 	//Erase app sector before loading program
-#pragma message "TO DO:This need to be removed once first packet is implemented"
+// #pragma message "TO DO:This need to be removed once first packet is implemented"
 	erase_app_sector(); // Temporary
 
 	while(1) {

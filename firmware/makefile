@@ -33,7 +33,6 @@ clean:
 	# Shared Test
 	$(MAKE) --no-print-directory -C shared/test clean
 
-	
 help:
 	@echo Component: motorcontroller2
 	@echo       Available TARGET options: app, bootloader
@@ -45,7 +44,6 @@ help:
 test:
 	$(MAKE) -C shared/test test
 	$(MAKE) -C motorcontroller2/test test
-
 
 sandbox:
 	@echo SANDBOX

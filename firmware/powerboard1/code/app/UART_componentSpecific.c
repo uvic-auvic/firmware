@@ -6,7 +6,7 @@
  */
 
 #include <stdlib.h>
-#include "stm32f4xx.h"
+#include "stm32f0xx.h"
 #include "UART.h"
 
 static void UART_receiveCallback(uint8_t const * const receiveData, const uint8_t receiveDataLength);
@@ -14,14 +14,14 @@ static void UART_enablePeripheralsClockCallback(void);
 
 static const UART_HWConfig_S UART_HWConfig = 
 {
-	.rxPin = GPIO_PinSource7,
-	.txPin = GPIO_PinSource6,
-	.GPIOPort = GPIOB,
-	.AFNumber = GPIO_AF_USART1,
+	.rxPin = GPIO_PinSource10,
+	.txPin = GPIO_PinSource9,
+	.GPIOPort = GPIOA,
+	.AFNumber = GPIO_AF_1,
 
 	.UARTPeriph = USART1,
 	.UARTInterruptNumber = USART1_IRQn,
-	.baudRate = 9600,
+	.baudRate = 115200,
 
 	.enablePeripheralsClockCallback = UART_enablePeripheralsClockCallback
 };
@@ -35,7 +35,7 @@ UART_config_S UART_config =
 
 static void UART_enablePeripheralsClockCallback(void)
 {
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
 }
 

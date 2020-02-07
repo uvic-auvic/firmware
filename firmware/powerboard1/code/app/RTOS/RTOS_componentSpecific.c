@@ -8,6 +8,10 @@
 #include "RTOS.h"
 
 #include "stm32f0xx.h"
+#include "UART.h"
+#include "circBuffer1D.h"
+#include "circBuffer2D.h"
+#include "LED.h"
 
 /*
  * If a new FreeRTOS task is needed, create it here so that there is one place where
@@ -15,8 +19,10 @@
  */
 void RTOS_init(void)
 {
-	RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
-	GPIOC->MODER |= GPIO_MODER_MODER8_0;
+	LED_init();
+	circBuffer1D_init();
+	circBuffer2D_init();
+	UART_init(); // Creates an RTOS task
 }
 
 void RTOS_run1ms(void)
@@ -31,11 +37,10 @@ void RTOS_run10ms(void)
 
 void RTOS_run100ms(void)
 {
-	GPIOC->ODR ^= GPIO_Pin_8;
+	LED_run100ms();
 }
 
 void RTOS_run1000ms(void)
 {
 
 }
-

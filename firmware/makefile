@@ -1,26 +1,38 @@
 
+export REPO_ROOT=$(CURDIR)
+
 motorcontroller2: _motorcontroller2
 _motorcontroller2:
 	@echo "Building Motor Controller 1 - $(TARGET) - $(DEVICE)"
-	$(MAKE) -C motorcontroller2/makefiles $(TARGET)
+	$(MAKE) --no-print-directory -C motorcontroller2/makefiles $(TARGET)
 
 powerboard1: _powerboard1
 _powerboard1:
-	@echo "Building Power Board 1 - $(TARGET)"
+	@echo "Building Power Board 1 - $(TARGET) - $(DEVICE)"
+	$(MAKE) --no-print-directory -C powerboard1/makefiles $(TARGET)
 
 all:
+	# Motor Controller
 	$(MAKE) motorcontroller2 TARGET=app DEVICE=STM32F411
 	$(MAKE) motorcontroller2 TARGET=bootloader DEVICE=STM32F411
 	$(MAKE) motorcontroller2 TARGET=app DEVICE=STM32F413
 	$(MAKE) motorcontroller2 TARGET=bootloader DEVICE=STM32F413
-	$(MAKE) powerboard1 TARGET=app
-	$(MAKE) powerboard1 TARGET=bootloader
+
+	# Power Board
+	$(MAKE) powerboard1 TARGET=app DEVICE=STM32F091
+	$(MAKE) powerboard1 TARGET=app DEVICE=STM32F051
 
 clean:
+	# Motor Controller
 	$(MAKE) motorcontroller2 TARGET=clean
-	$(MAKE) -C motorcontroller2/test clean
-	$(MAKE) -C shared/test clean
-	
+	$(MAKE) --no-print-directory -C motorcontroller2/test clean
+
+	# Power Board
+	$(MAKE) powerboard1 TARGET=clean
+
+	# Shared Test
+	$(MAKE) --no-print-directory -C shared/test clean
+
 help:
 	@echo Component: motorcontroller2
 	@echo       Available TARGET options: app, bootloader
@@ -32,7 +44,6 @@ help:
 test:
 	$(MAKE) -C shared/test test
 	$(MAKE) -C motorcontroller2/test test
-
 
 sandbox:
 	@echo SANDBOX

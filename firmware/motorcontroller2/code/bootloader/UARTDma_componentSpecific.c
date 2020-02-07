@@ -65,7 +65,7 @@ void UART_receiveCallback(uint8_t const * const payload, uint8_t const payloadSi
             //No matches
             else
             {
-#pragma message "TO DO:Return error through UART"
+// #pragma message "TO DO:Return error through UART"
                 //No matches for ASCII commands
             }
 
@@ -76,7 +76,7 @@ void UART_receiveCallback(uint8_t const * const payload, uint8_t const payloadSi
         {
 
             if(check_payload_CRC() == 0 && !OVERRIDE_CRC_CHECK) {
-#pragma message "TO DO:Return error through UART"
+// #pragma message "TO DO:Return error through UART"
                 //ERROR: Error in payload
             } else
             {
@@ -134,7 +134,7 @@ void UART_receiveCallback(uint8_t const * const payload, uint8_t const payloadSi
                 //No Matches
                 else
                 {
-#pragma message "TO DO:Return error through UART"
+// #pragma message "TO DO:Return error through UART"
                 }
 
             }

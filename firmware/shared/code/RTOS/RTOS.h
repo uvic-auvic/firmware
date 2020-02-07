@@ -9,6 +9,7 @@
 #define MOTORCONTROLLER2_CODE_APP_RTOS_RTOS_H_
 
 #include "RTOS_componentSpecific.h"
+#include <stdint.h>
 
 #define RTOS_TASK_1000MS_PRIORITY	(tskIDLE_PRIORITY + 1U)
 #define RTOS_TASK_100MS_PRIORITY	(RTOS_TASK_1000MS_PRIORITY + 1U)
@@ -24,5 +25,9 @@ typedef enum
 
 	RTOS_TASK_COUNT
 } RTOS_task_E;
+
+/* PUBLIC FUNCTIONS */
+uint32_t RTOS_getTimeMilliseconds(void);
+uint32_t RTOS_getTimeElapsedMilliseconds(const uint32_t timeToCompare);
 
 #endif /* MOTORCONTROLLER2_CODE_APP_RTOS_RTOS_H_ */

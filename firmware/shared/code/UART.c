@@ -60,13 +60,13 @@ static void UART_private_configureGPIO(void)
 	GPIO_Init(UART_config.HWConfig->GPIOPort, &GPIO_InitStructure);
 
 	// Attach GPIO AF to UART. This section needs to change if UART6 needs to be used
-	GPIO_PinAFConfig(UART_config.HWConfig->GPIOPort, UART_config.HWConfig->rxPin, GPIO_AF_USART1);
-	GPIO_PinAFConfig(UART_config.HWConfig->GPIOPort, UART_config.HWConfig->txPin, GPIO_AF_USART1);
+	GPIO_PinAFConfig(UART_config.HWConfig->GPIOPort, UART_config.HWConfig->rxPin, UART_config.HWConfig->AFNumber);
+	GPIO_PinAFConfig(UART_config.HWConfig->GPIOPort, UART_config.HWConfig->txPin, UART_config.HWConfig->AFNumber);
 }
 
 static void UART_private_configureUARTPeriph(void)
 {
-	configASSERT(IS_USART_1236_PERIPH(UART_config.HWConfig->UARTPeriph)); // Switch to `IS_USART_APP_PERIPH` if needed
+	configASSERT(IS_USART_ALL_PERIPH(UART_config.HWConfig->UARTPeriph)); // Switch to `IS_USART_APP_PERIPH` if needed
 
 	// Clock should be enabled in the enable clock callback
 
@@ -181,9 +181,9 @@ extern bool UART_writeLen(uint8_t const * const data, const uint8_t dataLength)
 // and when data is moved out from the transmit buffer and the transmit buffer is empty
 static inline void UART_commonInterruptHandler(void)
 {
-	if((UART_config.HWConfig->UARTPeriph->SR & USART_FLAG_RXNE) == USART_FLAG_RXNE) //If character is received
+	if(USART_GetFlagStatus(UART_config.HWConfig->UARTPeriph, USART_FLAG_RXNE) == SET) //If character is received
 	{
-		const uint8_t receivedByte = UART_config.HWConfig->UARTPeriph->DR;
+		const uint8_t receivedByte = (const uint8_t)USART_ReceiveData(UART_config.HWConfig->UARTPeriph);
 
 		if((receivedByte == '\n') || (receivedByte == '\r'))
 		{
@@ -204,12 +204,12 @@ static inline void UART_commonInterruptHandler(void)
 			(void)circBuffer1D_pushByte(CIRCBUFFER1D_CHANNEL_UART_RX, receivedByte);
 		}
 	}
-	else if ((UART_config.HWConfig->UARTPeriph->SR & USART_FLAG_TXE) == USART_FLAG_TXE) // If Transmission is complete
+	if(USART_GetFlagStatus(UART_config.HWConfig->UARTPeriph, USART_FLAG_TXE) == SET) // If Transmission is complete
 	{
 		uint8_t dataToSend;
 		if(circBuffer1D_popByte(CIRCBUFFER1D_CHANNEL_UART_TX, &dataToSend))
 		{
-			UART_config.HWConfig->UARTPeriph->DR = dataToSend;
+			USART_SendData(UART_config.HWConfig->UARTPeriph, dataToSend);
 		}
 		else
 		{

@@ -24,10 +24,8 @@ $(shell mkdir -p $(OUTPUT_DIR)/obj/bootloader/RTOS)
 
 # Each subdirectory must supply rules for building sources it contributes
 $(OUTPUT_DIR)/obj/bootloader/%.o: $(CODE_DIR)/%.c
-	@$(MAKE) --no-print-directory arm-complier ARM_TOOLS_COMPILER_FLAGS="$(ARM_TOOLS_COMPILER_FLAGS)"  ARM_TOOLS_COMPILER_SOURCE_FILE=$< ARM_TOOLS_COMPILER_OBJECT_FILE=$@ ARM_TOOLS_COMPILER_DEFS_FILE=$(@:%.o=%.d)
+	@$(MAKE) --no-print-directory arm-complier ARM_TOOLS_COMPILER_FLAGS="$(BOOTLOADER_COMPILER_FLAGS)"  ARM_TOOLS_COMPILER_SOURCE_FILE=$< ARM_TOOLS_COMPILER_OBJECT_FILE=$@ ARM_TOOLS_COMPILER_DEFS_FILE=$(@:%.o=%.d)
 
 # Each subdirectory must supply rules for building sources it contributes
 $(OUTPUT_DIR)/obj/bootloader/%.o: $(SHARED_CODE_DIR)/%.c
-	@$(MAKE) --no-print-directory arm-complier ARM_TOOLS_COMPILER_FLAGS="$(ARM_TOOLS_COMPILER_FLAGS)" ARM_TOOLS_COMPILER_SOURCE_FILE=$< ARM_TOOLS_COMPILER_OBJECT_FILE=$@ ARM_TOOLS_COMPILER_DEFS_FILE=$(@:%.o=%.d)
-
-	
+	@$(MAKE) --no-print-directory arm-complier ARM_TOOLS_COMPILER_FLAGS="$(BOOTLOADER_COMPILER_FLAGS)" ARM_TOOLS_COMPILER_SOURCE_FILE=$< ARM_TOOLS_COMPILER_OBJECT_FILE=$@ ARM_TOOLS_COMPILER_DEFS_FILE=$(@:%.o=%.d)

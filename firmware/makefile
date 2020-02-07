@@ -5,12 +5,12 @@ export REPO_ROOT=$(CURDIR)
 motorcontroller2: _motorcontroller2
 _motorcontroller2:
 	@echo "Building Motor Controller 1 - $(TARGET) - $(DEVICE)"
-	$(MAKE) -C motorcontroller2/makefiles $(TARGET)
+	$(MAKE) --no-print-directory -C motorcontroller2/makefiles $(TARGET)
 
 powerboard1: _powerboard1
 _powerboard1:
 	@echo "Building Power Board 1 - $(TARGET) - $(DEVICE)"
-	$(MAKE) -C powerboard1/makefiles $(TARGET)
+	$(MAKE) --no-print-directory -C powerboard1/makefiles $(TARGET)
 
 all:
 	# Motor Controller
@@ -26,13 +26,13 @@ all:
 clean:
 	# Motor Controller
 	$(MAKE) motorcontroller2 TARGET=clean
-	$(MAKE) -C motorcontroller2/test clean
+	$(MAKE) --no-print-directory -C motorcontroller2/test clean
 
 	# Power Board
 	$(MAKE) powerboard1 TARGET=clean
 
 	# Shared Test
-	$(MAKE) -C shared/test clean
+	$(MAKE) --no-print-directory -C shared/test clean
 
 	
 help:

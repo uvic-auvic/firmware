@@ -79,7 +79,7 @@ static void ADC_private_initADC(void)
     // Enable the ADC
     ADC_Cmd(ADC1, ENABLE);
 
-    // DMA will not stop after ADC first ADC conversion stops
+    // DMA will not stop after first ADC conversion stops
     ADC_DMARequestModeConfig(ADC1, ADC_DMAMode_Circular);
     ADC_DMACmd(ADC1, ENABLE);
 }

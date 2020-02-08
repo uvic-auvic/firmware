@@ -13,7 +13,6 @@
 #include "circBuffer1D.h"
 
 /* TYPEDEFS */
-
 typedef enum
 {
 	UART_STATE_IDLE,
@@ -27,18 +26,15 @@ typedef struct
 } UART_data_S;
 
 /* PRIVATE DATA */
-
 static UART_data_S UART_data;
 extern UART_config_S UART_config;
 
 /* PRIVATE FUNCTIONS DECLARATION */
-
 static void UART_private_configureGPIO(void);
 static void UART_private_configureUARTPeriph(void);
 static void UART_private_run(void);
 
 /* PRIVATE FUNCTION DEFINITION */
-
 static void UART_private_configureGPIO(void)
 {
 	// Check that all configs are valid
@@ -94,9 +90,9 @@ static void UART_private_initDMA(void)
 	DMA_InitTypeDef DMA_InitStruct;
 	DMA_StructInit(&DMA_InitStruct);
 
-	uint32_t peripheralBaseAddress = &(UART_config.HWConfig->UARTPeriph->RDR);
+	uint32_t peripheralBaseAddress = &(UART_config.HWConfig->UARTPeriph->RDR); // This won't work for STM32F4
 
-	DMA_InitStruct.DMA_PeripheralBaseAddr = UART_private_get
+	DMA_InitStruct.DMA_PeripheralBaseAddr = peripheralBaseAddress
 }
 
 static void UART_private_run(void)
@@ -134,8 +130,8 @@ static void UART_private_run(void)
 	}
 }
 
-/* PUBLIC FUNCTIONS */
 
+/* PUBLIC FUNCTIONS */
 extern void UART_init()
 {
 	if(UART_config.HWConfig->enablePeripheralsClockCallback != NULL)

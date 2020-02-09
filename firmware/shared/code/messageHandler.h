@@ -24,6 +24,6 @@ typedef struct
 
 void messageHandler_init(void);
 void messageHandler_run10ms(void);
-
+void messageHandler_messageReceivedCallback(protocol_message_S const * const receiveData);
 
 #endif /* SHARED_CODE_MESSAGEHANDLER_H_ */

@@ -55,6 +55,6 @@ static void UART_receiveCallback(uint8_t const * const receiveData, const uint8_
 {
 	if(receiveData != NULL)
 	{
-		// UART_writeLen(receiveData, receiveDataLength);
+		messageHandler_messageReceivedCallback((const protocol_message_S * const)receiveData);
 	}
 }

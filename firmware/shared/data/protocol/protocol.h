@@ -17,12 +17,12 @@ typedef enum
 
 } protocol_MID_E; // Cannot be higher than 11 bits
 
-typedef struct
+typedef struct __packed
 {
     uint8_t name[8U];
 } protocol_deviceName_S;
 
-typedef struct
+typedef struct __packed
 {
     uint8_t motorSpeed[8U];
 } protocol_motorSetSpeed_S;
@@ -39,7 +39,7 @@ typedef union
 
 } protocol_allMessages_U;
 
-typedef struct
+typedef struct __packed
 {
     protocol_MID_E messageID;
     protocol_allMessages_U  message;

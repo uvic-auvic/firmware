@@ -2,14 +2,14 @@
  * UART.h
  */
 
-#ifndef UART_H_
-#define UART_H_
+#ifndef SHARED_CODE_UART_H_
+#define SHARED_CODE_UART_H_
 
 #include "UART_componentSpecific.h"
 
-#if (MCU_ARCHITECTURE_M4)
+#if (DEVICE_FAMILY_STM32F4)
 #include "stm32f4xx.h"
-#elif (MCU_ARCHITECTURE_M0)
+#elif (DEVICE_FAMILY_STM32F0)
 #include "stm32f0xx.h"
 #endif
 
@@ -45,4 +45,4 @@ extern void UART_init();
 extern bool UART_write(char const * const data);
 extern bool UART_writeLen(uint8_t const * const data, const uint8_t dataLength);
 
-#endif /* UART_H_ */
+#endif /* SHARED_CODE_UART_H_ */

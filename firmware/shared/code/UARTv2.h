@@ -2,14 +2,14 @@
  * UART.h
  */
 
-#ifndef UART_H_
-#define UART_H_
+#ifndef SHARED_CODE_UART_H_
+#define SHARED_CODE_UART_H_
 
-#include "UART_componentSpecific.h"
+#include "UARTv2_componentSpecific.h"
 
-#if (MCU_ARCHITECTURE_M4)
+#if (DEVICE_FAMILY_STM32F4)
 #include "stm32f4xx.h"
-#elif (MCU_ARCHITECTURE_M0)
+#elif (DEVICE_FAMILY_STM32F0)
 #include "stm32f0xx.h"
 #endif
 
@@ -30,17 +30,20 @@ typedef struct
 	uint32_t 		baudRate;
 
 	// DMA
-	DMA_TypeDef     DMAController;
-	DMA_Channel_TypeDef   DMAChannelRX;
-	DMA_Channel_TypeDef   DMAChannelTX;
+	DMA_TypeDef *   	 	DMAController;
+	DMA_Channel_TypeDef *   DMAChannelRX;
+	DMA_Channel_TypeDef *   DMAChannelTX;
+	IRQn_Type				DMARXInterruptNumber;
+	IRQn_Type				DMATXInterruptNumber;
 
 	//Common
-	void (* enablePeripheralsClockCallback)(void);
+	void 		(* enablePeripheralsClockCallback)(void);
 
 } UART_HWConfig_S;
 
 typedef const struct
 {
+	uint32_t	taskPriority;
 	void (* receiveCallback)(uint8_t const * const receiveData, const uint8_t receiveDataLength);
 	const UART_HWConfig_S * const HWConfig;
 } UART_config_S;
@@ -50,4 +53,4 @@ extern void UART_init();
 extern bool UART_write(char const * const data);
 extern bool UART_writeLen(uint8_t const * const data, const uint8_t dataLength);
 
-#endif /* UART_H_ */
+#endif /* SHARED_CODE_UART_H_ */

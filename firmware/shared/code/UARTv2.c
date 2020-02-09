@@ -157,7 +157,7 @@ static void UART_private_run(void)
 			// Verify CRC (do later)
 
 
-			// Send callback (do later)
+			// Send callback
 			if(UART_config.receiveCallback != NULL)
 			{
 				UART_config.receiveCallback(dataToProcess.data.payload, dataToProcess.header.length);

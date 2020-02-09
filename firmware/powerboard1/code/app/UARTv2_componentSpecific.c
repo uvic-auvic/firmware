@@ -8,6 +8,7 @@
 #include "stm32f0xx.h"
 #include "UARTv2.h"
 #include "RTOS.h"
+#include "messageHandler.h"
 
 static void UART_receiveCallback(uint8_t const * const receiveData, const uint8_t receiveDataLength);
 static void UART_enablePeripheralsClockCallback(void);

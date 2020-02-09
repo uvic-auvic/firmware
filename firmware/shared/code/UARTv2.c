@@ -32,10 +32,14 @@ typedef enum
 
 typedef struct
 {
+	// RX
 	volatile UARTProtocol_protocol_S RXBuffer[UART_RX_BUFFER_COUNT];
 	UART_RXBuffer_E 				 RXBufferBeingBuffered;
 	volatile UART_RXBuffer_E		 RXBufferToProcess;
 	UART_RXIRQState_E				 RXIRQState;
+
+	// TX
+	volatile UARTProtocol_protocol_S TXBuffer;
 	TaskHandle_t					 taskHandle;
 } UART_data_S;
 
@@ -46,7 +50,8 @@ extern UART_config_S UART_config;
 /* PRIVATE FUNCTIONS DECLARATION */
 static void UART_private_configureGPIO(void);
 static void UART_private_configureUARTPeriph(void);
-static void UART_private_initDMA(void);
+static void UART_private_initDMARX(void);
+static void UART_private_initDMATX(void);
 
 /* PRIVATE FUNCTION DEFINITION */
 static void UART_private_configureGPIO(void)
@@ -74,20 +79,22 @@ static void UART_private_configureGPIO(void)
 	GPIO_PinAFConfig(UART_config.HWConfig->GPIOPort, UART_config.HWConfig->txPin, UART_config.HWConfig->AFNumber);
 }
 
-static void UART_private_initDMA(void)
+static void UART_private_initDMARX(void)
 {
 	configASSERT(IS_DMA_ALL_PERIPH(UART_config.HWConfig->DMAChannelRX));
-	configASSERT(IS_DMA_ALL_PERIPH(UART_config.HWConfig->DMAChannelTX));
 	configASSERT(IS_DMA_ALL_LIST(UART_config.HWConfig->DMAController));
 
 	DMA_InitTypeDef DMA_InitStruct;
 	DMA_StructInit(&DMA_InitStruct);
 
+#if DEVICE_FAMILY_STM32F0
 	const uint32_t peripheralBaseAddress = (uint32_t)&(UART_config.HWConfig->UARTPeriph->RDR); // This won't work for STM32F4
+#else
+#error "STM32F4 not supported"
+#endif
 
 	DMA_InitStruct.DMA_PeripheralBaseAddr = peripheralBaseAddress;
 	DMA_InitStruct.DMA_DIR = DMA_DIR_PeripheralSRC;
-	DMA_InitStruct.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
 	DMA_InitStruct.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
 	DMA_InitStruct.DMA_MemoryInc = DMA_MemoryInc_Enable;
 	DMA_InitStruct.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
@@ -112,6 +119,37 @@ static void UART_private_initDMA(void)
 	DMA_Cmd(UART_config.HWConfig->DMAChannelRX, ENABLE);
 }
 
+static void UART_private_initDMATX(void)
+{
+	configASSERT(IS_DMA_ALL_PERIPH(UART_config.HWConfig->DMAChannelTX));
+	configASSERT(IS_DMA_ALL_LIST(UART_config.HWConfig->DMAController));
+
+	DMA_InitTypeDef DMA_InitStruct;
+	DMA_StructInit(&DMA_InitStruct);
+
+	uint32_t peripheralBaseAddress = (uint32_t)&UART_config.HWConfig->UARTPeriph->TDR;
+
+	DMA_InitStruct.DMA_PeripheralBaseAddr = peripheralBaseAddress;
+	DMA_InitStruct.DMA_MemoryBaseAddr = (uint32_t)&UART_data.TXBuffer.header;
+	DMA_InitStruct.DMA_DIR = DMA_DIR_PeripheralDST;
+	DMA_InitStruct.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+	DMA_InitStruct.DMA_MemoryInc = DMA_MemoryInc_Enable;
+	DMA_InitStruct.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
+	DMA_InitStruct.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
+	DMA_InitStruct.DMA_Mode = DMA_Mode_Normal;
+	DMA_InitStruct.DMA_Priority = DMA_Priority_Medium;
+	DMA_InitStruct.DMA_M2M = DMA_M2M_Disable;
+
+	DMA_Init(UART_config.HWConfig->DMAChannelTX, &DMA_InitStruct);
+
+	DMA_ITConfig(UART_config.HWConfig->DMAChannelTX, DMA_IT_TC, ENABLE);
+
+	NVIC_SetPriority(UART_config.HWConfig->DMATXInterruptNumber, 7U);
+	NVIC_EnableIRQ(UART_config.HWConfig->DMATXInterruptNumber);
+
+	// Buffer size and enable will be set in the run task
+}
+
 static void UART_private_configureUARTPeriph(void)
 {
 	configASSERT(IS_USART_ALL_PERIPH(UART_config.HWConfig->UARTPeriph));
@@ -132,7 +170,7 @@ static void UART_private_configureUARTPeriph(void)
 	// Writes the setting above into the UART configuration registers
 	USART_Init(UART_config.HWConfig->UARTPeriph, &USART_InitStruct);
 
-	USART_DMACmd(UART_config.HWConfig->UARTPeriph, USART_DMAReq_Rx, ENABLE);
+	USART_DMACmd(UART_config.HWConfig->UARTPeriph, USART_DMAReq_Rx | USART_DMAReq_Tx, ENABLE);
 
 	USART_Cmd(UART_config.HWConfig->UARTPeriph, ENABLE);
 }
@@ -141,8 +179,10 @@ static void UART_private_run(void)
 {
 	while(1)
 	{
-		ulTaskNotifyTake(pdFALSE, portMAX_DELAY);
-		
+		uint32_t nextRun_ms = 0xFFFFFFFFU;
+		const uint32_t ticks = nextRun_ms == 0xFFFFFFFFU ? portMAX_DELAY : pdMS_TO_TICKS(nextRun_ms);
+		ulTaskNotifyTake(pdFALSE, ticks);
+
 		if(UART_data.RXBufferToProcess < UART_RX_BUFFER_COUNT)
 		{
 			// Copy RXBufferToProcess so that it can be safely changed by the DMA IRQ
@@ -161,6 +201,28 @@ static void UART_private_run(void)
 			if(UART_config.receiveCallback != NULL)
 			{
 				UART_config.receiveCallback(dataToProcess.data.payload, dataToProcess.header.length);
+			}
+		}
+
+		uint8_t dataToSend[UART_TX_BUFFER_LENGTH];
+		const uint8_t dataLength = circBuffer2D_pop(CIRCBUFFER2D_CHANNEL_UART_TX, dataToSend);
+		if(dataLength != 0U)
+		{
+			// New data available to send. Check if DMA is busy
+			if((DMA_GetCurrDataCounter(UART_config.HWConfig->DMAChannelTX) == 0U) && ((UART_config.HWConfig->DMAChannelTX->CCR & DMA_CCR_EN) == DMA_CCR_EN))
+			{
+				const uint8_t frameLength = dataLength + sizeof(UART_data.TXBuffer.header) + sizeof(UART_data.TXBuffer.data.crc);
+				DMA_SetCurrDataCounter(UART_config.HWConfig->DMAChannelTX, frameLength);
+
+				UART_data.TXBuffer.header.length = dataLength;
+				UART_data.TXBuffer.data.crc = 0x00U; // TODO: calculate CRC
+				memcpy((uint8_t * const)UART_data.TXBuffer.data.payload, dataToSend, dataLength);
+
+				DMA_Cmd(UART_config.HWConfig->DMAChannelTX, ENABLE);
+			}
+			else
+			{
+				// Set `nextRun`
 			}
 		}
 	}
@@ -184,7 +246,8 @@ extern void UART_init()
 	}
 
 	UART_private_configureGPIO();
-	UART_private_initDMA();
+	UART_private_initDMARX();
+	UART_private_initDMATX();
 	UART_private_configureUARTPeriph();
 
 	configASSERT(UART_config.taskPriority < configMAX_PRIORITIES);
@@ -223,7 +286,7 @@ extern bool UART_writeLen(uint8_t const * const data, const uint8_t dataLength)
 /* DMA Interrupt Handler */
 void DMA1_CH2_3_DMA2_CH1_2_IRQHandler(void)
 {
-	if(DMA_GetITStatus(DMA1_IT_TC3) == SET)
+	if(DMA_GetITStatus(DMA1_IT_TC3) == SET) // RX
 	{
 		DMA_ClearITPendingBit(DMA1_IT_TC3);
 
@@ -265,5 +328,17 @@ void DMA1_CH2_3_DMA2_CH1_2_IRQHandler(void)
 				break;
 			}
 		}
+	}
+
+	if(DMA_GetITStatus(DMA1_IT_TC2) == SET) // TX
+	{
+		DMA_ClearITPendingBit(DMA1_IT_TC2);
+
+		// F0 does not turn off the DMA channel when the Transfer is completed so turn it off before changing the registers
+		DMA_Cmd(UART_config.HWConfig->DMAChannelRX, DISABLE);
+
+		BaseType_t higherPriorityTaskWoken = pdFALSE;
+		vTaskNotifyGiveFromISR(UART_data.taskHandle, &higherPriorityTaskWoken);
+		portYIELD_FROM_ISR(higherPriorityTaskWoken);
 	}
 }

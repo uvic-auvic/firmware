@@ -53,7 +53,7 @@ typedef union
 
 } protocol_allMessages_U;
 
-typedef struct __packed
+typedef struct __attribute__((packed))
 {
     protocol_MID_E messageID;
     protocol_allMessages_U  message;

@@ -9,7 +9,7 @@
 #error "UART_PROTOCOL_MAX_PAYLOAD_SIZE must be smaller than 255"
 #endif
 
-typedef struct __packed
+typedef struct __attribute__((packed))
 {
 	// Sent first
 	struct

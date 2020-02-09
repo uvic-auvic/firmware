@@ -31,7 +31,7 @@ static const UART_HWConfig_S UART_HWConfig =
 	.DMAChannelRX = DMA1_Channel3,
 	.DMAChannelTX = DMA1_Channel2,
 	.DMARXInterruptNumber = DMA1_Channel2_3_IRQn,
-
+	.DMATXInterruptNumber = DMA1_Channel2_3_IRQn,
 	// Common
 	.enablePeripheralsClockCallback = UART_enablePeripheralsClockCallback,
 };

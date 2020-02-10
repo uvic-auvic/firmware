@@ -34,7 +34,7 @@ static LED_data_S LED_data;
 
 /* PRIVATE FUNCTION DECLARATION */
 static void LED_private_setState(const LED_channel_E channel, const bool state);
-//static void LED_private_toggle(const LED_channel_E channel);
+static void LED_private_toggle(const LED_channel_E channel);
 
 /* PRIVATE FUNCTION DEFINITION */
 static void LED_private_setState(const LED_channel_E channel, const bool state)

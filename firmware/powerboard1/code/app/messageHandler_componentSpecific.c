@@ -7,6 +7,7 @@
 
 #include "messageHandler.h"
 #include <stdlib.h>
+#include "stm32f0xx.h"
 
 void messageHandler_componentSpecific_messageReceivedCallback(const messageHandler_RXMessageChannel_E channel, const protocol_allMessages_U * const receivedData);
 
@@ -29,7 +30,7 @@ void messageHandler_componentSpecific_messageReceivedCallback(const messageHandl
         {
             case MESSAGE_HANDLER_RX_MESSAGE_CHANNEL_POWER_ENABLE:
             {
-
+                GPIOC->ODR ^= GPIO_Pin_8;
                 break;
             }
 

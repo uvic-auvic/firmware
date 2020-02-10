@@ -23,7 +23,7 @@ typedef struct
 } messageHandler_config_S;
 
 void messageHandler_init(void);
-void messageHandler_run10ms(void);
+void messageHandler_run1ms(void);
 bool messageHandler_getMessage(const messageHandler_RXMessageChannel_E channel, protocol_allMessages_U * const message);
 void messageHandler_messageReceivedCallback(protocol_message_S const * const receiveData);
 

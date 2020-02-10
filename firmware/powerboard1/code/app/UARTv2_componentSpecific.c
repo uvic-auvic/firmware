@@ -55,6 +55,7 @@ static void UART_receiveCallback(uint8_t const * const receiveData, const uint8_
 {
 	if(receiveData != NULL)
 	{
+		GPIOC->ODR ^= GPIO_Pin_9;
 		messageHandler_messageReceivedCallback((const protocol_message_S * const)receiveData);
 	}
 }

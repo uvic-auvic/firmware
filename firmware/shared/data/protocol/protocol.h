@@ -60,5 +60,6 @@ typedef struct __attribute__((packed))
 } protocol_message_S;
 
 uint8_t assert[(sizeof(protocol_allMessages_U) > PROTOCOL_MAX_MESSAGE_SIZE) ? -1 : 1];
+uint8_t assert[(sizeof(protocol_MID_E) == 1U) ? 1 : -1];
 
 #endif // SHARED_DATA_PROTOCOL_H_

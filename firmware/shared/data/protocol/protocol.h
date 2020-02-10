@@ -11,13 +11,13 @@ typedef enum
     protocol_RESERVED = 0U,
     protocol_MID_POLARIS_deviceName,
     protocol_MID_POLARIS_motorSetSpeed,
+    protocol_MID_POLARIS_powerEnable,
 
 
     protocol_MID_MC_deviceName = 21U,
     
 
     protocol_MID_PB_deviceName = 41U,
-    protocol_MID_PB_powerEnable,
 
 } protocol_MID_E; // Cannot be higher than 11 bits
 
@@ -44,12 +44,12 @@ typedef union
 {
     protocol_deviceName_S    POLARIS_deviceName;
     protocol_motorSetSpeed_S POLARIS_motorSetSpeed;
+    protocol_powerEnable_S   POLARIS_powerEnable;
 
     protocol_deviceName_S    MC_deviceName;
 
 
     protocol_deviceName_S    PB_deviceName;
-    protocol_powerEnable_S   PB_powerEnable;
 
 } protocol_allMessages_U;
 

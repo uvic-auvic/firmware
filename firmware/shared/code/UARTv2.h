@@ -41,7 +41,7 @@ typedef struct
 
 } UART_HWConfig_S;
 
-typedef const struct
+typedef struct
 {
 	uint32_t	taskPriority;
 	void (* receiveCallback)(uint8_t const * const receiveData, const uint8_t receiveDataLength);
@@ -50,7 +50,5 @@ typedef const struct
 
 
 extern void UART_init();
-extern bool UART_write(char const * const data);
-extern bool UART_writeLen(uint8_t const * const data, const uint8_t dataLength);
 
 #endif /* SHARED_CODE_UART_H_ */

@@ -36,8 +36,8 @@ static const UART_HWConfig_S UART_HWConfig =
 	.enablePeripheralsClockCallback = UART_enablePeripheralsClockCallback,
 };
 
-extern UART_config_S UART_config;
-UART_config_S UART_config =
+extern const UART_config_S UART_config;
+const UART_config_S UART_config =
 {
 	.taskPriority = RTOS_TASK_1MS_PRIORITY,
 	.receiveCallback = UART_receiveCallback,
@@ -55,7 +55,6 @@ static void UART_receiveCallback(uint8_t const * const receiveData, const uint8_
 {
 	if(receiveData != NULL)
 	{
-		GPIOC->ODR ^= GPIO_Pin_9;
 		messageHandler_messageReceivedCallback((const protocol_message_S * const)receiveData);
 	}
 }

@@ -16,7 +16,7 @@ const messageHandler_config_S messageHandler_config =
 {
     .RXMessageConfig =
     {
-        [MESSAGE_HANDLER_RX_MESSAGE_CHANNEL_POWER_ENABLE] = { .messageID = protocol_MID_PB_powerEnable}
+        [MESSAGE_HANDLER_RX_MESSAGE_CHANNEL_POWER_ENABLE] = { .messageID = protocol_MID_POLARIS_powerEnable}
     },
 
     .messageReceivedCallback = messageHandler_componentSpecific_messageReceivedCallback,
@@ -30,7 +30,6 @@ void messageHandler_componentSpecific_messageReceivedCallback(const messageHandl
         {
             case MESSAGE_HANDLER_RX_MESSAGE_CHANNEL_POWER_ENABLE:
             {
-                GPIOC->ODR ^= GPIO_Pin_8;
                 break;
             }
 

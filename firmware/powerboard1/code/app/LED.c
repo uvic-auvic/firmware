@@ -77,29 +77,29 @@ static void LED_private_setState(const LED_channel_E channel, const bool state)
 	}
 }
 
-//static void LED_private_toggle(const LED_channel_E channel)
-//{
-//	switch(channel)
-//	{
-//		case LED_CHANNEL_BLUE:
-//		{
-//			GPIOC->ODR ^= GPIO_Pin_9;
-//			break;
-//		}
-//
-//		case LED_CHANNEL_GREEN:
-//		{
-//			GPIOC->ODR ^= GPIO_Pin_8;
-//			break;
-//		}
-//
-//		case LED_CHANNEL_COUNT:
-//		default:
-//		{
-//			break;
-//		}
-//	}
-//}
+static void LED_private_toggle(const LED_channel_E channel)
+{
+	switch(channel)
+	{
+		case LED_CHANNEL_BLUE:
+		{
+			GPIOC->ODR ^= GPIO_Pin_9;
+			break;
+		}
+
+		case LED_CHANNEL_GREEN:
+		{
+			GPIOC->ODR ^= GPIO_Pin_8;
+			break;
+		}
+
+		case LED_CHANNEL_COUNT:
+		default:
+		{
+			break;
+		}
+	}
+}
 
 /* PUBLIC FUNCTIONS */
 void LED_init(void)
@@ -124,7 +124,7 @@ void LED_run100ms(void)
 			{
 				if(RTOS_getTimeElapsedMilliseconds(LED_data.lastToggleTimestamp) > LED_TOGGLE_PEROD_MS)
 				{
-//					LED_private_toggle(LED_CHANNEL_BLUE);
+					LED_private_toggle(LED_CHANNEL_BLUE);
 					LED_data.lastToggleTimestamp = RTOS_getTimeMilliseconds();
 				}
 				break;
@@ -134,7 +134,7 @@ void LED_run100ms(void)
 			{
 				if(RTOS_getTimeElapsedMilliseconds(LED_data.initTimestamp) > LED_STAY_ON_AFTER_INIT_PERIOD)
 				{
-//					LED_private_setState(LED_CHANNEL_GREEN, false);
+					LED_private_setState(LED_CHANNEL_GREEN, false);
 				}
 				break;
 			}

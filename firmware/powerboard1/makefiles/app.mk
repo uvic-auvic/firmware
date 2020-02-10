@@ -12,8 +12,6 @@ $(OUTPUT_DIR)/obj/app/UARTv2.o \
 $(OUTPUT_DIR)/obj/app/UARTv2_componentSpecific.o \
 $(OUTPUT_DIR)/obj/app/messageHandler.o \
 $(OUTPUT_DIR)/obj/app/messageHandler_componentSpecific.o \
-# $(OUTPUT_DIR)/obj/app/UART.o \
-# $(OUTPUT_DIR)/obj/app/UART_componentSpecific.o \
 
 APP_C_DEPS += $(APP_OBJS:%.o=%.d)
 

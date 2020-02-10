@@ -45,7 +45,7 @@ typedef struct
 
 /* PRIVATE DATA */
 static UART_data_S UART_data;
-extern UART_config_S UART_config;
+extern const UART_config_S UART_config;
 
 /* PRIVATE FUNCTIONS DECLARATION */
 static void UART_private_configureGPIO(void);
@@ -74,7 +74,7 @@ static void UART_private_configureGPIO(void)
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
 	GPIO_Init(UART_config.HWConfig->GPIOPort, &GPIO_InitStructure);
 
-	// Attach GPIO AF to UART. This section needs to change if UART6 needs to be used
+	// Attach GPIO AF to UART
 	GPIO_PinAFConfig(UART_config.HWConfig->GPIOPort, UART_config.HWConfig->rxPin, UART_config.HWConfig->AFNumber);
 	GPIO_PinAFConfig(UART_config.HWConfig->GPIOPort, UART_config.HWConfig->txPin, UART_config.HWConfig->AFNumber);
 }
@@ -182,12 +182,13 @@ static void UART_private_run(void)
 		uint32_t nextRun_ms = 0xFFFFFFFFU;
 		const uint32_t ticks = nextRun_ms == 0xFFFFFFFFU ? portMAX_DELAY : pdMS_TO_TICKS(nextRun_ms);
 		ulTaskNotifyTake(pdFALSE, ticks);
-
-		if(UART_data.RXBufferToProcess < UART_RX_BUFFER_COUNT)
+		
+		// RX
+		if(UART_data.RXBufferToProcess < UART_RX_BUFFER_COUNT) // This variable will get set by the DMA IRQ when data is ready
 		{
 			// Copy RXBufferToProcess so that it can be safely changed by the DMA IRQ
 			const UART_RXBuffer_E RXBufferToProcess = UART_data.RXBufferToProcess;
-			UART_data.RXBufferToProcess = UART_RX_BUFFER_COUNT; // Reset this so that the DMA IRQ can set it again
+			UART_data.RXBufferToProcess = UART_RX_BUFFER_COUNT; // Reset this to indicate that the new data has been acknowledged and it is safe for the DMA IRQ to change this variable
 
 			// Copy the data in the DMA buffer so that the buffer can be safely used the DMA peripheral
 			UARTProtocol_protocol_S dataToProcess;
@@ -204,6 +205,7 @@ static void UART_private_run(void)
 			}
 		}
 
+		// TX
 		uint8_t dataToSend[UART_TX_BUFFER_LENGTH];
 		const uint8_t dataLength = circBuffer2D_pop(CIRCBUFFER2D_CHANNEL_UART_TX, dataToSend);
 		if(dataLength != 0U)
@@ -261,26 +263,6 @@ extern void UART_init()
 					  &UART_data.taskHandle);      /* Used to pass out the created task's handle. */
 }
 
-
-/*
- * ERROR CODE:
- * -1 = String length is not 1 or greater
- * -2 = OutputBuffer will overflow. Wait some time and retry
- * 1  = Added to buffer successfully
- */
-extern bool UART_write(char const * const data)
-{
-//	return UART_writeLen((uint8_t const * const)data, strnlen(data, UART_TX_BUFFER_SIZE));
-	return false;
-}
-
-extern bool UART_writeLen(uint8_t const * const data, const uint8_t dataLength)
-{
-	bool ret = false;
-
-	return ret;
-}
-
 /* INTERRUPT HANDLER */
 
 /* DMA Interrupt Handler */
@@ -298,7 +280,9 @@ void DMA1_CH2_3_DMA2_CH1_2_IRQHandler(void)
 				// F0 does not turn off the DMA channel when the Transfer is completed so turn it off before changing the registers
 				DMA_Cmd(UART_config.HWConfig->DMAChannelRX, DISABLE);
 
+				// Program the length of data to be expected
 				UART_config.HWConfig->DMAChannelRX->CNDTR = UART_data.RXBuffer[UART_data.RXBufferBeingBuffered].header.length + sizeof(UART_data.RXBuffer[0U].data.crc);
+				// Change the address to write the new data to
 				UART_config.HWConfig->DMAChannelRX->CMAR = (uint32_t)&UART_data.RXBuffer[UART_data.RXBufferBeingBuffered].data.crc;
 				UART_data.RXIRQState = UART_RX_IRQ_STATE_RECEIVING_PAYLOAD;
 

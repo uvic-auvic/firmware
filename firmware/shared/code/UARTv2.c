@@ -165,12 +165,12 @@ static void UART_private_configureUARTPeriph(void)
 	USART_InitStruct.USART_StopBits = USART_StopBits_1;	// we want 1 stop bit (standard)
 	USART_InitStruct.USART_Parity = USART_Parity_No;// we don't want a parity bit (standard)
 	USART_InitStruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None; // we don't want flow control (standard)
-	USART_InitStruct.USART_Mode = USART_Mode_Tx | USART_Mode_Rx; // we want to enable the transmitter and the receiver
+	USART_InitStruct.USART_Mode = USART_Mode_Rx; // Just enable receiver for now
 
 	// Writes the setting above into the UART configuration registers
 	USART_Init(UART_config.HWConfig->UARTPeriph, &USART_InitStruct);
 
-	USART_DMACmd(UART_config.HWConfig->UARTPeriph, USART_DMAReq_Rx | USART_DMAReq_Tx, ENABLE);
+	USART_DMACmd(UART_config.HWConfig->UARTPeriph, USART_DMAReq_Rx, ENABLE);
 
 	USART_Cmd(UART_config.HWConfig->UARTPeriph, ENABLE);
 }
@@ -188,15 +188,15 @@ static void UART_private_run(void)
 		{
 			// Copy RXBufferToProcess so that it can be safely changed by the DMA IRQ
 			const UART_RXBuffer_E RXBufferToProcess = UART_data.RXBufferToProcess;
-			UART_data.RXBufferToProcess = UART_RX_BUFFER_COUNT; // Reset this to indicate that the new data has been acknowledged and it is safe for the DMA IRQ to change this variable
 
 			// Copy the data in the DMA buffer so that the buffer can be safely used the DMA peripheral
 			UARTProtocol_protocol_S dataToProcess;
 			const uint16_t sizeToCopy = sizeof(UART_data.RXBuffer[0U].header) + sizeof(UART_data.RXBuffer[0U].data.crc) + UART_data.RXBuffer[RXBufferToProcess].header.length;
 			memcpy(&dataToProcess, (const uint8_t *)&UART_data.RXBuffer[RXBufferToProcess], sizeToCopy);
 
-			// Verify CRC (do later)
+			UART_data.RXBufferToProcess = UART_RX_BUFFER_COUNT; // Reset this to indicate that the new data has been acknowledged and it is safe for the DMA IRQ to change this variable
 
+			// Verify CRC (do later)
 
 			// Send callback
 			if(UART_config.receiveCallback != NULL)
@@ -208,7 +208,7 @@ static void UART_private_run(void)
 		// TX
 		uint8_t dataToSend[UART_TX_BUFFER_LENGTH];
 		const uint8_t dataLength = circBuffer2D_pop(CIRCBUFFER2D_CHANNEL_UART_TX, dataToSend);
-		if(dataLength != 0U)
+		if(dataLength > 0U)
 		{
 			// New data available to send. Check if DMA is busy
 			if((DMA_GetCurrDataCounter(UART_config.HWConfig->DMAChannelTX) == 0U) && ((UART_config.HWConfig->DMAChannelTX->CCR & DMA_CCR_EN) == DMA_CCR_EN))

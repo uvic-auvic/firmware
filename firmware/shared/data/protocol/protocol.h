@@ -2,12 +2,16 @@
 #define SHARED_DATA_PROTOCOL_H_
 
 #include <stdint.h>
+#include <stdbool.h>
+
+#define PROTOCOL_MAX_MESSAGE_SIZE  (8U)
 
 typedef enum
 {
     protocol_RESERVED = 0U,
     protocol_MID_POLARIS_deviceName,
     protocol_MID_POLARIS_motorSetSpeed,
+    protocol_MID_POLARIS_powerEnable,
 
 
     protocol_MID_MC_deviceName = 21U,
@@ -17,20 +21,30 @@ typedef enum
 
 } protocol_MID_E; // Cannot be higher than 11 bits
 
-typedef struct
+typedef struct __attribute__((packed))
 {
     uint8_t name[8U];
 } protocol_deviceName_S;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
     uint8_t motorSpeed[8U];
 } protocol_motorSetSpeed_S;
+
+typedef struct __attribute__((packed))
+{
+    bool motorPowerEnable;
+    bool systemPowerEnable;
+    bool _5VPowerEnable;
+    bool _9VPowerEnable;
+    bool _12VPowerEnable;
+} protocol_powerEnable_S;
 
 typedef union
 {
     protocol_deviceName_S    POLARIS_deviceName;
     protocol_motorSetSpeed_S POLARIS_motorSetSpeed;
+    protocol_powerEnable_S   POLARIS_powerEnable;
 
     protocol_deviceName_S    MC_deviceName;
 
@@ -39,12 +53,13 @@ typedef union
 
 } protocol_allMessages_U;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
     protocol_MID_E messageID;
     protocol_allMessages_U  message;
 } protocol_message_S;
 
-uint8_t assert[(sizeof(protocol_allMessages_U) > 8U) ? -1 : 1];
+uint8_t assert[(sizeof(protocol_allMessages_U) > PROTOCOL_MAX_MESSAGE_SIZE) ? -1 : 1];
+uint8_t assert[(sizeof(protocol_MID_E) == 1U) ? 1 : -1];
 
 #endif // SHARED_DATA_PROTOCOL_H_

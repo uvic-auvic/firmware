@@ -2,14 +2,16 @@
 APP_OBJS += \
 $(OUTPUT_DIR)/obj/app/RTOS/RTOS.o \
 $(OUTPUT_DIR)/obj/app/RTOS/RTOS_componentSpecific.o \
-$(OUTPUT_DIR)/obj/app/UART.o \
-$(OUTPUT_DIR)/obj/app/UART_componentSpecific.o \
 $(OUTPUT_DIR)/obj/app/circBuffer1D.o \
 $(OUTPUT_DIR)/obj/app/circBuffer1D_componentSpecific.o \
 $(OUTPUT_DIR)/obj/app/circBuffer2D.o \
 $(OUTPUT_DIR)/obj/app/circBuffer2D_componentSpecific.o \
 $(OUTPUT_DIR)/obj/app/LED.o \
 $(OUTPUT_DIR)/obj/app/ADC.o \
+$(OUTPUT_DIR)/obj/app/UARTv2.o \
+$(OUTPUT_DIR)/obj/app/UARTv2_componentSpecific.o \
+$(OUTPUT_DIR)/obj/app/messageHandler.o \
+$(OUTPUT_DIR)/obj/app/messageHandler_componentSpecific.o \
 
 APP_C_DEPS += $(APP_OBJS:%.o=%.d)
 

@@ -9,7 +9,8 @@
 #define MOTORCONTROLLER2_CODE_APP_RTOS_RTOS_H_
 
 #include "RTOS_componentSpecific.h"
-#include <stdint.h>
+#include "FreeRTOS.h"
+#include "task.h"
 
 #define RTOS_TASK_1000MS_PRIORITY	(tskIDLE_PRIORITY + 1U)
 #define RTOS_TASK_100MS_PRIORITY	(RTOS_TASK_1000MS_PRIORITY + 1U)

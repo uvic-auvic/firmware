@@ -55,6 +55,10 @@
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="4"/>
 </listAttribute>
+<listAttribute key="org.eclipse.debug.ui.favoriteGroups">
+<listEntry value="org.eclipse.debug.ui.launchGroup.debug"/>
+<listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
+</listAttribute>
 <stringAttribute key="org.eclipse.dsf.launch.MEMORY_BLOCKS" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;memoryBlockExpressionList context=&quot;reserved-for-future-use&quot;&gt;&#13;&#10;&lt;gdbmemoryBlockExpression address=&quot;536877140&quot; label=&quot;ADC_data.rawData&quot;/&gt;&#13;&#10;&lt;/memoryBlockExpressionList&gt;&#13;&#10;"/>
 <stringAttribute key="process_factory_id" value="fr.ac6.mcu.debug.launching.MCUGdbProcessFactory"/>
 </launchConfiguration>

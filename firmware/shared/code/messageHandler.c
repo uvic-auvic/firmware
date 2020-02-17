@@ -56,7 +56,7 @@ void messageHandler_init(void)
 }
 
 void messageHandler_run1ms(void)
-{   
+{
     // RX
     for(messageHandler_RXMessageChannel_E channel = (messageHandler_RXMessageChannel_E)0U; channel < MESSAGE_HANDLER_RX_MESSAGE_CHANNEL_COUNT; channel++)
     {

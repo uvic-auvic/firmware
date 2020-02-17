@@ -13,7 +13,7 @@
 static void UART_receiveCallback(uint8_t const * const receiveData, const uint8_t receiveDataLength);
 static void UART_enablePeripheralsClockCallback(void);
 
-static const UART_HWConfig_S UART_HWConfig = 
+static const UART_HWConfig_S UART_HWConfig =
 {
 	// GPIO
 	.rxPin = GPIO_PinSource10,

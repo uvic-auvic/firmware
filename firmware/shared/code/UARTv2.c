@@ -213,7 +213,7 @@ static void UART_private_run(void)
 		if(dataLength > 0U)
 		{
 			// New data available to send. Check if DMA is busy. Number for data remaining to transfer should be 0 and the DMA channel should be disabled
-			const uint16_t bytesRemaining = DMA_GetCurrDataCounter(UART_config.HWConfig->DMAChannelTX); 
+			const uint16_t bytesRemaining = DMA_GetCurrDataCounter(UART_config.HWConfig->DMAChannelTX);
 			if((bytesRemaining == 0U) && ((UART_config.HWConfig->DMAChannelTX->CCR & DMA_CCR_EN) == 0U))
 			{
 				const uint8_t frameLength = dataLength + sizeof(UART_data.TXBuffer.header) + sizeof(UART_data.TXBuffer.data.crc);
@@ -274,7 +274,7 @@ bool UART_writeLen(const uint8_t * const data, const uint8_t length)
 	{
 		ret = circBuffer2D_push(CIRCBUFFER2D_CHANNEL_UART_TX, data, length);
 
-		vTaskNotifyGiveFromISR(UART_data.taskHandle, NULL);
+		xTaskNotifyGive(UART_data.taskHandle);
 	}
 
 	return ret;

@@ -25,3 +25,6 @@ Note: The `-C firmware` argument is required since the main makefile is in a sub
 
 ![auvic-firmware-build](https://github.com/uvic-auvic/firmware/workflows/auvic-firmware-build/badge.svg)
 
+## Documentation
+Checkout the [wiki](https://github.com/uvic-auvic/firmware/wiki) for detailed information about the firmware.
+

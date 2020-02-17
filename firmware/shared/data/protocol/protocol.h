@@ -7,7 +7,7 @@
 #define PROTOCOL_MAX_MESSAGE_SIZE  (8U)
 
 // Message ID Definition `protocol_MID_<sending_node>_<message_name>`
-typedef enum
+typedef enum __attribute__((packed))
 {
     protocol_RESERVED = 0U,
     protocol_MID_POLARIS_deviceName,
@@ -80,7 +80,7 @@ typedef struct __attribute__((packed))
 } protocol_message_S;
 
 // Asserts
-uint8_t assert[(sizeof(protocol_allMessages_U) > PROTOCOL_MAX_MESSAGE_SIZE) ? -1 : 1];
-uint8_t assert[(sizeof(protocol_MID_E) == 1U) ? 1 : -1];
+uint8_t assert_protocol_maxMessageSize[(sizeof(protocol_allMessages_U) > PROTOCOL_MAX_MESSAGE_SIZE) ? -1 : 1];
+uint8_t assert_protocol_messageIDSize[(sizeof(protocol_MID_E) == 1U) ? 1 : -1];
 
 #endif // SHARED_DATA_PROTOCOL_H_

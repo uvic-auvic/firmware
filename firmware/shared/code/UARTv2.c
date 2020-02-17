@@ -177,12 +177,14 @@ static void UART_private_configureUARTPeriph(void)
 
 static void UART_private_run(void)
 {
+	uint32_t nextRun_ms = 0xFFFFFFFFU;
+
 	while(1)
 	{
-		uint32_t nextRun_ms = 0xFFFFFFFFU;
 		const uint32_t ticks = nextRun_ms == 0xFFFFFFFFU ? portMAX_DELAY : pdMS_TO_TICKS(nextRun_ms);
 		ulTaskNotifyTake(pdFALSE, ticks);
-		
+		nextRun_ms = 0xFFFFFFFFU;
+
 		// RX
 		if(UART_data.RXBufferToProcess < UART_RX_BUFFER_COUNT) // This variable will get set by the DMA IRQ when data is ready
 		{
@@ -210,11 +212,12 @@ static void UART_private_run(void)
 		const uint8_t dataLength = circBuffer2D_pop(CIRCBUFFER2D_CHANNEL_UART_TX, dataToSend);
 		if(dataLength > 0U)
 		{
-			// New data available to send. Check if DMA is busy
-			if((DMA_GetCurrDataCounter(UART_config.HWConfig->DMAChannelTX) == 0U) && ((UART_config.HWConfig->DMAChannelTX->CCR & DMA_CCR_EN) == DMA_CCR_EN))
+			// New data available to send. Check if DMA is busy. Number for data remaining to transfer should be 0 and the DMA channel should be disabled
+			const uint16_t bytesRemaining = DMA_GetCurrDataCounter(UART_config.HWConfig->DMAChannelTX); 
+			if((bytesRemaining == 0U) && ((UART_config.HWConfig->DMAChannelTX->CCR & DMA_CCR_EN) == 0U))
 			{
 				const uint8_t frameLength = dataLength + sizeof(UART_data.TXBuffer.header) + sizeof(UART_data.TXBuffer.data.crc);
-				DMA_SetCurrDataCounter(UART_config.HWConfig->DMAChannelTX, frameLength);
+				DMA_SetCurrDataCounter(UART_config.HWConfig->DMAChannelTX, frameLength); // Set the new data length to transfer
 
 				UART_data.TXBuffer.header.length = dataLength;
 				UART_data.TXBuffer.data.crc = 0x00U; // TODO: calculate CRC
@@ -225,13 +228,14 @@ static void UART_private_run(void)
 			else
 			{
 				// Set `nextRun`
+				nextRun_ms = 1U; // Try again in 1ms
 			}
 		}
 	}
 }
 
 /* PUBLIC FUNCTIONS */
-extern void UART_init()
+void UART_init()
 {
 	if(UART_config.HWConfig == NULL)
 	{
@@ -261,6 +265,19 @@ extern void UART_init()
 					  NULL,    /* Parameter passed into the task. */
 					  UART_config.taskPriority,/* Priority at which the task is created. */
 					  &UART_data.taskHandle);      /* Used to pass out the created task's handle. */
+}
+
+bool UART_writeLen(const uint8_t * const data, const uint8_t length)
+{
+	bool ret = false;
+	if((data != NULL) && (length != 0U) && (length <= UART_TX_BUFFER_LENGTH))
+	{
+		ret = circBuffer2D_push(CIRCBUFFER2D_CHANNEL_UART_TX, data, length);
+
+		vTaskNotifyGiveFromISR(UART_data.taskHandle, NULL);
+	}
+
+	return ret;
 }
 
 /* INTERRUPT HANDLER */
@@ -314,11 +331,12 @@ void DMA1_CH2_3_DMA2_CH1_2_IRQHandler(void)
 		}
 	}
 
+
 	if(DMA_GetITStatus(DMA1_IT_TC2) == SET) // TX
 	{
 		DMA_ClearITPendingBit(DMA1_IT_TC2);
 
-		// F0 does not turn off the DMA channel when the Transfer is completed so turn it off before changing the registers
+		// F0 does not turn off the DMA channel when the Transfer is completed so turn it off here
 		DMA_Cmd(UART_config.HWConfig->DMAChannelRX, DISABLE);
 
 		BaseType_t higherPriorityTaskWoken = pdFALSE;

@@ -14,6 +14,7 @@
 #include "LED.h"
 #include "ADC.h"
 #include "messageHandler.h"
+#include "sensors.h"
 
 /*
  * If a new FreeRTOS task is needed, create it here so that there is one place where
@@ -27,6 +28,7 @@ void RTOS_init(void)
 	UART_init(); // Creates a RTOS task
 	ADC_init();
 	messageHandler_init();
+	sensors_init();
 }
 
 void RTOS_run1ms(void)
@@ -36,7 +38,7 @@ void RTOS_run1ms(void)
 
 void RTOS_run10ms(void)
 {
-
+	sensors_run10ms();
 }
 
 void RTOS_run100ms(void)

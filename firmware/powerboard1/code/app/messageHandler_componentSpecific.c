@@ -72,7 +72,8 @@ static void messageHandler_componentSpecific_messageReceivedCallback(const messa
 
             case MESSAGE_HANDLER_RX_MESSAGE_CHANNEL_POLARIS_REQUEST:
             {
-                const messageHandler_TXMessageChannel_E TXChannel = messageHandler_componentSpecific_translatePolarisMessageRequest(receivedData->POLARIS_messageRequest.requestedMessage);
+                const messageHandler_TXMessageChannel_E TXChannel = receivedData->POLARIS_messageRequest.requestedMessage;
+                // const messageHandler_TXMessageChannel_E TXChannel = messageHandler_componentSpecific_translatePolarisMessageRequest(receivedData->POLARIS_messageRequest.requestedMessage);
                 messageHandler_dispatchMessage(TXChannel);
 
                 break;

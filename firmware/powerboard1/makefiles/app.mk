@@ -32,7 +32,7 @@ APP_COMPILER_FLAGS := \
 -Werror \
 -Wswitch-enum \
 -Wswitch-default \
-# -Wextra
+-Wextra \
 
 # Each subdirectory must supply rules for building sources it contributes
 $(OUTPUT_DIR)/obj/app/%.o: $(CODE_DIR)/%.c

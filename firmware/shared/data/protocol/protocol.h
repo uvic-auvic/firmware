@@ -68,6 +68,9 @@ typedef struct __attribute__((packed))
 typedef struct __attribute__((packed))
 {
     uint16_t extPressure;
+    uint16_t intPressure;
+    uint16_t intTemperature;
+    uint16_t intHumidity;
 } protocol_PBEnvData_S;
 
 // Link Layer Stuff
@@ -82,7 +85,7 @@ typedef union
 
 
     protocol_deviceName_S    PB_deviceName; // Sent by Power Board, Received by Polaris
-    protocol_PBEnvData_S     PB_endData; // Sent by Power Board, Received by Polaris
+    protocol_PBEnvData_S     PB_envData; // Sent by Power Board, Received by Polaris
 
 } protocol_allMessages_U;
 

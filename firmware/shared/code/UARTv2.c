@@ -165,12 +165,12 @@ static void UART_private_configureUARTPeriph(void)
 	USART_InitStruct.USART_StopBits = USART_StopBits_1;	// we want 1 stop bit (standard)
 	USART_InitStruct.USART_Parity = USART_Parity_No;// we don't want a parity bit (standard)
 	USART_InitStruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None; // we don't want flow control (standard)
-	USART_InitStruct.USART_Mode = USART_Mode_Rx; // Just enable receiver for now
+	USART_InitStruct.USART_Mode = USART_Mode_Rx | USART_Mode_Tx; // Just enable receiver for now
 
 	// Writes the setting above into the UART configuration registers
 	USART_Init(UART_config.HWConfig->UARTPeriph, &USART_InitStruct);
 
-	USART_DMACmd(UART_config.HWConfig->UARTPeriph, USART_DMAReq_Rx, ENABLE);
+	USART_DMACmd(UART_config.HWConfig->UARTPeriph, USART_DMAReq_Rx | USART_DMAReq_Tx, ENABLE);
 
 	USART_Cmd(UART_config.HWConfig->UARTPeriph, ENABLE);
 }
@@ -337,7 +337,7 @@ void DMA1_CH2_3_DMA2_CH1_2_IRQHandler(void)
 		DMA_ClearITPendingBit(DMA1_IT_TC2);
 
 		// F0 does not turn off the DMA channel when the Transfer is completed so turn it off here
-		DMA_Cmd(UART_config.HWConfig->DMAChannelRX, DISABLE);
+		DMA_Cmd(UART_config.HWConfig->DMAChannelTX, DISABLE);
 
 		BaseType_t higherPriorityTaskWoken = pdFALSE;
 		vTaskNotifyGiveFromISR(UART_data.taskHandle, &higherPriorityTaskWoken);

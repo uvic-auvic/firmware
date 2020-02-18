@@ -2,33 +2,68 @@
 import sys
 import time
 import serial
+import threading
 
-def delay(delay):
+def construct_frame(message_ID, message, message_length):
 
-    for i in range(0,delay):
-        pass
+    payload_bytes = message_ID.to_bytes(length=1, byteorder='little')
+    payload_bytes += message.to_bytes(length=message_length, byteorder='little')
+    crc_bytes = 0x00.to_bytes(length=2, byteorder='little')
+    header_bytes = len(payload_bytes).to_bytes(length=1, byteorder='little')
+
+    frame = header_bytes + crc_bytes + payload_bytes
+
+    return frame 
+
+def rx_thread(port):
+
+    while 1:
+        print("In Thread")
+        if(port.in_waiting):
+            header = port.read()
+            crc = port.read(2)
+            payload = port.read(header)
+
+            print("Received: {}{}{}".format(header, crc, payload))
+
+            break
+
 
 def main():
 
     port = serial.Serial("COM3", baudrate=115200, timeout=1)
-    
-    while 1:
-        crc = 0x00.to_bytes(length=2, byteorder='little')
-        messageID = 0x2A.to_bytes(length=1, byteorder='little')
-        data = 0xAABBCCDD.to_bytes(length=4, byteorder='little')
+
+    # rx_thread_handle = threading.Thread(target=rx_thread, args=(port,))
+    # rx_thread_handle.start()
+    frame = construct_frame(4, 0, 1)
+
+    success_count = 0
+    failure_count = 0
+
+    for i in range(0, 100000):
+
+        port.reset_input_buffer()
+        port.reset_output_buffer()
         
-        frame_2 = crc + messageID + data
-        length = len(messageID) + len(data)
-        frame_1 = length.to_bytes(length=1, byteorder='little')
-        
-        frame = frame_1 + frame_2
-        
-        # print("Sending {}".format(frame))
+        print("Sending: {}".format(frame))
         port.write(frame)
-        
-        delay(50000)
-        #time.sleep(0.001)
+
+        header = port.read()
+        crc = port.read(2)
+        payload = port.read(int.from_bytes(header, byteorder='little'))
+
+        print("Received: {}{}{}".format(header, crc, payload))
+
+        if(payload == b')PWR_BRD\x00\x00'):
+            success_count += 1
+        else:
+            failure_count += 1
+
+        print("Success: {} / Failure: {}".format(success_count, failure_count))
+
+        # rx_thread_handle.join()
     
+
     port.close()
 
 if __name__  == "__main__":

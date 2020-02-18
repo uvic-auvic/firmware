@@ -88,7 +88,7 @@ void messageHandler_run1ms(void)
                 messageToSend.messageID = channelConfig->messageID;
 
                 // Add message to the UART queue
-                UART_writeLen((const uint8_t * const)&messageToSend, channelConfig->messageLength);
+                UART_writeLen((const uint8_t * const)&messageToSend, channelConfig->messageLength + sizeof(messageToSend.messageID));
             }
 
             channelData->dispatchRequested = false;

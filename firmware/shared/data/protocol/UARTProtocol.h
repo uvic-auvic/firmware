@@ -25,6 +25,4 @@ typedef struct __attribute__((packed))
 	} data;
 } UARTProtocol_protocol_S;
 
-
-
 #endif // SHARED_DATA_UARTPROTOCOL_H_

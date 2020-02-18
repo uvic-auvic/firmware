@@ -14,17 +14,27 @@
 typedef struct
 {
     protocol_MID_E  messageID;
+    protocol_allMessages_U initValue;
 } messageHandler_RXMessageConfig_S;
 
 typedef struct
 {
+    protocol_MID_E  messageID;
+    uint8_t         messageLength;
+} messageHandler_TXMessageConfig_S;
+
+typedef struct
+{
     messageHandler_RXMessageConfig_S RXMessageConfig[MESSAGE_HANDLER_RX_MESSAGE_CHANNEL_COUNT];
+    messageHandler_TXMessageConfig_S TXMessageConfig[MESSAGE_HANDLER_TX_MESSAGE_CHANNEL_COUNT];
     void (* messageReceivedCallback)(const messageHandler_RXMessageChannel_E channel, const protocol_allMessages_U * const receivedData);
+    void (* messagePopulateCallback)(const messageHandler_TXMessageChannel_E channel, protocol_allMessages_U * const message);
 } messageHandler_config_S;
 
 void messageHandler_init(void);
 void messageHandler_run1ms(void);
 bool messageHandler_getMessage(const messageHandler_RXMessageChannel_E channel, protocol_allMessages_U * const message);
+void messageHandler_dispatchMessage(const messageHandler_TXMessageChannel_E channel);
 void messageHandler_messageReceivedCallback(protocol_message_S const * const receiveData);
 
 #endif /* SHARED_CODE_MESSAGEHANDLER_H_ */

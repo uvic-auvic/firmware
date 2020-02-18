@@ -49,6 +49,7 @@ typedef struct
 } UART_config_S;
 
 
-extern void UART_init();
+void UART_init();
+bool UART_writeLen(const uint8_t * const data, const uint8_t length);
 
 #endif /* SHARED_CODE_UART_H_ */

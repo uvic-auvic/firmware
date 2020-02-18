@@ -11,7 +11,10 @@ BOOTLOADER_COMPILER_FLAGS= \
 -O0 \
 -g3 \
 -Wall \
--Werror
+-Werror \
+-Wswitch-enum \
+-Wswitch-default \
+# -Wextra
 
 INCLUDE_PATH+= \
 -I$(SHARED_CODE_DIR) \

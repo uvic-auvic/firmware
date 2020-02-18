@@ -6,7 +6,10 @@
 
 #define PROTOCOL_MAX_MESSAGE_SIZE  (8U)
 
-// Message ID Definition `protocol_MID_<sending_node>_<message_name>`
+/********************************
+ * MESSAGE ID DEFINITION
+ * ******************************/
+// `protocol_MID_<sending_node>_<message_name>`
 typedef enum __attribute__((packed))
 {
     protocol_RESERVED = 0U,
@@ -23,11 +26,14 @@ typedef enum __attribute__((packed))
 
     protocol_MID_PB_deviceName = 41U,
     protocol_MID_PB_envData, // Environmental Data
+    protocol_MID_PB_battVoltages,
+    protocol_MID_PB_battCurrents,
 
 } protocol_MID_E; // Cannot be higher than 11 bits
 
-// Individual Messages Definitions and any relevant enums
-
+/*******************************************
+ * MESSAGE DEFINITIONS, ENUMS
+ * *****************************************/
 // protocol_MID_MC_deviceName, protocol_MID_PB_deviceName, protocol_MID_POLARIS_deviceName
 typedef struct __attribute__((packed))
 {
@@ -44,10 +50,8 @@ typedef struct __attribute__((packed))
 typedef struct __attribute__((packed))
 {
     bool motorPowerEnable;
-    bool systemPowerEnable;
     bool _5VPowerEnable;
-    bool _9VPowerEnable;
-    bool _12VPowerEnable;
+    bool _12V9VPowerEnable;
 } protocol_powerEnable_S;
 
 // protocol_MID_POLARIS_PBMessageRequest
@@ -55,6 +59,8 @@ typedef enum
 {
     PROTOCOL_PB_MESSAGE_REQUEST_MESSAGE_RID,
     PROTOCOL_PB_MESSAGE_REQUEST_MESSAGE_ENV_DATA,
+    PROTOCOL_PB_MESSAGE_REQUEST_MESSAGE_BATT_VOLTAGES,
+    PROTOCOL_PB_MESSAGE_REQUEST_MESSAGE_BATT_CURRENTS,
 
     PROTOCOL_PB_MESSAGE_REQUEST_MESSAGE_COUNT,
 } protocol_PBMessageRequest_message_E;
@@ -73,7 +79,23 @@ typedef struct __attribute__((packed))
     uint16_t intHumidity;
 } protocol_PBEnvData_S;
 
-// Link Layer Stuff
+// protocol_MID_PB_battVoltages
+typedef struct __attribute__((packed))
+{
+    uint16_t leftBattVoltage; // mV
+    uint16_t rightBattVoltage; // mV
+} protocol_PBBattVoltages_S;
+
+// protocol_MID_PB_battCurrents
+typedef struct
+{
+    uint32_t leftBattCurrent; // mA
+    uint32_t rightBattCurrent; // mA
+} protocol_PBBattCurrents_S;
+
+/********************************
+ * LINK LAYER STUFF
+ * ******************************/
 typedef union
 {
     protocol_deviceName_S    POLARIS_deviceName;  // Sent by: Polaris, Received by: No One
@@ -86,7 +108,8 @@ typedef union
 
     protocol_deviceName_S    PB_deviceName; // Sent by Power Board, Received by Polaris
     protocol_PBEnvData_S     PB_envData; // Sent by Power Board, Received by Polaris
-
+    protocol_PBBattVoltages_S PB_battVoltages; // Sent by Power Board, Received by Polaris
+    protocol_PBBattCurrents_S PB_battCurrents; // Sent by Power Board, Received by Polaris
 } protocol_allMessages_U;
 
 typedef struct __attribute__((packed))

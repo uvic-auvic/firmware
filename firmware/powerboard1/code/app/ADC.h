@@ -7,6 +7,8 @@
 
 #include <stdint.h>
 
+#define ADC_TO_PIN_VOLTAGE (3.3/4095)
+
 typedef enum
 {
     ADC_CHANNEL_WATER_SENSOR,

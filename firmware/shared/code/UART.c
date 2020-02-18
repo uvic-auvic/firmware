@@ -4,6 +4,7 @@
 
 #include "UART.h"
 
+#include "utils.h"
 #include <stdbool.h>
 #include <string.h>
 #include "utils.h"
@@ -160,6 +161,7 @@ extern void UART_init()
 extern bool UART_write(char const * const data)
 {
 //	return UART_writeLen((uint8_t const * const)data, strnlen(data, UART_TX_BUFFER_SIZE));
+	UNUSED(data);
 	return false;
 }
 

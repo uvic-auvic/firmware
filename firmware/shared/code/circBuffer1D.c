@@ -7,6 +7,7 @@
 
 #include "circBuffer1D.h"
 #include <stdlib.h>
+#include "utils.h"
 
 typedef struct
 {
@@ -124,5 +125,8 @@ bool circBuffer1D_push(const circBuffer1D_channel_E channel, const uint8_t * con
 
 uint8_t circBuffer1D_pop(const circBuffer1D_channel_E channel, uint8_t * const dataToReturn)
 {
+	UNUSED(channel);
+	UNUSED(dataToReturn);
+
 	return 0U;
 }

@@ -10,6 +10,7 @@
 typedef enum __attribute__((packed))
 {
     protocol_RESERVED = 0U,
+
     protocol_MID_POLARIS_deviceName,
     protocol_MID_POLARIS_motorSetSpeed,
     protocol_MID_POLARIS_powerEnable,
@@ -21,21 +22,25 @@ typedef enum __attribute__((packed))
     
 
     protocol_MID_PB_deviceName = 41U,
+    protocol_MID_PB_envData, // Environmental Data
 
 } protocol_MID_E; // Cannot be higher than 11 bits
 
-
 // Individual Messages Definitions and any relevant enums
+
+// protocol_MID_MC_deviceName, protocol_MID_PB_deviceName, protocol_MID_POLARIS_deviceName
 typedef struct __attribute__((packed))
 {
     uint8_t name[8U];
 } protocol_deviceName_S;
 
+// protocol_MID_POLARIS_motorSetSpeed
 typedef struct __attribute__((packed))
 {
     uint8_t motorSpeed[8U];
 } protocol_motorSetSpeed_S;
 
+// protocol_MID_POLARIS_powerEnable
 typedef struct __attribute__((packed))
 {
     bool motorPowerEnable;
@@ -45,10 +50,11 @@ typedef struct __attribute__((packed))
     bool _12VPowerEnable;
 } protocol_powerEnable_S;
 
+// protocol_MID_POLARIS_PBMessageRequest
 typedef enum
 {
     PROTOCOL_PB_MESSAGE_REQUEST_MESSAGE_RID,
-    PROTOCOL_PB_MESSAGE_REQUEST_MESSAGE_EXT_PRESSURE,
+    PROTOCOL_PB_MESSAGE_REQUEST_MESSAGE_ENV_DATA,
 
     PROTOCOL_PB_MESSAGE_REQUEST_MESSAGE_COUNT,
 } protocol_PBMessageRequest_message_E;
@@ -57,6 +63,12 @@ typedef struct __attribute__((packed))
 {
     protocol_PBMessageRequest_message_E requestedMessage;
 } protocol_PBMessageRequest_S;
+
+// protocol_MID_PB_envData
+typedef struct __attribute__((packed))
+{
+    uint16_t extPressure;
+} protocol_PBEnvData_S;
 
 // Link Layer Stuff
 typedef union
@@ -69,7 +81,8 @@ typedef union
     protocol_deviceName_S    MC_deviceName; // Sent by Motor Controller, Received by Polaris
 
 
-    protocol_deviceName_S    PB_deviceName; // Sent by Power Board, Receiver by Polaris
+    protocol_deviceName_S    PB_deviceName; // Sent by Power Board, Received by Polaris
+    protocol_PBEnvData_S     PB_endData; // Sent by Power Board, Received by Polaris
 
 } protocol_allMessages_U;
 

@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "stm32f0xx.h"
+#include "sensors.h"
 
 static void messageHandler_componentSpecific_messageReceivedCallback(const messageHandler_RXMessageChannel_E channel, const protocol_allMessages_U * const receivedData);
 static void messageHandler_componentSpecific_messagePopulateCallback(const messageHandler_TXMessageChannel_E channel, protocol_allMessages_U * const message);
@@ -48,6 +49,11 @@ const messageHandler_config_S messageHandler_config =
             .messageID = protocol_MID_PB_deviceName,
             .messageLength = sizeof(protocol_deviceName_S),
         },
+        [MESSAGE_HANDLER_TX_MESSAGE_CHANNEL_ENV_DATA] =
+        {
+            .messageID = protocol_MID_PB_envData,
+            .messageLength = sizeof(protocol_PBEnvData_S),
+        }
     },
     .messageReceivedCallback = messageHandler_componentSpecific_messageReceivedCallback,
     .messagePopulateCallback = messageHandler_componentSpecific_messagePopulateCallback,
@@ -66,7 +72,7 @@ static void messageHandler_componentSpecific_messageReceivedCallback(const messa
 
             case MESSAGE_HANDLER_RX_MESSAGE_CHANNEL_POLARIS_REQUEST:
             {
-                const messageHandler_TXMessageChannel_E TXChannel = receivedData->POLARIS_messageRequest.requestedMessage;
+                const messageHandler_TXMessageChannel_E TXChannel = messageHandler_componentSpecific_translatePolarisMessageRequest(receivedData->POLARIS_messageRequest.requestedMessage);
                 messageHandler_dispatchMessage(TXChannel);
 
                 break;
@@ -89,8 +95,14 @@ static void messageHandler_componentSpecific_messagePopulateCallback(const messa
         case MESSAGE_HANDLER_TX_MESSAGE_CHANNEL_RID:
         {
             memset(message, 0U, sizeof(*message));
-            memcpy(message, "PWR_BRD", 7U);
+            memcpy(message->PB_deviceName.name, "PWR_BRD", 7U);
 
+            break;
+        }
+
+        case MESSAGE_HANDLER_TX_MESSAGE_CHANNEL_ENV_DATA:
+        {
+            message->PB_endData.extPressure = sensors_getExternalPressure();
             break;
         }
 
@@ -113,9 +125,9 @@ static inline messageHandler_TXMessageChannel_E messageHandler_componentSpecific
             break;
         }
 
-        case PROTOCOL_PB_MESSAGE_REQUEST_MESSAGE_EXT_PRESSURE:
+        case PROTOCOL_PB_MESSAGE_REQUEST_MESSAGE_ENV_DATA:
         {
-
+            ret = MESSAGE_HANDLER_TX_MESSAGE_CHANNEL_ENV_DATA;
             break;
         }
 

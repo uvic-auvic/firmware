@@ -12,6 +12,7 @@
 #include "messageHandler.h"
 #include "protocol.h"
 #include "ADC.h"
+#include "RTOS.h"
 
 #define SYSTEM_POWER_GPIO		(GPIO_Pin_11)
 #define MOTOR_POWER_GPIO		(GPIO_Pin_12)
@@ -21,11 +22,21 @@
 #define ADC_VALUE_TO_BAT_VOLTAGE(x)	((((10090U * 33) / 10U) * (x)) / 4095U) //mV
 #define ADC_VALUE_TO_CURRENT(x)	((121000U * (x)) / 4095U) //121000mA of current when pin is at 3.3V
 
+#define DELAY_BEFORE_POWER_ON_MS   (2000U)
+
+typedef enum
+{
+    POWER_MANAGEMENT_STATE_INIT,
+    POWER_MANAGEMENT_STATE_RUN,
+} powerManagement_state_E;
+
 typedef struct
 {
     uint32_t currents[POWER_MANAGEMENT_CHANNEL_COUNT];
     uint32_t batteryCurrents[POWER_MANAGEMENT_BATTERY_CHANNEL_COUNT];
     uint32_t batteryVoltages[POWER_MANAGEMENT_BATTERY_CHANNEL_COUNT];
+    powerManagement_state_E state;
+    uint32_t initTimestamp;
 } powerManagement_data_S;
 
 static powerManagement_data_S powerManagement_data;
@@ -45,22 +56,47 @@ void powerManagement_init(void)
 
 	GPIO_InitStruct.GPIO_Pin = (_12V_9V_GPIO | _5V_GPIO);
 	GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+    powerManagement_data.initTimestamp = RTOS_getTimeMilliseconds();
 }
 
 void powerManagement_run100ms(void)
 {
-    protocol_allMessages_U message;
-    messageHandler_getMessage(MESSAGE_HANDLER_RX_MESSAGE_CHANNEL_POWER_ENABLE, &message);
+    switch(powerManagement_data.state)
+    {
+        case POWER_MANAGEMENT_STATE_INIT:
+        {
+            if(RTOS_getTimeElapsedMilliseconds(powerManagement_data.initTimestamp) > DELAY_BEFORE_POWER_ON_MS)
+            {
+                // Turn on system power by default
+                powerManagement_setState(POWER_MANAGEMENT_CHANNEL_SYSTEM, true);
 
-    powerManagement_data.batteryVoltages[POWER_MANAGEMENT_BATTERY_CHANNEL_LEFT] = ADC_VALUE_TO_BAT_VOLTAGE(ADC_getChannelData(ADC_CHANNEL_LEFT_BATT_VOLTAGE));
-    powerManagement_data.batteryVoltages[POWER_MANAGEMENT_BATTERY_CHANNEL_RIGHT] = ADC_VALUE_TO_BAT_VOLTAGE(ADC_getChannelData(ADC_CHANNEL_RIGHT_BATT_VOLTAGE));
+                powerManagement_data.state = POWER_MANAGEMENT_STATE_RUN;
+            }
+            break;
+        }
+        case POWER_MANAGEMENT_STATE_RUN:
+        {
+            protocol_allMessages_U message;
+            messageHandler_getMessage(MESSAGE_HANDLER_RX_MESSAGE_CHANNEL_POWER_ENABLE, &message);
 
-    powerManagement_data.batteryCurrents[POWER_MANAGEMENT_BATTERY_CHANNEL_LEFT] = ADC_VALUE_TO_CURRENT(ADC_getChannelData(ADC_CHANNEL_LEFT_BATT_CURRENT));
-    powerManagement_data.batteryCurrents[POWER_MANAGEMENT_BATTERY_CHANNEL_RIGHT] = ADC_VALUE_TO_CURRENT(ADC_getChannelData(ADC_CHANNEL_RIGHT_BATT_CURRENT));
+            powerManagement_data.batteryVoltages[POWER_MANAGEMENT_BATTERY_CHANNEL_LEFT] = ADC_VALUE_TO_BAT_VOLTAGE(ADC_getChannelData(ADC_CHANNEL_LEFT_BATT_VOLTAGE));
+            powerManagement_data.batteryVoltages[POWER_MANAGEMENT_BATTERY_CHANNEL_RIGHT] = ADC_VALUE_TO_BAT_VOLTAGE(ADC_getChannelData(ADC_CHANNEL_RIGHT_BATT_VOLTAGE));
 
-    powerManagement_setState(POWER_MANAGEMENT_CHANNEL_MOTOR, message.POLARIS_powerEnable.motorPowerEnable);
-    powerManagement_setState(POWER_MANAGEMENT_CHANNEL_5V, message.POLARIS_powerEnable._5VPowerEnable);
-    powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V_9V, message.POLARIS_powerEnable._12V9VPowerEnable);
+            powerManagement_data.batteryCurrents[POWER_MANAGEMENT_BATTERY_CHANNEL_LEFT] = ADC_VALUE_TO_CURRENT(ADC_getChannelData(ADC_CHANNEL_LEFT_BATT_CURRENT));
+            powerManagement_data.batteryCurrents[POWER_MANAGEMENT_BATTERY_CHANNEL_RIGHT] = ADC_VALUE_TO_CURRENT(ADC_getChannelData(ADC_CHANNEL_RIGHT_BATT_CURRENT));
+
+            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_MOTOR, message.POLARIS_powerEnable.motorPowerEnable);
+            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_5V, message.POLARIS_powerEnable._5VPowerEnable);
+            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V_9V, message.POLARIS_powerEnable._12V9VPowerEnable);
+
+            break;
+        }
+        default:
+        {
+
+        }
+    }
 }
 
 void powerManagement_setState(const powerManagement_channel_E channel, const bool newState)

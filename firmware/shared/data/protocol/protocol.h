@@ -22,7 +22,7 @@ typedef enum __attribute__((packed))
 
 
     protocol_MID_MC_deviceName = 21U,
-    
+
 
     protocol_MID_PB_deviceName = 41U,
     protocol_MID_PB_envData, // Environmental Data
@@ -55,7 +55,7 @@ typedef struct __attribute__((packed))
 } protocol_powerEnable_S;
 
 // protocol_MID_POLARIS_PBMessageRequest
-typedef enum
+typedef enum __attribute__((packed))
 {
     PROTOCOL_PB_MESSAGE_REQUEST_MESSAGE_RID,
     PROTOCOL_PB_MESSAGE_REQUEST_MESSAGE_ENV_DATA,
@@ -87,7 +87,7 @@ typedef struct __attribute__((packed))
 } protocol_PBBattVoltages_S;
 
 // protocol_MID_PB_battCurrents
-typedef struct
+typedef struct __attribute__((packed))
 {
     uint32_t leftBattCurrent; // mA
     uint32_t rightBattCurrent; // mA

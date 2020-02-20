@@ -99,38 +99,42 @@ static void messageHandler_componentSpecific_messageReceivedCallback(const messa
 
 static void messageHandler_componentSpecific_messagePopulateCallback(const messageHandler_TXMessageChannel_E channel, protocol_allMessages_U * const message)
 {
-    switch(channel)
+    if(message != NULL)
     {
-        case MESSAGE_HANDLER_TX_MESSAGE_CHANNEL_RID:
+        switch(channel)
         {
-            memset(message, 0U, sizeof(*message));
-            memcpy(message->PB_deviceName.name, "PWR_BRD", 7U);
+            case MESSAGE_HANDLER_TX_MESSAGE_CHANNEL_RID:
+            {
+                memset(message, 0U, sizeof(*message));
+                memcpy(message->PB_deviceName.name, "PWR_BRD", 7U);
 
-            break;
-        }
+                break;
+            }
+            case MESSAGE_HANDLER_TX_MESSAGE_CHANNEL_ENV_DATA:
+            {
+                const uint16_t extPressure = sensors_getExternalPressure();
+                memcpy(&message->PB_envData.extPressure, &extPressure, sizeof(extPressure));
 
-        case MESSAGE_HANDLER_TX_MESSAGE_CHANNEL_ENV_DATA:
-        {
-            message->PB_envData.extPressure = sensors_getExternalPressure();
-            break;
-        }
+                break;
+            }
 
-        case MESSAGE_HANDLER_TX_MESSAGE_CHANNEL_BATT_VOLTAGES:
-        {
-            message->PB_battVoltages.leftBattVoltage = powerManagement_getBatteryVoltage_mV(POWER_MANAGEMENT_BATTERY_CHANNEL_LEFT);
-            message->PB_battVoltages.rightBattVoltage = powerManagement_getBatteryVoltage_mV(POWER_MANAGEMENT_BATTERY_CHANNEL_RIGHT);
-            break;
-        }
-        case MESSAGE_HANDLER_TX_MESSAGE_CHANNEL_BATT_CURRENTS:
-        {
-            message->PB_battCurrents.leftBattCurrent = powerManagement_getBatteryCurrent_mA(POWER_MANAGEMENT_BATTERY_CHANNEL_LEFT);
-            message->PB_battCurrents.rightBattCurrent = powerManagement_getBatteryCurrent_mA(POWER_MANAGEMENT_BATTERY_CHANNEL_RIGHT);
-            break;
-        }
-        case MESSAGE_HANDLER_TX_MESSAGE_CHANNEL_COUNT:
-        default:
-        {
-            break;
+            case MESSAGE_HANDLER_TX_MESSAGE_CHANNEL_BATT_VOLTAGES:
+            {
+                message->PB_battVoltages.leftBattVoltage = powerManagement_getBatteryVoltage_mV(POWER_MANAGEMENT_BATTERY_CHANNEL_LEFT);
+                message->PB_battVoltages.rightBattVoltage = powerManagement_getBatteryVoltage_mV(POWER_MANAGEMENT_BATTERY_CHANNEL_RIGHT);
+                break;
+            }
+            case MESSAGE_HANDLER_TX_MESSAGE_CHANNEL_BATT_CURRENTS:
+            {
+                message->PB_battCurrents.leftBattCurrent = powerManagement_getBatteryCurrent_mA(POWER_MANAGEMENT_BATTERY_CHANNEL_LEFT);
+                message->PB_battCurrents.rightBattCurrent = powerManagement_getBatteryCurrent_mA(POWER_MANAGEMENT_BATTERY_CHANNEL_RIGHT);
+                break;
+            }
+            case MESSAGE_HANDLER_TX_MESSAGE_CHANNEL_COUNT:
+            default:
+            {
+                break;
+            }
         }
     }
 }

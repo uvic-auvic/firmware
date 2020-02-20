@@ -19,9 +19,9 @@
 /* TYPEDEFS */
 typedef struct
 {
-    bool newDataAvailable;
     protocol_allMessages_U message;
     uint32_t    timeReceived;
+    bool newDataAvailable;
 } messageHandler_RXChannelData_S;
 
 typedef struct
@@ -83,12 +83,14 @@ void messageHandler_run1ms(void)
             if(messageHandler_config.messagePopulateCallback != NULL)
             {
                 // Fill message
-                protocol_message_S messageToSend;
-                messageHandler_config.messagePopulateCallback(channel, &(messageToSend.message));
-                messageToSend.messageID = channelConfig->messageID;
+                protocol_message_S frame;
+                protocol_allMessages_U message; // A separate variable is passed into the function below to get around the memory alignment problem
+                messageHandler_config.messagePopulateCallback(channel, &message);
+                memcpy(&frame.message, &message, sizeof(message));
+                frame.messageID = channelConfig->messageID;
 
                 // Add message to the UART queue
-                UART_writeLen((const uint8_t * const)&messageToSend, channelConfig->messageLength + sizeof(messageToSend.messageID));
+                UART_writeLen((const uint8_t * const)&frame, channelConfig->messageLength + sizeof(frame.messageID));
             }
 
             channelData->dispatchRequested = false;

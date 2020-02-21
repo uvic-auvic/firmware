@@ -12,7 +12,7 @@ Ensure(test1)
 int main(int argc, char **argv)
 {
 
-    TestSuite *suite = create_test_suite();
+    TestSuite *suite = create_named_test_suite("first_mc_test");
 
     add_test(suite, test1);
 

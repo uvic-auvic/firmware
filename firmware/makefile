@@ -29,6 +29,7 @@ clean:
 
 	# Power Board
 	$(MAKE) powerboard1 TARGET=clean
+	$(MAKE) --no-print-directory -C powerboard1/test clean
 
 	# Shared Test
 	$(MAKE) --no-print-directory -C shared/test clean
@@ -44,6 +45,7 @@ help:
 test:
 	$(MAKE) -C shared/test test
 	$(MAKE) -C motorcontroller2/test test
+	$(MAKE) -C powerboard1/test test
 
 sandbox:
 	@echo SANDBOX

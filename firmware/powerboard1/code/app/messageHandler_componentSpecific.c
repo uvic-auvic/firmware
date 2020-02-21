@@ -112,9 +112,7 @@ static void messageHandler_componentSpecific_messagePopulateCallback(const messa
             }
             case MESSAGE_HANDLER_TX_MESSAGE_CHANNEL_ENV_DATA:
             {
-                const uint16_t extPressure = sensors_getExternalPressure();
-                memcpy(&message->PB_envData.extPressure, &extPressure, sizeof(extPressure));
-
+                message->PB_envData.extPressure = sensors_getExternalPressure();
                 break;
             }
 

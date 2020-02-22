@@ -5,8 +5,8 @@
  *      Author: Poorna Chander Kalidas
  */
 
-#ifndef POWERBOARD1_CODE_APP_POWERMANAGEMENT_H_
-#define POWERBOARD1_CODE_APP_POWERMANAGEMENT_H_
+#ifndef POWERMANAGEMENT_H_
+#define POWERMANAGEMENT_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -36,4 +36,4 @@ uint32_t powerManagement_getCurrent_mA(const powerManagement_channel_E channel);
 uint32_t powerManagement_getBatteryCurrent_mA(const powerManagement_batteryChannel_E channel);
 uint16_t powerManagement_getBatteryVoltage_mV(const powerManagement_batteryChannel_E channel);
 
-#endif /* POWERBOARD1_CODE_APP_POWERMANAGEMENT_H_ */
+#endif /* POWERMANAGEMENT_H_ */

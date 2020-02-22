@@ -4,7 +4,7 @@ firmware/motorcontroller2/MOTORCONTROLLER/*
 firmware/powerboard/POWERBOARD/*
 firmware/motorcontroller2/test/MC_TEST/*
 firmware/shared/test/SHARED_TEST/*
-firmware/powerboard/PB_TEST/*
+firmware/powerboard1/test/PB_TEST/*
 
 # Object files
 *.o

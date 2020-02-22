@@ -1,5 +1,6 @@
-#ifndef SHARED_CODE_CIRCBUFFER2D_H_
-#define SHARED_CODE_CIRCBUFFER2D_H_
+
+#ifndef CIRCBUFFER2D_H_
+#define CIRCBUFFER2D_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -19,4 +20,4 @@ bool circBuffer2D_getSpaceAvailable(const circBuffer2D_channel_E channel);
 bool circBuffer2D_push(const circBuffer2D_channel_E channel, uint8_t const * const data, const uint16_t length);
 uint8_t circBuffer2D_pop(const circBuffer2D_channel_E channel, uint8_t * const dataToReturn);
 
-#endif /* SHARED_CODE_CIRCBUFFER1D_H_ */
+#endif /* CIRCBUFFER1D_H_ */

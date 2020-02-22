@@ -1,5 +1,6 @@
-#ifndef SHARED_DATA_PROTOCOL_H_
-#define SHARED_DATA_PROTOCOL_H_
+
+#ifndef PROTOCOL_H_
+#define PROTOCOL_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -70,6 +71,19 @@ typedef struct __attribute__((packed))
     protocol_PBMessageRequest_message_E requestedMessage;
 } protocol_PBMessageRequest_S;
 
+// protocol_MID_POLARIS_MCMessageRequest
+typedef enum __attribute__((packed))
+{
+    PROTOCOL_MC_MESSAGE_REQUEST_MESSAGE_RID,
+
+    PROTOCOL_MC_MESSAGE_REQUEST_MESSAGE_COUNT,
+} protocol_MCMessageRequest_message_E;
+
+typedef struct __attribute__((packed))
+{
+    protocol_MCMessageRequest_message_E requestedMessage;
+} protocol_MCMessageRequest_S;
+
 // protocol_MID_PB_envData
 typedef struct __attribute__((packed))
 {
@@ -101,10 +115,10 @@ typedef union
     protocol_deviceName_S    POLARIS_deviceName;  // Sent by: Polaris, Received by: No One
     protocol_motorSetSpeed_S POLARIS_motorSetSpeed; // Sent by: Polaris, Received by: Motor Controller
     protocol_powerEnable_S   POLARIS_powerEnable; // Sent by: Polaris, Received by: Power Board
-    protocol_PBMessageRequest_S POLARIS_messageRequest; // Sent by: Polaris, Received by: Power Board 
+    protocol_PBMessageRequest_S POLARIS_PBMessageRequest; // Sent by: Polaris, Received by: Power Board 
+    protocol_MCMessageRequest_S POLARIS_MCMessageRequest; // Sent by Polaris, Receiver by: Motor Controller
 
     protocol_deviceName_S    MC_deviceName; // Sent by Motor Controller, Received by Polaris
-
 
     protocol_deviceName_S    PB_deviceName; // Sent by Power Board, Received by Polaris
     protocol_PBEnvData_S     PB_envData; // Sent by Power Board, Received by Polaris
@@ -122,4 +136,4 @@ typedef struct __attribute__((packed))
 uint8_t assert_protocol_maxMessageSize[(sizeof(protocol_allMessages_U) > PROTOCOL_MAX_MESSAGE_SIZE) ? -1 : 1];
 uint8_t assert_protocol_messageIDSize[(sizeof(protocol_MID_E) == 1U) ? 1 : -1];
 
-#endif // SHARED_DATA_PROTOCOL_H_
+#endif // PROTOCOL_H_

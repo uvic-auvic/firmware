@@ -8,8 +8,8 @@ $(OUTPUT_DIR)/obj/app/circBuffer2D.o \
 $(OUTPUT_DIR)/obj/app/circBuffer2D_componentSpecific.o \
 $(OUTPUT_DIR)/obj/app/LED.o \
 $(OUTPUT_DIR)/obj/app/ADC.o \
-$(OUTPUT_DIR)/obj/app/UARTv2.o \
-$(OUTPUT_DIR)/obj/app/UARTv2_componentSpecific.o \
+$(OUTPUT_DIR)/obj/app/UARTF0.o \
+$(OUTPUT_DIR)/obj/app/UARTF0_componentSpecific.o \
 $(OUTPUT_DIR)/obj/app/messageHandler.o \
 $(OUTPUT_DIR)/obj/app/messageHandler_componentSpecific.o \
 $(OUTPUT_DIR)/obj/app/sensors.o \

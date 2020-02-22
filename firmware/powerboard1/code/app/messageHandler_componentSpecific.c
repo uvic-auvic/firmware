@@ -37,7 +37,7 @@ const messageHandler_config_S messageHandler_config =
         [MESSAGE_HANDLER_RX_MESSAGE_CHANNEL_POLARIS_REQUEST] =
         {
             .messageID = protocol_MID_POLARIS_PBMessageRequest,
-            .initValue = {.POLARIS_messageRequest = {0U}},
+            .initValue = {.POLARIS_PBMessageRequest = {.requestedMessage = PROTOCOL_PB_MESSAGE_REQUEST_MESSAGE_COUNT}},
         }
     },
 
@@ -81,7 +81,7 @@ static void messageHandler_componentSpecific_messageReceivedCallback(const messa
 
             case MESSAGE_HANDLER_RX_MESSAGE_CHANNEL_POLARIS_REQUEST:
             {
-                const messageHandler_TXMessageChannel_E TXChannel = messageHandler_componentSpecific_translatePolarisMessageRequest(receivedData->POLARIS_messageRequest.requestedMessage);
+                const messageHandler_TXMessageChannel_E TXChannel = messageHandler_componentSpecific_translatePolarisMessageRequest(receivedData->POLARIS_PBMessageRequest.requestedMessage);
                 messageHandler_dispatchMessage(TXChannel);
 
                 break;

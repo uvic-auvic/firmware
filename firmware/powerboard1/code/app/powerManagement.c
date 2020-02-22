@@ -94,7 +94,7 @@ void powerManagement_run100ms(void)
         }
         default:
         {
-
+            break;
         }
     }
 }

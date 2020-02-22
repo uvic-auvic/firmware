@@ -2,10 +2,10 @@
  * UART.h
  */
 
-#ifndef SHARED_CODE_UART_H_
-#define SHARED_CODE_UART_H_
+#ifndef UART_H_
+#define UART_H_
 
-#include "UARTv2_componentSpecific.h"
+#include "UARTF4_componentSpecific.h"
 
 #if (DEVICE_FAMILY_STM32F4)
 #include "stm32f4xx.h"
@@ -31,8 +31,10 @@ typedef struct
 
 	// DMA
 	DMA_TypeDef *   	 	DMAController;
-	DMA_Channel_TypeDef *   DMAChannelRX;
-	DMA_Channel_TypeDef *   DMAChannelTX;
+	DMA_Stream_TypeDef *    DMAStreamRX;
+	DMA_Stream_TypeDef *    DMAStreamTX;
+	uint32_t				DMAChannelRX; // a value of @ref DMA_channel. Example: DMA_Channel_0
+	uint32_t				DMAChannelTX; // a value of @ref DMA_channel. Example: DMA_Channel_0
 	IRQn_Type				DMARXInterruptNumber;
 	IRQn_Type				DMATXInterruptNumber;
 
@@ -52,4 +54,7 @@ typedef struct
 void UART_init();
 bool UART_writeLen(const uint8_t * const data, const uint8_t length);
 
-#endif /* SHARED_CODE_UART_H_ */
+// Interrupt Handler
+void UART_DMAInterruptHandler(void);
+
+#endif /* UART_H_ */

@@ -5,7 +5,7 @@
 #ifndef UART_H_
 #define UART_H_
 
-#include "UART_componentSpecific.h"
+#include "UARTF0_componentSpecific.h"
 
 #if (DEVICE_FAMILY_STM32F4)
 #include "stm32f4xx.h"
@@ -29,20 +29,30 @@ typedef struct
 	IRQn_Type 		UARTInterruptNumber;
 	uint32_t 		baudRate;
 
+	// DMA
+	DMA_TypeDef *   	 	DMAController;
+	DMA_Channel_TypeDef *   DMAChannelRX;
+	DMA_Channel_TypeDef *   DMAChannelTX;
+	IRQn_Type				DMARXInterruptNumber;
+	IRQn_Type				DMATXInterruptNumber;
+
 	//Common
-	void (* enablePeripheralsClockCallback)(void);
+	void 		(* enablePeripheralsClockCallback)(void);
 
 } UART_HWConfig_S;
 
-typedef const struct
+typedef struct
 {
+	uint32_t	taskPriority;
 	void (* receiveCallback)(uint8_t const * const receiveData, const uint8_t receiveDataLength);
 	const UART_HWConfig_S * const HWConfig;
 } UART_config_S;
 
 
-extern void UART_init();
-extern bool UART_write(char const * const data);
-extern bool UART_writeLen(uint8_t const * const data, const uint8_t dataLength);
+void UART_init();
+bool UART_writeLen(const uint8_t * const data, const uint8_t length);
+
+// Interrupt Handler
+void UART_DMAInterruptHandler(void);
 
 #endif /* UART_H_ */

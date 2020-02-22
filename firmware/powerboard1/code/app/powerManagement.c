@@ -78,7 +78,7 @@ void powerManagement_run100ms(void)
         case POWER_MANAGEMENT_STATE_RUN:
         {
             protocol_allMessages_U message;
-            messageHandler_getMessage(MESSAGE_HANDLER_RX_MESSAGE_CHANNEL_POWER_ENABLE, &message);
+            messageHandler_getMessage(MESSAGE_HANDLER_RX_MESSAGE_CHANNEL_POWER_ENABLE, &message, NULL);
 
             powerManagement_data.batteryVoltages[POWER_MANAGEMENT_BATTERY_CHANNEL_LEFT] = ADC_VALUE_TO_BAT_VOLTAGE(ADC_getChannelData(ADC_CHANNEL_LEFT_BATT_VOLTAGE));
             powerManagement_data.batteryVoltages[POWER_MANAGEMENT_BATTERY_CHANNEL_RIGHT] = ADC_VALUE_TO_BAT_VOLTAGE(ADC_getChannelData(ADC_CHANNEL_RIGHT_BATT_VOLTAGE));

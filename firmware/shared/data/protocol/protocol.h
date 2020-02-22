@@ -23,6 +23,8 @@ typedef enum __attribute__((packed))
 
 
     protocol_MID_MC_deviceName = 21U,
+    protocol_MID_MC_motorRPMLow,
+    protocol_MID_MC_motorRPMHigh,
 
 
     protocol_MID_PB_deviceName = 41U,
@@ -35,6 +37,16 @@ typedef enum __attribute__((packed))
 /*******************************************
  * MESSAGE DEFINITIONS, ENUMS
  * *****************************************/
+
+typedef enum
+{
+    PROTOCOL_NODE_POLARIS,
+    PROTOCOL_NODE_POWER_BOARD,
+    PROTOCOL_NODE_MOTOR_CONTROLLER,
+
+    PROTOCOL_NODE_COUNT,
+} protocol_node_E;
+
 // protocol_MID_MC_deviceName, protocol_MID_PB_deviceName, protocol_MID_POLARIS_deviceName
 typedef struct __attribute__((packed))
 {
@@ -44,8 +56,14 @@ typedef struct __attribute__((packed))
 // protocol_MID_POLARIS_motorSetSpeed
 typedef struct __attribute__((packed))
 {
-    uint8_t motorSpeed[8U];
+    int8_t motorSpeed[8U]; // In percent with a base of 127
 } protocol_motorSetSpeed_S;
+
+// protocol_MID_MC_motorRPMLow, protocol_MID_MC_motorRPMHigh
+typedef struct
+{
+    int16_t motorSpeed[4U]; // Motor 0 to 3 got motorRPMLow, Motor 4 to 7 for motorRPMHigh
+} protocol_motorRPM_S;
 
 // protocol_MID_POLARIS_powerEnable
 typedef struct __attribute__((packed))
@@ -75,6 +93,8 @@ typedef struct __attribute__((packed))
 typedef enum __attribute__((packed))
 {
     PROTOCOL_MC_MESSAGE_REQUEST_MESSAGE_RID,
+    PROTOCOL_MC_MESSAGE_REQUEST_MESSAGE_RPM_LOW,
+    PROTOCOL_MC_MESSAGE_REQUEST_MESSAGE_RPM_HIGH,
 
     PROTOCOL_MC_MESSAGE_REQUEST_MESSAGE_COUNT,
 } protocol_MCMessageRequest_message_E;
@@ -119,6 +139,8 @@ typedef union
     protocol_MCMessageRequest_S POLARIS_MCMessageRequest; // Sent by Polaris, Receiver by: Motor Controller
 
     protocol_deviceName_S    MC_deviceName; // Sent by Motor Controller, Received by Polaris
+    protocol_motorRPM_S      MC_motorRPMLow; // Sent by Motor Controller, Received by Polaris
+    protocol_motorRPM_S      MC_motorRPMHigh; // Sent by Motor Controller, Received by Polaris
 
     protocol_deviceName_S    PB_deviceName; // Sent by Power Board, Received by Polaris
     protocol_PBEnvData_S     PB_envData; // Sent by Power Board, Received by Polaris

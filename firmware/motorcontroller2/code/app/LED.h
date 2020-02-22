@@ -9,8 +9,5 @@
 #define LED_H_
 
 void LED_init(void);
-void LED_run15(void);
-void LED_run14(void);
-void LED_run13(void);
-void LED_run12(void);
+void LED_run100ms(void);
 #endif /* LED_H_ */

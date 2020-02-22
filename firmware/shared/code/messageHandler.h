@@ -33,7 +33,7 @@ typedef struct
 
 void messageHandler_init(void);
 void messageHandler_run1ms(void);
-bool messageHandler_getMessage(const messageHandler_RXMessageChannel_E channel, protocol_allMessages_U * const message);
+bool messageHandler_getMessage(const messageHandler_RXMessageChannel_E channel, protocol_allMessages_U * const message, uint32_t * const timeReceived);
 void messageHandler_dispatchMessage(const messageHandler_TXMessageChannel_E channel);
 void messageHandler_messageReceivedCallback(protocol_message_S const * const receiveData);
 

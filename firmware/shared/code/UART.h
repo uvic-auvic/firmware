@@ -2,8 +2,8 @@
  * UART.h
  */
 
-#ifndef SHARED_CODE_UART_H_
-#define SHARED_CODE_UART_H_
+#ifndef UART_H_
+#define UART_H_
 
 #include "UART_componentSpecific.h"
 
@@ -45,4 +45,4 @@ extern void UART_init();
 extern bool UART_write(char const * const data);
 extern bool UART_writeLen(uint8_t const * const data, const uint8_t dataLength);
 
-#endif /* SHARED_CODE_UART_H_ */
+#endif /* UART_H_ */

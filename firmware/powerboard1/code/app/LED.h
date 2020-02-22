@@ -5,9 +5,9 @@
  *      Author: Poornachander
  */
 
-#ifndef POWERBOARD1_CODE_APP_LED_H_
-#define POWERBOARD1_CODE_APP_LED_H_
+#ifndef APP_LED_H_
+#define APP_LED_H_
 
 void LED_init(void);
 void LED_run100ms(void);
-#endif /* POWERBOARD1_CODE_APP_LED_H_ */
+#endif /* APP_LED_H_ */

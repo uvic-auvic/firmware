@@ -1,5 +1,6 @@
-#ifndef SHARED_DATA_PROTOCOL_H_
-#define SHARED_DATA_PROTOCOL_H_
+
+#ifndef PROTOCOL_H_
+#define PROTOCOL_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -135,4 +136,4 @@ typedef struct __attribute__((packed))
 uint8_t assert_protocol_maxMessageSize[(sizeof(protocol_allMessages_U) > PROTOCOL_MAX_MESSAGE_SIZE) ? -1 : 1];
 uint8_t assert_protocol_messageIDSize[(sizeof(protocol_MID_E) == 1U) ? 1 : -1];
 
-#endif // SHARED_DATA_PROTOCOL_H_
+#endif // PROTOCOL_H_

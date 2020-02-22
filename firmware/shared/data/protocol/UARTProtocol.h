@@ -1,5 +1,5 @@
-#ifndef SHARED_DATA_UARTPROTOCOL_H_
-#define SHARED_DATA_UARTPROTOCOL_H_
+#ifndef UARTPROTOCOL_H_
+#define UARTPROTOCOL_H_
 
 #include <stdint.h>
 
@@ -25,4 +25,4 @@ typedef struct __attribute__((packed))
 	} data;
 } UARTProtocol_protocol_S;
 
-#endif // SHARED_DATA_UARTPROTOCOL_H_
+#endif // UARTPROTOCOL_H_

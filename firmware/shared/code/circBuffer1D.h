@@ -5,8 +5,8 @@
  *      Author: Poornachander
  */
 
-#ifndef SHARED_CODE_CIRCBUFFER1D_H_
-#define SHARED_CODE_CIRCBUFFER1D_H_
+#ifndef CIRCBUFFER1D_H_
+#define CIRCBUFFER1D_H_
 
 #include "circBuffer1D_componentSpecific.h"
 #include <stdbool.h>
@@ -31,4 +31,4 @@ bool circBuffer1D_push(const circBuffer1D_channel_E channel, const uint8_t * con
 uint8_t circBuffer1D_pop(const circBuffer1D_channel_E channel, uint8_t * const dataToReturn);
 
 
-#endif /* SHARED_CODE_CIRCBUFFER1D_H_ */
+#endif /* CIRCBUFFER1D_H_ */

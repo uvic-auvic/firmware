@@ -118,7 +118,6 @@ static void UART_private_initDMARX(void)
 	UART_data.RXIRQState = UART_RX_IRQ_STATE_WAITING_FOR_HEADER;
 
 	UART_config.HWConfig->DMAStreamRX->M0AR = (uint32_t)&UART_data.RXBuffer[UART_data.RXBufferBeingBuffered].header; 
-	// UART_config.HWConfig->DMAStreamRX->CMAR = (uint32_t)&UART_data.RXBuffer[UART_data.RXBufferBeingBuffered].header;
 	UART_config.HWConfig->DMAStreamRX->NDTR = sizeof(UART_data.RXBuffer[0U].header);
 	DMA_Cmd(UART_config.HWConfig->DMAStreamRX, ENABLE);
 }

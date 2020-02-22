@@ -5,8 +5,8 @@
  *      Author: Poorna Chander Kalidas
  */
 
-#ifndef SHARED_CODE_MESSAGEHANDLER_H_
-#define SHARED_CODE_MESSAGEHANDLER_H_
+#ifndef MESSAGEHANDLER_H_
+#define MESSAGEHANDLER_H_
 
 #include "messageHandler_componentSpecific.h"
 #include "protocol.h"
@@ -37,4 +37,4 @@ bool messageHandler_getMessage(const messageHandler_RXMessageChannel_E channel, 
 void messageHandler_dispatchMessage(const messageHandler_TXMessageChannel_E channel);
 void messageHandler_messageReceivedCallback(protocol_message_S const * const receiveData);
 
-#endif /* SHARED_CODE_MESSAGEHANDLER_H_ */
+#endif /* MESSAGEHANDLER_H_ */

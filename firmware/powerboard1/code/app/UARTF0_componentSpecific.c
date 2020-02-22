@@ -7,7 +7,7 @@
 
 #include "utils.h"
 #include "stm32f0xx.h"
-#include "UARTv2.h"
+#include "UARTF0.h"
 #include "RTOS.h"
 #include "messageHandler.h"
 
@@ -60,3 +60,10 @@ static void UART_receiveCallback(uint8_t const * const receiveData, const uint8_
 		messageHandler_messageReceivedCallback((const protocol_message_S * const)receiveData);
 	}
 }
+
+/* DMA Interrupt Handler */
+void DMA1_CH2_3_DMA2_CH1_2_IRQHandler(void)
+{
+	UART_DMAInterruptHandler();
+}
+

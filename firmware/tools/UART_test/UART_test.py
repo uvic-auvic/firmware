@@ -29,18 +29,23 @@ def rx_thread(port):
             break
 
 
+def send_message(port, message_ID, message, message_length):
+    frame = construct_frame(5, 1, 1)
+    port.reset_input_buffer()
+    port.reset_output_buffer()
+
 def main():
 
-    port = serial.Serial("COM3", baudrate=115200, timeout=1)
+    port = serial.Serial("COM3", baudrate=9600, timeout=1)
 
     # rx_thread_handle = threading.Thread(target=rx_thread, args=(port,))
     # rx_thread_handle.start()
-    frame = construct_frame(4, 0, 1)
+    frame = construct_frame(5, 1, 1)
 
     success_count = 0
     failure_count = 0
 
-    for i in range(0, 100000):
+    while(1):
 
         port.reset_input_buffer()
         port.reset_output_buffer()
@@ -54,14 +59,14 @@ def main():
 
         print("Received: {}{}{}".format(header, crc, payload))
 
-        if(payload == b')PWR_BRD\x00\x00'):
+        if(payload == b'\x15MTR_CONT\x00'):
             success_count += 1
         else:
             failure_count += 1
 
         print("Success: {} / Failure: {}".format(success_count, failure_count))
 
-        # rx_thread_handle.join()
+    # rx_thread_handle.join()
     
 
     port.close()

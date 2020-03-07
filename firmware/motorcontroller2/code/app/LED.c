@@ -7,59 +7,99 @@
 
 #include "stm32f4xx.h"
 
+#include <stdbool.h>
+
+typedef enum
+{
+	LED_CHANNEL_RED,
+	LED_CHANNEL_BLUE,
+
+	LED_CHANEL_COUNT,
+} LED_channel_E;
+
+/* PRIVATE FUNCTION DECLARATION */
+static void LED_private_setState(const LED_channel_E channel, const bool state);
+static void LED_private_toggleLED(const LED_channel_E channel);
+
+/* PRIVATE FUNCTION DEFINITION */
+static void LED_private_toggleLED(const LED_channel_E channel)
+{
+	switch(channel)
+	{
+		case LED_CHANNEL_RED:
+		{
+			GPIOA->ODR ^= GPIO_Pin_4;
+			break;
+		}
+		case LED_CHANNEL_BLUE:
+		{
+			GPIOA->ODR ^= GPIO_Pin_5;
+			break;
+		}
+		case LED_CHANEL_COUNT:
+		default:
+		{
+			break;
+		}
+	}
+}
+
+static void LED_private_setState(const LED_channel_E channel, const bool state)
+{
+	switch(channel)
+	{
+		case LED_CHANNEL_RED:
+		{
+			if(state)
+			{
+				GPIOA->BSRRL = GPIO_Pin_4;
+			}
+			else
+			{
+				GPIOA->BSRRH = GPIO_Pin_4;
+			}
+
+			break;
+		}
+		case LED_CHANNEL_BLUE:
+		{
+			if(state)
+			{
+				GPIOA->BSRRL = GPIO_Pin_5;
+			}
+			else
+			{
+				GPIOA->BSRRH = GPIO_Pin_5;
+			}
+
+			break;
+		}
+		case LED_CHANEL_COUNT:
+		default:
+		{
+			break;
+		}
+	}
+}
+
 void LED_init(void)
 {
-#if DEVICE_STM32F413
-	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
-	GPIOB->MODER |= GPIO_MODER_MODER0_0 | GPIO_MODER_MODER14_0;
-#elif DEVICE_STM32F411
-	RCC->AHB1ENR |= RCC_AHB1ENR_GPIODEN;
-	GPIOD->MODER |= GPIO_MODER_MODER15_0 | GPIO_MODER_MODER14_0 | GPIO_MODER_MODER13_0 | GPIO_MODER_MODER12_0;
-#elif DEVICE_PCBA_REV_A
-	// TBD
-#endif
+	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+
+	GPIO_InitTypeDef GPIO_InitStructure;
+
+	//Configure pin PA4(red LED) and pin PA5(blue LED) as output
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4 | GPIO_Pin_5;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+	LED_private_setState(LED_CHANNEL_BLUE, true);
 }
 
-void LED_run15(void)
+void LED_run100ms(void)
 {
-#if DEVICE_STM32F413
-	GPIOB->ODR ^= GPIO_Pin_0;
-#elif DEVICE_STM32F411
-	GPIOD->ODR ^= GPIO_Pin_15;
-#elif DEVICE_PCBA_REV_A
-	// TBD
-#endif
-}
-
-void LED_run14(void)
-{
-#if DEVICE_STM32F413
-	GPIOB->ODR ^= GPIO_Pin_14;
-#elif DEVICE_STM32F411
-	GPIOD->ODR ^= GPIO_Pin_14;
-#elif DEVICE_PCBA_REV_A
-	// TBD
-#endif
-}
-
-void LED_run13(void)
-{
-#if DEVICE_STM32F413
-
-#elif DEVICE_STM32F411
-	GPIOD->ODR ^= GPIO_Pin_13;
-#elif DEVICE_PCBA_REV_A
-	// TBD
-#endif
-}
-
-void LED_run12(void)
-{
-#if DEVICE_STM32F413
-	// Only has 3 LEDs
-#elif DEVICE_STM32F411
-	GPIOD->ODR ^= GPIO_Pin_12;
-#elif DEVICE_PCBA_REV_A
-	// TBD
-#endif
+	LED_private_toggleLED(LED_CHANNEL_RED);
 }

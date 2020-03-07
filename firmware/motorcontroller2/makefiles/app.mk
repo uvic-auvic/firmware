@@ -11,6 +11,9 @@ $(OUTPUT_DIR)/obj/app/circBuffer2D.o \
 $(OUTPUT_DIR)/obj/app/circBuffer2D_componentSpecific.o \
 $(OUTPUT_DIR)/obj/app/messageHandler.o \
 $(OUTPUT_DIR)/obj/app/messageHandler_componentSpecific.o \
+$(OUTPUT_DIR)/obj/app/motorDriver.o \
+$(OUTPUT_DIR)/obj/app/motorRPMFeedback.o \
+$(OUTPUT_DIR)/obj/app/motorInterface.o \
 
 APP_C_DEPS += $(APP_OBJS:%.o=%.d)
 

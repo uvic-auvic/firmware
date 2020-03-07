@@ -54,6 +54,9 @@ firmware/libs/cgreen/build/*
 .vscode/c_cpp_properties.json
 .vscode/settings.json
 
+# Python
+*.pyc
+
 # =========================
 # Operating System Files
 # =========================

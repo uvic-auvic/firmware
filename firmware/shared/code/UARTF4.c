@@ -203,7 +203,7 @@ static void UART_private_run(void)
 
 			UART_data.RXBufferToProcess = UART_RX_BUFFER_COUNT; // Reset this to indicate that the new data has been acknowledged and it is safe for the DMA IRQ to change this variable
 
-			// Verify CRC (do later)
+			// TODO Verify CRC
 
 			// Send callback
 			if(UART_config.receiveCallback != NULL)

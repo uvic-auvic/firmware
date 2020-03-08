@@ -12,7 +12,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include "RTOS.h"
-#include "UART.h"
+#if DEVICE_FAMILY_STM32F4
+#include "UARTF4.h"
+#endif
+#if DEVICE_FAMILY_STM32F0
+#include "UARTF0.h"
+#endif
 
 /* DEFINES */
 

@@ -8,7 +8,7 @@
 #include "RTOS.h"
 
 #include "stm32f0xx.h"
-#include "UART.h"
+#include "UARTF0.h"
 #include "circBuffer1D.h"
 #include "circBuffer2D.h"
 #include "LED.h"

@@ -6,11 +6,10 @@
  */
 
 #include "circBuffer1D.h"
-#include "UART.h"
+#include "UARTF0.h"
 
 extern const circBuffer1D_channelConfig_S circBuffer1D_channelConfig[CIRCBUFFER1D_CHANNEL_COUNT];
 const circBuffer1D_channelConfig_S circBuffer1D_channelConfig[CIRCBUFFER1D_CHANNEL_COUNT] =
 {
-	[CIRCBUFFER1D_CHANNEL_UART_TX] = { .size = UART_TX_BUFFER_SIZE },
-	[CIRCBUFFER1D_CHANNEL_UART_RX] = { .size = UART_RX_BUFFER_LENGTH },
+	[CIRCBUFFER1D_CHANNEL_NULL] = { .size = 0U },
 };

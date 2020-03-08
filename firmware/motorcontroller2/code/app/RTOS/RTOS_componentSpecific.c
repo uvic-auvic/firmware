@@ -10,7 +10,7 @@
 #include "LED.h"
 #include "circBuffer1D.h"
 #include "circBuffer2D.h"
-#include "UART.h"
+#include "UARTF4.h"
 #include "messageHandler.h"
 #include "motorDriver.h"
 #include "motorRPMFeedback.h"

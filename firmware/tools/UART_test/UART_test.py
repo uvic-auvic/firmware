@@ -40,7 +40,7 @@ def main():
 
     # rx_thread_handle = threading.Thread(target=rx_thread, args=(port,))
     # rx_thread_handle.start()
-    frame = construct_frame(5, 1, 1)
+    frame = construct_frame(5, 0, 1)
 
     success_count = 0
     failure_count = 0

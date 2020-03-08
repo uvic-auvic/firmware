@@ -20,11 +20,12 @@ typedef struct {
 	GPIO_TypeDef*	GPIOPort;
 	
 	// I2C
-	
+	I2C_TypeDef*	I2CPeriph;
+	IRQn_Type	I2CInterruptNumber;
+	uint32_t 	baudRate;
+
 	// DMA
 	DMA_TypeDef*	DMAController;
-	
-
 } I2C_HWConfig_S;
 
 typedef enum {
@@ -37,5 +38,10 @@ typedef struct {
 	const I2C_HWConfig_S* const HWConfig;
 } I2C_config_S;
 
+typedef enum {
+	I2C_IDLE = -1,
+	I2C_WRITE = 0,
+	I2C_READ = 1
+} I2C_State;
 
 #endif

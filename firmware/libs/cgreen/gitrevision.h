@@ -1,0 +1,1 @@
+#define GITREVISION "unknown"

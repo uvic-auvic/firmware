@@ -16,7 +16,7 @@ typedef struct
 } circBuffer2D_config_S;
 
 void circBuffer2D_init(void);
-bool circBuffer2D_getSpaceAvailable(const circBuffer2D_channel_E channel);
+uint8_t circBuffer2D_getSpaceAvailable(const circBuffer2D_channel_E channel);
 bool circBuffer2D_push(const circBuffer2D_channel_E channel, uint8_t const * const data, const uint16_t length);
 uint8_t circBuffer2D_pop(const circBuffer2D_channel_E channel, uint8_t * const dataToReturn);
 

@@ -6,6 +6,8 @@
 
 #include "isotp.h"
 #include "RTOS.h"
+#include "protocol.h"
+#include "utils.h"
 
 #define ISOTP_UART_MAX_SIZE	(1000U)
 
@@ -14,7 +16,7 @@ typedef struct
 	IsoTpLink linkHandle;
 	uint8_t RXBuffer[ISOTP_UART_MAX_SIZE];
 	uint8_t TXBuffer[ISOTP_UART_MAX_SIZE];
-	uint8_t lastReceivedData[ISOTP_UART_MAX_SIZE]
+	uint8_t lastReceivedData[ISOTP_UART_MAX_SIZE];
 } ISOTP_UART_data_S;
 
 static ISOTP_UART_data_S ISOTP_UART_data;
@@ -22,7 +24,7 @@ static ISOTP_UART_data_S ISOTP_UART_data;
 void ISOTP_UART_init(void)
 {
 	memset(&ISOTP_UART_data, 0U, sizeof(ISOTP_UART_data));
-	isotp_init_link(&ISOTP_UART_data.linkHandle, , ISOTP_UART_data.TXBuffer, sizeof(ISOTP_UART_data.TXBuffer, ISOTP_UART_data.RXBuffer, sizeof(ISOTP_UART_data.RXBuffer)));
+	isotp_init_link(&ISOTP_UART_data.linkHandle, protocol_MID_MC_ISOTP, ISOTP_UART_data.TXBuffer, sizeof(ISOTP_UART_data.TXBuffer), ISOTP_UART_data.RXBuffer, sizeof(ISOTP_UART_data.RXBuffer));
 }
 
 void ISOTP_UART_run1ms(void)
@@ -37,8 +39,9 @@ void ISOTP_UART_run1ms(void)
 	}
 }
 
-void ISOTP_UART_messageReceivedCallback()
+void ISOTP_UART_messageReceivedCallback(uint8_t * message, const uint8_t length)
 {
+	UNUSED(length);
 	isotp_on_can_message(&ISOTP_UART_data.linkHandle, message, sizeof(message));
 }
 
@@ -50,5 +53,9 @@ uint32_t isotp_user_get_ms(void)
 
 int isotp_user_send_can(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size)
 {
+	UNUSED(arbitration_id);
+	UNUSED(data);
+	UNUSED(size);
 
+	return 0;
 }

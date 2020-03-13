@@ -53,6 +53,7 @@ INCLUDE_PATH+= \
 -I$(CODE_DIR)/RTOS
 
 -include $(SHARED_MAKEFILES)/FreeRTOSlib.mk
+-include $(SHARED_MAKEFILES)/ISOTPLib.mk
 -include STMLib.mk
 -include app.mk
 -include appStartup.mk

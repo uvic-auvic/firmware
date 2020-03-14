@@ -20,7 +20,7 @@ typedef enum
 {
 	UART_RX_IRQ_STATE_WAITING_FOR_HEADER,
 	UART_RX_IRQ_STATE_RECEIVING_PAYLOAD,
-	UART_RX_IRQ_STATE_ERROR_INVALID_HEADER,
+	UART_RX_IRQ_STATE_ERROR,
 } UART_RXIRQState_E;
 
 typedef enum
@@ -240,35 +240,40 @@ static void UART_private_run(void)
 		}
 
 		// RX ERROR HANDLING
-		if(UART_data.RXIRQState == UART_RX_IRQ_STATE_ERROR_INVALID_HEADER)
+		switch(UART_data.RXIRQState)
 		{
-			// Received invalid header. Re-enable receiver. It should wait for a idle line before starting reception
-			USART_DMACmd(UART_config.HWConfig->UARTPeriph, USART_DMAReq_Rx, DISABLE); // Disable DMA Requests
-			UART_config.HWConfig->UARTPeriph->CR1 &= ~USART_CR1_RE; // Turn off receiver
-			DMA_Cmd(UART_config.HWConfig->DMAStreamRX, DISABLE); // Disable SMA channel
-			UART_config.HWConfig->DMAStreamRX->M0AR = (uint32_t)&UART_data.RXBuffer[UART_data.RXBufferBeingBuffered].header;
-			UART_config.HWConfig->DMAStreamRX->NDTR = sizeof(UART_data.RXBuffer[0U].header);
-			UART_data.RXIRQState = UART_RX_IRQ_STATE_WAITING_FOR_HEADER;
-			DMA_Cmd(UART_config.HWConfig->DMAStreamRX, ENABLE);
-			USART_DMACmd(UART_config.HWConfig->UARTPeriph, USART_DMAReq_Rx, ENABLE); // Enable DMA_reqs from UART periph
-			UART_config.HWConfig->UARTPeriph->CR1 |= USART_CR1_RE; // Enable receiver
-		}
-		else if (UART_data.RXIRQState == UART_RX_IRQ_STATE_RECEIVING_PAYLOAD)
-		{
-			if(RTOS_getTimeElapsedMilliseconds(UART_data.timeStartedPayloadReception) >= 2U)
+			default:
+			case UART_RX_IRQ_STATE_ERROR:
 			{
-				DMA_Cmd(UART_config.HWConfig->DMAStreamRX, DISABLE); // Disable DMA
+				// Re-enable receiver. It should wait for a idle line before starting reception
+				DMA_Cmd(UART_config.HWConfig->DMAStreamRX, DISABLE); // Disable DMA channel
 				USART_DMACmd(UART_config.HWConfig->UARTPeriph, USART_DMAReq_Rx, DISABLE); // Disable DMA Requests
 				UART_config.HWConfig->UARTPeriph->CR1 &= ~USART_CR1_RE; // Turn off receiver
-				UART_config.HWConfig->DMAStreamRX->NDTR = sizeof(UART_data.RXBuffer[0U].header); // Set number of expected bytes
+				UART_config.HWConfig->DMAStreamRX->M0AR = (uint32_t)&UART_data.RXBuffer[UART_data.RXBufferBeingBuffered].header;
+				UART_config.HWConfig->DMAStreamRX->NDTR = sizeof(UART_data.RXBuffer[0U].header);
 				UART_data.RXIRQState = UART_RX_IRQ_STATE_WAITING_FOR_HEADER;
-				DMA_Cmd(UART_config.HWConfig->DMAStreamRX, ENABLE); // Enable DMA
-				USART_DMACmd(UART_config.HWConfig->UARTPeriph, USART_DMAReq_Rx, ENABLE); // Enable DMA Requests
-				UART_config.HWConfig->UARTPeriph->CR1 |= USART_CR1_RE; // Turn on receiver
+				DMA_Cmd(UART_config.HWConfig->DMAStreamRX, ENABLE);
+				USART_DMACmd(UART_config.HWConfig->UARTPeriph, USART_DMAReq_Rx, ENABLE); // Enable DMA_reqs from UART periph
+				UART_config.HWConfig->UARTPeriph->CR1 |= USART_CR1_RE; // Enable receiver
+
+				break;
 			}
-			else
+			case UART_RX_IRQ_STATE_RECEIVING_PAYLOAD:
 			{
-				nextRun_ms = 1U;
+				if(RTOS_getTimeElapsedMilliseconds(UART_data.timeStartedPayloadReception) >= 15U)
+				{
+					UART_data.RXIRQState = UART_RX_IRQ_STATE_ERROR;
+					nextRun_ms = 0U;
+				}
+				else
+				{
+					nextRun_ms = 1U;
+				}
+				break;
+			}
+			case UART_RX_IRQ_STATE_WAITING_FOR_HEADER:
+			{
+				break;
 			}
 		}
 	}
@@ -353,7 +358,7 @@ void UART_DMAInterruptHandler(void)
 					USART_DMACmd(UART_config.HWConfig->UARTPeriph, USART_DMAReq_Rx, DISABLE); // Disable DMA Requests
 					UART_config.HWConfig->UARTPeriph->CR1 &= ~USART_CR1_RE; // Turn off receiver
 
-					UART_data.RXIRQState = UART_RX_IRQ_STATE_ERROR_INVALID_HEADER;
+					UART_data.RXIRQState = UART_RX_IRQ_STATE_ERROR;
 				}
 
 				// need to notify the task for watchdog, or to handle error
@@ -386,7 +391,7 @@ void UART_DMAInterruptHandler(void)
 				break;
 			}
 
-			case UART_RX_IRQ_STATE_ERROR_INVALID_HEADER:
+			case UART_RX_IRQ_STATE_ERROR:
 			default:
 			{
 

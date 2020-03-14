@@ -78,6 +78,9 @@ def motors_test_RID(port:serial.Serial, verbose:bool=True):
 
         if verbose:
             print("Success: {},   Failure: {}".format(success_count, failure_count))
+            print("Received: {} {} {}".format(header, crc, payload))
+        
+        time.sleep(0.1) # wait 100ms
     
     if verbose:
         out_str = "Test End:\n"
@@ -92,48 +95,140 @@ def motors_test_RID(port:serial.Serial, verbose:bool=True):
     
     return result
 
-def motors_test_faulty_UART_packets(port:serial.Serial, verbose:bool=True):
+def motors_test_oversized_UART_packet(port:serial.Serial, verbose:bool=True):
 
-    # Test normal tranmission
+    # Test normal tranmission. Just a sanity check to make sure normal operation works before continuing
     if motors_test_RID(port, False) == False:
         if verbose:
-            print("Failed: Test Normal Transmission")
+            print("Test Oversized UART Packet: Failed: Sanity check failed")
         return False
 
-    # Test: Length too long
-    frame = int(20).to_bytes(length=1, byteorder='little') # Send packet with payload of size 20
-    frame += 0x0.to_bytes(length=2, byteorder='little') # crc
-    frame += 0x0.to_bytes(length=20, byteorder='little') # Just zeros for payload
+    port.reset_input_buffer()
 
-    port.write(frame)
+    # Test: Length too long. Send a packet with a length that is greater than what the device can support.
+    for i in range(10):
+        port.reset_output_buffer()
 
-    time.sleep(0.01) # wait 10ms
+        frame = int(20).to_bytes(length=1, byteorder='little') # Send packet with payload of size 20
+        frame += 0x0.to_bytes(length=2, byteorder='little') # crc
+        frame += 0x0.to_bytes(length=20, byteorder='little') # Just zeros for payload
 
-    if motors_test_RID(port, False) == False: # Test that the board still responds after receiveing a bad packet
-        if verbose: print("Failed: Test Length Too Long")
+        port.write(frame)
+
+        time.sleep(0.01) # wait 10ms
+
+        if port.in_waiting != 0:
+            if verbose:
+                print("Test Oversized UART Packet: Failed: Received data when not expected")
+            return False
+
+
+    # Test that the board still responds after receiveing a bad packet
+    if motors_test_RID(port, False) == False:
+        if verbose: print("Test Oversized UART Packet: Failed: Post test comms check")
         return False
 
-    print("Success: Test Fault UART Packets")
+    print("Success: Test Oversized UART Packet")
     return True
 
-########
-# SCRIPT START
-#######
+def motors_test_undersized_UART_packet(port:serial.Serial, verbose:bool=True):
+
+    # Test normal tranmission. Just a sanity check to make sure normal operation works before continuing
+    if motors_test_RID(port, False) == False:
+        if verbose:
+            print("Test Undersized UART Packet: Failed: Sanity check failed")
+        return False
+
+    port.reset_input_buffer()
+
+    # Test: Length too small. Send a packet with a payload length of 0. So the packet only has a CRC
+    for i in range(10):
+        port.reset_output_buffer()
+
+        frame = int(0).to_bytes(length=1, byteorder='little') # Send packet with payload of size 0
+        frame += 0x0.to_bytes(length=2, byteorder='little') # crc
+        # No payload in this one
+
+        port.write(frame)
+
+        time.sleep(0.01) # wait 10ms
+
+        if port.in_waiting != 0:
+            if verbose:
+                print("Test Undersized UART Packet: Failed: Received data when not expected")
+            return False
+
+    # Test that the board still responds after receiveing a bad packet
+    if motors_test_RID(port, False) == False:
+        if verbose: print("Test Undersized UART Packet: Failed: Post test comms check")
+        return False
+
+    print("Success: Test Undersized UART Packet")
+    return True
+
+def motors_test_aborted_UART_packet(port:serial.Serial, verbose:bool=True):
+
+    # Test normal tranmission. Just a sanity check to make sure normal operation works before continuing
+    if motors_test_RID(port, False) == False:
+        if verbose:
+            print("Test Aborted UART Packet: Failed: Sanity check failed")
+        return False
+    
+    port.reset_input_buffer()
+
+    # Test: Simulate a packet transmission being aborted
+    for i in range(10):
+        port.reset_output_buffer()
+
+        frame = serial_lib.construct_frame(5, 0, 1) # Contruct the RID request frame
+        frame = frame[0:-1] # remove the last byte
+
+        port.write(frame)
+
+        time.sleep(0.1) # wait 100ms
+
+        if port.in_waiting != 0:
+            if verbose:
+                print("Test Aborted UART Packet: Failed: Received data when not expected")
+            return False
+
+    # Test that the board still responds after receiveing a bad packet
+    if motors_test_RID(port, False) == False:
+        if verbose: print("Test Aborted UART Packet: Failed: Post test comms check")
+        return False
+
+    print("Success: Test Aborted UART Packet")
+    return True
+
+def test_helper(port:serial.Serial, interation:int=10):
+    success = 0
+    failure = 0
+    for i in range(interation):
+        if motors_test_aborted_UART_packet(port):
+            success += 1
+        else:
+            failure += 1
+        
+        print("Success: {}   Failure: {}   Success Rate: {}".format(success, failure, (success * 100)/(success+failure)))
+
+#######################
+#    SCRIPT START
+#######################
 parser = argparse.ArgumentParser()
 parser.add_argument("port")
 args = parser.parse_args()
 
 port = None
 if args.port:
-    port = serial.Serial(port=args.port, baudrate=9600, timeout=0.5)
+    port = serial.Serial(port=args.port, baudrate=9600, timeout=0.1)
 
 if port is None:
     raise "ERROR"
     quit()
 
-# motors_control_console(port)
-# motors_test_RID(port, verbose=True)
+motors_test_RID(port)
+motors_test_oversized_UART_packet(port)
+motors_test_undersized_UART_packet(port)
+motors_test_aborted_UART_packet(port)
 
-# port.close()
-
-
+port.close()

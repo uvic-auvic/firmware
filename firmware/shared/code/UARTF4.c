@@ -243,8 +243,12 @@ static void UART_private_run(void)
 		if(UART_data.RXIRQState == UART_RX_IRQ_STATE_ERROR_INVALID_HEADER)
 		{
 			// Received invalid header. Re-enable receiver. It should wait for a idle line before starting reception
-			DMA_Cmd(UART_config.HWConfig->DMAStreamRX, DISABLE);
+			USART_DMACmd(UART_config.HWConfig->UARTPeriph, USART_DMAReq_Rx, DISABLE); // Disable DMA Requests
+			UART_config.HWConfig->UARTPeriph->CR1 &= ~USART_CR1_RE; // Turn off receiver
+			DMA_Cmd(UART_config.HWConfig->DMAStreamRX, DISABLE); // Disable SMA channel
+			UART_config.HWConfig->DMAStreamRX->M0AR = (uint32_t)&UART_data.RXBuffer[UART_data.RXBufferBeingBuffered].header;
 			UART_config.HWConfig->DMAStreamRX->NDTR = sizeof(UART_data.RXBuffer[0U].header);
+			UART_data.RXIRQState = UART_RX_IRQ_STATE_WAITING_FOR_HEADER;
 			DMA_Cmd(UART_config.HWConfig->DMAStreamRX, ENABLE);
 			USART_DMACmd(UART_config.HWConfig->UARTPeriph, USART_DMAReq_Rx, ENABLE); // Enable DMA_reqs from UART periph
 			UART_config.HWConfig->UARTPeriph->CR1 |= USART_CR1_RE; // Enable receiver

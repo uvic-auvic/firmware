@@ -1,5 +1,5 @@
 /*
- * UART_componentSpecific.c
+ * ISOTP_UART_componentSpecific.c
  *
  *  Created on: Feb 20, 2020
  *      Author: Poornachander

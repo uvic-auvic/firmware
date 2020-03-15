@@ -15,6 +15,7 @@
 #include "motorDriver.h"
 #include "motorRPMFeedback.h"
 #include "motorInterface.h"
+#include "ISOTP_UART.h"
 
 /*
  * If a new FreeRTOS task is needed, create it here so that there is one place where
@@ -30,11 +31,13 @@ void RTOS_init(void)
 	motorDriver_init();
 	motorRPMFeedback_init();
 	motorInterface_init();
+	ISOTP_UART_init();
 }
 
 void RTOS_run1ms(void)
 {
 	messageHandler_run1ms();
+	ISOTP_UART_run1ms();
 }
 
 void RTOS_run10ms(void)

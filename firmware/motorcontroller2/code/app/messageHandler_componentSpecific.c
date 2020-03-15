@@ -30,11 +30,6 @@ const messageHandler_config_S messageHandler_config =
             .messageID = protocol_MID_POLARIS_motorSetSpeed,
             .initValue = {.POLARIS_motorSetSpeed = {.motorSpeed = {0U}}},
         },
-        [MESSAGE_HANDLER_RX_MESSAGE_CHANNEL_ISOTP] =
-        {
-            .messageID = protocol_MID_POLARIS_MCISOTP,
-            .initValue = {.POLARIS_MCISOTP = {.data = {0U}}},
-        },
     },
 
     .TXMessageConfig =
@@ -54,11 +49,6 @@ const messageHandler_config_S messageHandler_config =
             .messageID = protocol_MID_MC_motorRPMHigh,
             .messageLength = sizeof(protocol_motorRPM_S),
         },
-        [MESSAGE_HANDLER_TX_MESSAGE_CHANNEL_ISOTP] =
-        {
-            .messageID = protocol_MID_MC_ISOTP,
-            .messageLength = sizeof(protocol_ISOTP_S),
-        }
     },
     .messageReceivedCallback = messageHandler_componentSpecific_messageReceivedCallback,
     .messagePopulateCallback = messageHandler_componentSpecific_messagePopulateCallback,
@@ -79,11 +69,6 @@ static void messageHandler_componentSpecific_messageReceivedCallback(const messa
             }
             case MESSAGE_HANDLER_RX_MESSAGE_CHANNEL_MOTOR_SPEED:
             {
-                break;
-            }
-            case MESSAGE_HANDLER_RX_MESSAGE_CHANNEL_ISOTP:
-            {
-
                 break;
             }
             case MESSAGE_HANDLER_RX_MESSAGE_CHANNEL_COUNT:
@@ -123,11 +108,6 @@ static void messageHandler_componentSpecific_messagePopulateCallback(const messa
                 {
                     message->MC_motorRPMHigh.motorSpeed[channel - 4U] = motorRPMFeedback_getMotorRPM(channel);
                 }
-                break;
-            }
-            case MESSAGE_HANDLER_TX_MESSAGE_CHANNEL_ISOTP:
-            {
-                
                 break;
             }
             case MESSAGE_HANDLER_TX_MESSAGE_CHANNEL_COUNT:

@@ -10,6 +10,8 @@
 #include "UARTF4.h"
 #include "RTOS.h"
 #include "messageHandler.h"
+#include "ISOTP_UART.h"
+#include "protocol.h"
 
 static void UART_enablePeripheralsClockCallback(void);
 static void UART_receiveCallback(uint8_t const * const receiveData, const uint8_t receiveDataLength);
@@ -57,10 +59,11 @@ static void UART_enablePeripheralsClockCallback(void)
 
 static void UART_receiveCallback(uint8_t const * const receiveData, const uint8_t receiveDataLength)
 {
-	UNUSED(receiveDataLength);
 	if(receiveData != NULL)
 	{
 		messageHandler_messageReceivedCallback((const protocol_message_S * const)receiveData);
+		
+		ISOTP_UART_frameReceivedCallback((const protocol_message_S * const)receiveData, receiveDataLength);
 	}
 }
 

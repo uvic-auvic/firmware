@@ -19,9 +19,11 @@ c__EA_protocol_MID_E__enumvalues = {
     3: 'protocol_MID_POLARIS_powerEnable',
     4: 'protocol_MID_POLARIS_PBMessageRequest',
     5: 'protocol_MID_POLARIS_MCMessageRequest',
+    6: 'protocol_MID_POLARIS_MCISOTP',
     21: 'protocol_MID_MC_deviceName',
     22: 'protocol_MID_MC_motorRPMLow',
     23: 'protocol_MID_MC_motorRPMHigh',
+    24: 'protocol_MID_MC_ISOTP',
     41: 'protocol_MID_PB_deviceName',
     42: 'protocol_MID_PB_envData',
     43: 'protocol_MID_PB_battVoltages',
@@ -33,9 +35,11 @@ protocol_MID_POLARIS_motorSetSpeed = 2
 protocol_MID_POLARIS_powerEnable = 3
 protocol_MID_POLARIS_PBMessageRequest = 4
 protocol_MID_POLARIS_MCMessageRequest = 5
+protocol_MID_POLARIS_MCISOTP = 6
 protocol_MID_MC_deviceName = 21
 protocol_MID_MC_motorRPMLow = 22
 protocol_MID_MC_motorRPMHigh = 23
+protocol_MID_MC_ISOTP = 24
 protocol_MID_PB_deviceName = 41
 protocol_MID_PB_envData = 42
 protocol_MID_PB_battVoltages = 43
@@ -160,6 +164,13 @@ class struct_c__SA_protocol_PBBattCurrents_S(ctypes.Structure):
      ]
 
 protocol_PBBattCurrents_S = struct_c__SA_protocol_PBBattCurrents_S
+class struct_c__SA_protocol_ISOTP_S(ctypes.Structure):
+    _pack_ = True # source:False
+    _fields_ = [
+    ('data', ctypes.c_ubyte * 8),
+     ]
+
+protocol_ISOTP_S = struct_c__SA_protocol_ISOTP_S
 class union_c__UA_protocol_allMessages_U(ctypes.Union):
     _pack_ = True # source:False
     _fields_ = [
@@ -168,9 +179,11 @@ class union_c__UA_protocol_allMessages_U(ctypes.Union):
     ('POLARIS_powerEnable', protocol_powerEnable_S),
     ('POLARIS_PBMessageRequest', protocol_PBMessageRequest_S),
     ('POLARIS_MCMessageRequest', protocol_MCMessageRequest_S),
+    ('POLARIS_MCISOTP', protocol_ISOTP_S),
     ('MC_deviceName', protocol_deviceName_S),
     ('MC_motorRPMLow', protocol_motorRPM_S),
     ('MC_motorRPMHigh', protocol_motorRPM_S),
+    ('MC_ISOTP', protocol_ISOTP_S),
     ('PB_deviceName', protocol_deviceName_S),
     ('PB_envData', protocol_PBEnvData_S),
     ('PB_battVoltages', protocol_PBBattVoltages_S),
@@ -204,14 +217,16 @@ __all__ = \
     'c__EA_protocol_MCMessageRequest_message_E',
     'c__EA_protocol_MID_E',
     'c__EA_protocol_PBMessageRequest_message_E',
-    'c__EA_protocol_node_E', 'protocol_MCMessageRequest_S',
+    'c__EA_protocol_node_E', 'protocol_ISOTP_S',
+    'protocol_MCMessageRequest_S',
     'protocol_MCMessageRequest_message_E',
     'protocol_MCMessageRequest_message_E__enumvalues',
     'protocol_MID_E', 'protocol_MID_E__enumvalues',
-    'protocol_MID_MC_deviceName', 'protocol_MID_MC_motorRPMHigh',
-    'protocol_MID_MC_motorRPMLow', 'protocol_MID_PB_battCurrents',
-    'protocol_MID_PB_battVoltages', 'protocol_MID_PB_deviceName',
-    'protocol_MID_PB_envData',
+    'protocol_MID_MC_ISOTP', 'protocol_MID_MC_deviceName',
+    'protocol_MID_MC_motorRPMHigh', 'protocol_MID_MC_motorRPMLow',
+    'protocol_MID_PB_battCurrents', 'protocol_MID_PB_battVoltages',
+    'protocol_MID_PB_deviceName', 'protocol_MID_PB_envData',
+    'protocol_MID_POLARIS_MCISOTP',
     'protocol_MID_POLARIS_MCMessageRequest',
     'protocol_MID_POLARIS_PBMessageRequest',
     'protocol_MID_POLARIS_deviceName',
@@ -225,7 +240,7 @@ __all__ = \
     'protocol_deviceName_S', 'protocol_message_S',
     'protocol_motorRPM_S', 'protocol_motorSetSpeed_S',
     'protocol_node_E', 'protocol_node_E__enumvalues',
-    'protocol_powerEnable_S',
+    'protocol_powerEnable_S', 'struct_c__SA_protocol_ISOTP_S',
     'struct_c__SA_protocol_MCMessageRequest_S',
     'struct_c__SA_protocol_PBBattCurrents_S',
     'struct_c__SA_protocol_PBBattVoltages_S',

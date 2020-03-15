@@ -260,14 +260,16 @@ static void UART_private_run(void)
 			}
 			case UART_RX_IRQ_STATE_RECEIVING_PAYLOAD:
 			{
-				if(RTOS_getTimeElapsedMilliseconds(UART_data.timeStartedPayloadReception) >= 15U)
+				const uint32_t timeout_ms = UART_data.RXBuffer[UART_data.RXBufferBeingBuffered].header.length * ((9.0f * MS_IN_SEC)/UART_config.HWConfig->baudRate) + 2U;
+				const uint32_t timeElapsed = RTOS_getTimeElapsedMilliseconds(UART_data.timeStartedPayloadReception);
+				if(timeElapsed >= timeout_ms)
 				{
 					UART_data.RXIRQState = UART_RX_IRQ_STATE_ERROR;
 					nextRun_ms = 0U;
 				}
 				else
 				{
-					nextRun_ms = 1U;
+					nextRun_ms = timeout_ms - timeElapsed;
 				}
 				break;
 			}

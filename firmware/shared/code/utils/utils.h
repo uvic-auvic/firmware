@@ -5,8 +5,8 @@
  *      Author: Poornachander
  */
 
-#ifndef SHARED_CODE_UTILS_H_
-#define SHARED_CODE_UTILS_H_
+#ifndef UTILS_H_
+#define UTILS_H_
 
 #define BITVALUE(x) ( 1U << (x))
 
@@ -16,4 +16,4 @@
 
 #define UNUSED(x)   ((void)(x))
 
-#endif /* SHARED_CODE_UTILS_H_ */
+#endif /* UTILS_H_ */

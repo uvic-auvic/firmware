@@ -51,7 +51,7 @@ typedef struct
 } UART_config_S;
 
 
-void UART_init();
+void UART_init(void);
 bool UART_writeLen(const uint8_t * const data, const uint8_t length);
 
 // Interrupt Handler

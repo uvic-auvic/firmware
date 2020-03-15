@@ -53,6 +53,7 @@ INCLUDE_PATH+= \
 -I$(CODE_DIR)/RTOS
 
 -include $(SHARED_MAKEFILES)/FreeRTOSlib.mk
+-include $(SHARED_MAKEFILES)/ISOTPLib.mk
 -include STMLib.mk
 -include app.mk
 -include appStartup.mk
@@ -76,7 +77,8 @@ APP_LINKER_OPTIONS:=\
 BOOTLOADER_LINKER_OPTIONS:=
 
 ARM_TOOL_LINKER_LIBRARIES := \
--lm
+-lm \
+-lc \
 
 ARM_TOOLS_LINKER_SCRIPT := $(LINKER_SCRIPT)
 ARM_TOOLS_LINKER_TARGET_MAP := $(TARGET_MAP)

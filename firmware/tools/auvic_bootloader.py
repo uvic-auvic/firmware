@@ -3,7 +3,7 @@
 import serial
 import sys
 import math
-from stm32_library import stm32_crc32
+from lib.stm32_library import stm32_crc32
 
 com_port = "COM3"
 data_list = []

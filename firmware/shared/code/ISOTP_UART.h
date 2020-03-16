@@ -41,6 +41,7 @@ typedef struct
 
 void ISOTP_UART_init(void);
 void ISOTP_UART_run1ms(void);
+bool ISOTP_UART_sendISOTPMessage(const uint8_t * const data, const uint16_t legnth);
 void ISOTP_UART_frameReceivedCallback(const protocol_message_S * const message, const uint8_t length);
 
 #endif /* ISOTP_UART_H_ */

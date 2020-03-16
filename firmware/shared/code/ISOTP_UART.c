@@ -41,7 +41,22 @@ void ISOTP_UART_run1ms(void)
 	}
 }
 
-void ISOTP_UART_frameReceivedCallback(const protocol_message_S * const message, const uint8_t length)
+bool ISOTP_UART_sendISOTPMessage(const uint8_t * const data, const uint16_t length)
+{
+	bool ret = false;
+
+	if((data != NULL) && (length > 0U) && (length <= ISOTP_UART_MAX_SIZE))
+	{
+		if(isotp_send(&ISOTP_UART_data.linkHandle, data, length) == ISOTP_RET_OK)
+		{
+			ret = true;
+		}
+	}
+
+	return ret;
+}
+
+bool ISOTP_UART_frameReceivedCallback(const protocol_message_S * const message, const uint8_t length)
 {
 	if((message != NULL) && (length > 0U) && (length <= 8U))
 	{
@@ -66,7 +81,7 @@ int isotp_user_send_can(const uint32_t arbitration_id, const uint8_t* data, cons
 		protocol_message_S frameToSend;
 		frameToSend.messageID = arbitration_id;
 		memcpy(&frameToSend.message, data, size);
-		UART_writeLen((const uint8_t * const)&frameToSend, size);
+		ret = UART_writeLen((const uint8_t * const)&frameToSend, size) ? 1U : 0U;
 	}
 
 	return ret;

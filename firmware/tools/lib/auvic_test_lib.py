@@ -1,6 +1,7 @@
 import sys
 import serial
 import time
+import isotp
 from .auvic_serial_lib import SerialLib as SerialLib
 
 class SerialTester:

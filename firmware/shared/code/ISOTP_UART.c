@@ -56,7 +56,7 @@ bool ISOTP_UART_sendISOTPMessage(const uint8_t * const data, const uint16_t leng
 	return ret;
 }
 
-bool ISOTP_UART_frameReceivedCallback(const protocol_message_S * const message, const uint8_t length)
+void ISOTP_UART_frameReceivedCallback(const protocol_message_S * const message, const uint8_t length)
 {
 	if((message != NULL) && (length > 0U) && (length <= 8U))
 	{

@@ -1,5 +1,5 @@
 /*
- * UART.c
+ * UARTF4.c
  */
 
 #include "UARTF4.h"

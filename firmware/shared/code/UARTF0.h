@@ -1,9 +1,9 @@
 /*
- * UARTF4.h
+ * UARTF0.h
  */
 
-#ifndef UARTF4_H_
-#define UARTF4_H_
+#ifndef UARTF0_H_
+#define UARTF0_H_
 
 #include "UARTF0_componentSpecific.h"
 
@@ -55,4 +55,4 @@ bool UART_writeLen(const uint8_t * const data, const uint8_t length);
 // Interrupt Handler
 void UART_DMAInterruptHandler(void);
 
-#endif /* UARTF4_H_ */
+#endif /* UARTF0_H_ */

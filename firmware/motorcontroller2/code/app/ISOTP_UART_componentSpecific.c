@@ -30,7 +30,7 @@ static void ISOTP_UART_componentSpecific_messageReceivedCallback(const ISOTP_UAR
 {
 	UNUSED(data);
 	UNUSED(length);
-
+	UNUSED(channel);
 	switch(channel)
 	{
 		case ISOTP_UART_CHANNEL_LOOPBACK:

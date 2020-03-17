@@ -17,7 +17,15 @@
  * OS specific defines
  *************************************************************/
 #ifdef _WIN32
-#define snprintf _snprintf
+#define snprintf(...) _snprintf(...)
+#else
+#define snprintf(...)
+#endif
+
+#ifdef _WIN32
+#define sprintf(...) _sprintf(...)
+#else
+#define sprintf(...)
 #endif
 
 #ifdef _WIN32

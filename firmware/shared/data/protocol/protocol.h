@@ -165,7 +165,7 @@ typedef struct __attribute__((packed))
 } protocol_message_S;
 
 // Asserts
-uint8_t assert_protocol_maxMessageSize[(sizeof(protocol_allMessages_U) > PROTOCOL_MAX_MESSAGE_SIZE) ? -1 : 1];
-uint8_t assert_protocol_messageIDSize[(sizeof(protocol_MID_E) == 1U) ? 1 : -1];
+uint8_t assert_protocol_maxMessageSize[(sizeof(protocol_allMessages_U) > PROTOCOL_MAX_MESSAGE_SIZE) ? -1 : 0];
+uint8_t assert_protocol_messageIDSize[(sizeof(protocol_MID_E) == 1U) ? 0 : -1];
 
 #endif // PROTOCOL_H_

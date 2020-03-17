@@ -37,8 +37,9 @@ class SerialLib(serial.Serial):
     
     def receive_message(self):
         header = self.read(1)
-        crc = self.read(2)
-        payload = self.read(int.from_bytes(header, byteorder='little'))
+        if len(header) > 0
+            crc = self.read(2)
+            payload = self.read(int.from_bytes(header, byteorder='little'))
 
         return header, crc, payload
 
@@ -57,6 +58,22 @@ class SerialLib(serial.Serial):
 
         while self.isotp_handle.transmitting():
             self.isotp_handle.process()
+        
+    def send_and_receive_isotp_message(self, message:bytes):
+
+        send_isotp_message(message)
+        timeStarted = time.time()
+
+        while self.isotp_handle.available() is False: # or timeout
+            self.isotp_handle.process()
+
+            if (time.time() - timeStarted) > 0.1:
+                break
+        
+        if self.isotp_handle.available():
+            receivedData = self.isotp_handle.recv()
+
+        return receivedData
 
     def isotp_rx_callback(self):
         header, crc, payload = self.receive_message()

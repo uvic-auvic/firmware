@@ -17,11 +17,10 @@ typedef union
 } protocol_ISOTP_MID_U;
 
 // Individual ISOTP message definitions
-typedef struct
+typedef struct __attribute__((packed))
 {
     uint8_t data[PROTOCOL_ISOTP_MAX_DATA_SIZE];
 } protocol_ISOTP_genericMessage_S;
-
 
 // All ISOTP message definitions
 typedef union
@@ -31,13 +30,13 @@ typedef union
 } protocol_ISOTP_allMessages_U;
 
 // High Level Struct
-typedef struct
+typedef struct __attribute__((packed))
 {
     protocol_ISOTP_MID_U         messageID;
     protocol_ISOTP_allMessages_U message;
 } protocol_ISOTP_message_S;
 
-uint8_t assert_protocol_ISOTP_messageIDSize[sizeof(protocol_ISOTP_MID_U) > 1U ? -1 : 0];
-uint8_t assert_protocol_ISOTP_messageSize[sizeof(protocol_ISOTP_allMessages_U) > PROTOCOL_ISOTP_MAX_DATA_SIZE ? -1 : 0];
+uint8_t assert_protocol_ISOTP_messageIDSize[sizeof(protocol_ISOTP_MID_U) != PROTOCOL_ISOTP_MESSAGE_ID_SIZE ? -1 : 0];
+uint8_t assert_protocol_ISOTP_messageSize[sizeof(protocol_ISOTP_allMessages_U) != PROTOCOL_ISOTP_MAX_DATA_SIZE ? -1 : 0];
 
 #endif // PROTOCOL_ISOTP_H_

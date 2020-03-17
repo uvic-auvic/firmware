@@ -28,7 +28,20 @@ const ISOTP_UART_config_S ISOTP_UART_config =
 
 static void ISOTP_UART_componentSpecific_messageReceivedCallback(const ISOTP_UART_channel_E channel, const protocol_ISOTP_allMessages_U * const data, const uint16_t length)
 {
-	UNUSED(channel);
 	UNUSED(data);
 	UNUSED(length);
+
+	switch(channel)
+	{
+		case ISOTP_UART_CHANNEL_LOOPBACK:
+		{
+			(void)ISOTP_UART_sendISOTPMessage(ISOTP_UART_CHANNEL_LOOPBACK, data, length);
+			break;
+		}
+		case ISOTP_UART_CHANNEL_COUNT:
+		default:
+		{
+			break;
+		}
+	}
 }

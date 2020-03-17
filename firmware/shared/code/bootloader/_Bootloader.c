@@ -36,6 +36,7 @@ static firmwareInfo_t firmwareInfo_var;
 firmwareInfo_t * firmwareInfo_ptr = &firmwareInfo_var;
 
 
+
 /**
  * Local implementation of itoa
  */

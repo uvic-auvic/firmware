@@ -14,6 +14,8 @@
 #define MS_IN_SEC   (1000U)  // Milliseconds in one second
 #define US_IN_SEC   (1000000U) // Microseconds in one second
 
+#define US_IN_MS    (1000U) // Microseconds in on millisecond
+
 #define UNUSED(x)   ((void)(x))
 
 #endif /* UTILS_H_ */

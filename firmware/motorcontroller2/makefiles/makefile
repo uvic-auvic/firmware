@@ -52,8 +52,13 @@ INCLUDE_PATH+= \
 -I$(CODE_DIR) \
 -I$(CODE_DIR)/RTOS
 
+ifeq ($(TARGET),app)
 -include $(SHARED_MAKEFILES)/FreeRTOSlib.mk
 -include $(SHARED_MAKEFILES)/ISOTPLib.mk
+
+OTHER_DEFINES += -DUSE_FREE_RTOS_ASSERT=1
+
+endif
 -include STMLib.mk
 -include app.mk
 -include appStartup.mk

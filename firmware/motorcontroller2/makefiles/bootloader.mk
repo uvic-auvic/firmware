@@ -1,9 +1,8 @@
 
 BOOTLOADER_OBJS += \
-$(OUTPUT_DIR)/obj/bootloader/UARTDma.o \
-$(OUTPUT_DIR)/obj/bootloader/UARTDma_componentSpecific.o \
-$(OUTPUT_DIR)/obj/bootloader/bootloader/Bootloader.o \
-$(OUTPUT_DIR)/obj/bootloader/bootloader/Flash_Interface.o
+$(OUTPUT_DIR)/obj/bootloader/bootloader/bootloader.o \
+$(OUTPUT_DIR)/obj/bootloader/time.o \
+$(OUTPUT_DIR)/obj/bootloader/time_componentSpecific.o \
 
 BOOTLOADER_C_DEPS += $(BOOTLOADER_OBJS:%.o=%.d)
 

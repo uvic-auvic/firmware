@@ -2,7 +2,6 @@ import sys
 import serial
 import time
 from .auvic_serial_lib import SerialLib as SerialLib
-import generated.protocol
 
 class SerialTester:
     def __init__(self, serial_handle:SerialLib, RID_response:bytes):

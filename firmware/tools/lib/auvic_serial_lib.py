@@ -13,12 +13,11 @@ class SerialLib(serial.Serial):
     def construct_frame(self, message_ID, message, message_length=None):
 
         payload_bytes = message_ID.to_bytes(length=1, byteorder='little')
-        if type(message) == bytes:
-            if message_length is None:
-                payload_bytes += message
-            elif type(message_length) == int:
+        if type(message) == bytes or type(message) == bytearray:
+            if type(message_length) == int:
                 payload_bytes += message[0:message_length]
-
+            else:
+                payload_bytes += message
         elif type(message) == int:
             payload_bytes += message.to_bytes(length=message_length, byteorder='little')
             
@@ -37,7 +36,9 @@ class SerialLib(serial.Serial):
     
     def receive_message(self):
         header = self.read(1)
-        if len(header) > 0
+        crc = None
+        payload = None
+        if header is not None and len(header) > 0:
             crc = self.read(2)
             payload = self.read(int.from_bytes(header, byteorder='little'))
 
@@ -61,7 +62,7 @@ class SerialLib(serial.Serial):
         
     def send_and_receive_isotp_message(self, message:bytes):
 
-        send_isotp_message(message)
+        self.send_isotp_message(message)
         timeStarted = time.time()
 
         while self.isotp_handle.available() is False: # or timeout
@@ -70,6 +71,7 @@ class SerialLib(serial.Serial):
             if (time.time() - timeStarted) > 0.1:
                 break
         
+        receivedData = None
         if self.isotp_handle.available():
             receivedData = self.isotp_handle.recv()
 
@@ -77,11 +79,15 @@ class SerialLib(serial.Serial):
 
     def isotp_rx_callback(self):
         header, crc, payload = self.receive_message()
-        arbitration_id = int.from_bytes(payload[0], byteorder='little')
-        dlc = int.from_bytes(header, byteorder='little')
-        data = payload[1:]
+        if payload is not None and len(payload) > 0:
+            arbitration_id = int.from_bytes(payload[0], byteorder='little')
+            dlc = int.from_bytes(header, byteorder='little')
+            data = payload[1:]
 
-        return isotp.CanMessage(arbitration_id=arbitration_id, data=data, dlc=dlc)
-
+            return isotp.CanMessage(arbitration_id=arbitration_id, data=data, dlc=dlc)
+        else:
+            return None
+        
     def isotp_tx_callback(self, tx_message):
+        print("ISOTP TX Callback: MID:{} MESSAGE:{}, LEN:{}".format(tx_message.arbitration_id, tx_message.data.hex(), tx_message.dlc))
         self.send_message(message_ID=tx_message.arbitration_id, message=tx_message.data, message_length=tx_message.dlc)

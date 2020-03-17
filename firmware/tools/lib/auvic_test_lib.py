@@ -1,20 +1,20 @@
 import sys
 import serial
 import time
-import isotp
 from .auvic_serial_lib import SerialLib as SerialLib
+import generated.protocol
 
 class SerialTester:
-    def __init__(self, serial_handle:SerialLib, RID_response:bytes, request_MID:int):
+    def __init__(self, serial_handle:SerialLib, RID_response:bytes):
         self.serial_handle = serial_handle
         self.RID_response = RID_response
-        self.request_MID = request_MID
 
     def test_RID(self, verbose:bool=True):
         success_count = 0
         failure_count = 0
         for i in range(10):
-            header, crc, payload = self.serial_handle.send_and_receive(self.request_MID, 0, 1)
+            # header, crc, payload = self.serial_handle.send_and_receive(self.request_MID, 0, 1)
+            header, crc, payload = self.serial_handle.request_message(0) # Message Request 0 is RID
 
             if payload == self.RID_response:
                 success_count += 1
@@ -39,7 +39,7 @@ class SerialTester:
             result = True
         
         return result
-    
+
     def test_aborted_UART_packet(self, verbose:bool=True):
         # Test normal tranmission. Just a sanity check to make sure normal operation works before continuing
         if self.test_RID(False) == False:
@@ -183,3 +183,7 @@ class SerialTester:
                 return False
         
         return True
+
+    def test_ISOTP_loopback(self, verbose:bool=True):
+        
+        pass

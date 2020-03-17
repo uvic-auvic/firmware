@@ -8,15 +8,14 @@
 #include "RTOS.h"
 #include "utils.h"
 #include "UART.h"
-
-#define ISOTP_UART_MAX_SIZE	(1024U)
+#include "assert.h"
 
 typedef struct
 {
 	IsoTpLink linkHandle;
-	uint8_t RXBuffer[ISOTP_UART_MAX_SIZE];
-	uint8_t TXBuffer[ISOTP_UART_MAX_SIZE];
-	uint8_t lastReceivedData[ISOTP_UART_MAX_SIZE];
+	protocol_ISOTP_message_S RXBuffer;
+	protocol_ISOTP_message_S TXBuffer;
+	protocol_ISOTP_message_S lastReceivedData;
 } ISOTP_UART_data_S;
 
 static ISOTP_UART_data_S ISOTP_UART_data;
@@ -26,7 +25,7 @@ extern const ISOTP_UART_config_S ISOTP_UART_config;
 void ISOTP_UART_init(void)
 {
 	memset(&ISOTP_UART_data, 0U, sizeof(ISOTP_UART_data));
-	isotp_init_link(&ISOTP_UART_data.linkHandle, ISOTP_UART_config.TXMessageID, ISOTP_UART_data.TXBuffer, sizeof(ISOTP_UART_data.TXBuffer), ISOTP_UART_data.RXBuffer, sizeof(ISOTP_UART_data.RXBuffer));
+	isotp_init_link(&ISOTP_UART_data.linkHandle, ISOTP_UART_config.TXMessageID, (uint8_t *)&ISOTP_UART_data.TXBuffer, sizeof(ISOTP_UART_data.TXBuffer), (uint8_t *)&ISOTP_UART_data.RXBuffer, sizeof(ISOTP_UART_data.RXBuffer));
 }
 
 void ISOTP_UART_run1ms(void)
@@ -34,22 +33,34 @@ void ISOTP_UART_run1ms(void)
 	isotp_poll(&ISOTP_UART_data.linkHandle);
 
 	uint16_t receivedDataSize;
-	bool ret = isotp_receive(&ISOTP_UART_data.linkHandle, ISOTP_UART_data.lastReceivedData, sizeof(ISOTP_UART_data.lastReceivedData), &receivedDataSize);
-	if (ISOTP_RET_OK == ret) {
-		/* Handle received message */
-		ISOTP_UART_config.messageReceivedCallback(ISOTP_UART_data.lastReceivedData, receivedDataSize);
+	bool ret = isotp_receive(&ISOTP_UART_data.linkHandle, (uint8_t *)&ISOTP_UART_data.lastReceivedData, sizeof(ISOTP_UART_data.lastReceivedData), &receivedDataSize);
+	if (ISOTP_RET_OK == ret)
+	{
+		if(receivedDataSize >= sizeof(protocol_ISOTP_MID_U))
+		{
+			for(ISOTP_UART_channel_E channel = (ISOTP_UART_channel_E)0U; channel < ISOTP_UART_CHANNEL_COUNT; channel++)
+			{
+				if(ISOTP_UART_config.channelConfig[channel].messageID.asUint8 == ISOTP_UART_data.lastReceivedData.messageID.asUint8)
+				{
+					ISOTP_UART_config.messageReceivedCallback(channel, &ISOTP_UART_data.lastReceivedData.message, receivedDataSize);
+					break;
+				}
+			}
+		}
 	}
 }
 
-bool ISOTP_UART_sendISOTPMessage(const uint8_t * const data, const uint16_t length)
+bool ISOTP_UART_sendISOTPMessage(const ISOTP_UART_channel_E channel, const protocol_ISOTP_allMessages_U * const data, const uint16_t length)
 {
 	bool ret = false;
-
-	if((data != NULL) && (length > 0U) && (length <= ISOTP_UART_MAX_SIZE))
+	if(channel < ISOTP_UART_CHANNEL_COUNT)
 	{
-		if(isotp_send(&ISOTP_UART_data.linkHandle, data, length) == ISOTP_RET_OK)
+		if((data != NULL) && (length > 0U) && (length <= sizeof(protocol_ISOTP_allMessages_U)))
 		{
-			ret = true;
+			if(isotp_send(&ISOTP_UART_data.linkHandle, (uint8_t *)data, length) == ISOTP_RET_OK)
+			{
+				ret = true;
+			}
 		}
 	}
 

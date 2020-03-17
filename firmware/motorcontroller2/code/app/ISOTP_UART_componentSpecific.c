@@ -8,17 +8,27 @@
 #include "utils.h"
 #include "ISOTP_UART.h"
 
-static void ISOTP_UART_componentSpecific_messageReceivedCallback(const uint8_t * const data, const uint16_t length);
+static void ISOTP_UART_componentSpecific_messageReceivedCallback(const ISOTP_UART_channel_E channel, const protocol_ISOTP_allMessages_U * const data, const uint16_t length);
+
+static const ISOTP_UART_channelConfig_S ISOTP_UART_channelConfig[ISOTP_UART_CHANNEL_COUNT] =
+{
+	[ISOTP_UART_CHANNEL_LOOPBACK] = { .messageID.MC_ISOTP_MID = MOTORCONTROLLER_ISOTP_MID_LOOPBACK},
+};
 
 const ISOTP_UART_config_S ISOTP_UART_config =
 {
 	.RXMessageID = protocol_MID_POLARIS_MCISOTP,
 	.TXMessageID = protocol_MID_MC_ISOTP,
 	.messageReceivedCallback = ISOTP_UART_componentSpecific_messageReceivedCallback,
+	.channelConfig =
+	{
+		[ISOTP_UART_CHANNEL_LOOPBACK] = { .messageID.MC_ISOTP_MID = MOTORCONTROLLER_ISOTP_MID_LOOPBACK},
+	},
 };
 
-static void ISOTP_UART_componentSpecific_messageReceivedCallback(const uint8_t * const data, const uint16_t length)
+static void ISOTP_UART_componentSpecific_messageReceivedCallback(const ISOTP_UART_channel_E channel, const protocol_ISOTP_allMessages_U * const data, const uint16_t length)
 {
+	UNUSED(channel);
 	UNUSED(data);
 	UNUSED(length);
 }

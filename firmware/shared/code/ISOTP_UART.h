@@ -5,8 +5,12 @@
 #ifndef ISOTP_UART_H_
 #define ISOTP_UART_H_
 
+#include "ISOTP_UART_componentSpecific.h"
+
 #include <stdint.h>
 #include "protocol.h"
+#include "protocol_ISOTP.h"
+
 
 /* Max number of messages the receiver can receive at one time, this value 
  * is affectied by can driver queue length
@@ -34,14 +38,20 @@
 
 typedef struct
 {
+    protocol_ISOTP_MID_U messageID;
+} ISOTP_UART_channelConfig_S;
+
+typedef struct
+{
     uint16_t RXMessageID;
     uint16_t TXMessageID;
-    void (* messageReceivedCallback)(const uint8_t * const data, const uint16_t length);
+    void (* messageReceivedCallback)(const ISOTP_UART_channel_E channel, const protocol_ISOTP_allMessages_U * const data, const uint16_t length);
+    ISOTP_UART_channelConfig_S channelConfig[ISOTP_UART_CHANNEL_COUNT];
 } ISOTP_UART_config_S;
 
 void ISOTP_UART_init(void);
 void ISOTP_UART_run1ms(void);
-bool ISOTP_UART_sendISOTPMessage(const uint8_t * const data, const uint16_t legnth);
+bool ISOTP_UART_sendISOTPMessage(const ISOTP_UART_channel_E channel, const protocol_ISOTP_allMessages_U * const data, const uint16_t length);
 void ISOTP_UART_frameReceivedCallback(const protocol_message_S * const message, const uint8_t length);
 
 #endif /* ISOTP_UART_H_ */

@@ -185,15 +185,18 @@ class SerialTester:
 
     def test_ISOTP_loopback(self, verbose:bool=True):
 
-        test_message = b'This is a test message'
-        received_message = self.serial_handle.send_and_receive_isotp_message(test_message)
-        
-        if received_message == test_message:
-            print("Success: Test ISOTP Loopback")
-            ret = True
+        test_message = b'This is a'
+        received_message = self.serial_handle.send_and_receive_isotp_message(1, test_message)
+        if received_message is not None:
+            if received_message == test_message:
+                print("Success: Test ISOTP Loopback")
+                ret = True
+            else:
+                print("Test ISOTP Loopback: Failed: Received data did not match sent data")
+                ret = False
         else:
-            print("Test ISOTP Loopback: Failed: Received data did not match sent data")
+            print("Test ISOTP Loopback: Failed: Did not receive data from board")
             ret = False
-
+        
         return ret
         

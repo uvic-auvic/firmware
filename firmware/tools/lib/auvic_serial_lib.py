@@ -53,16 +53,16 @@ class SerialLib(serial.Serial):
     def request_message(self, message_to_request:int):
         return self.send_and_receive(self.message_request_id, message_to_request, 1)
 
-    def send_isotp_message(self, message:bytes):
+    def send_isotp_message(self, ISOTP_MID:int, message:bytes):
         self.isotp_handle.reset()
-        self.isotp_handle.send(message)
+        self.isotp_handle.send(ISOTP_MID.to_bytes(byteorder='little', length=1) + message)
 
         while self.isotp_handle.transmitting():
             self.isotp_handle.process()
         
-    def send_and_receive_isotp_message(self, message:bytes):
+    def send_and_receive_isotp_message(self, ISOTP_MID:int, message:bytes):
 
-        self.send_isotp_message(message)
+        self.send_isotp_message(ISOTP_MID, message)
         timeStarted = time.time()
 
         while self.isotp_handle.available() is False: # or timeout
@@ -79,8 +79,16 @@ class SerialLib(serial.Serial):
 
     def isotp_rx_callback(self):
         header, crc, payload = self.receive_message()
+        print("ISOTP RX CALLBACK: ")
+        if type(header) is bytes:
+            print("  Header: {}".format(header.hex()))
+        if type(crc) is bytes:
+            print("  CRC: {}".format(crc.hex()))
+        if type(payload) is bytes:
+            print("  Payload: {}".format(payload.hex()))
+        
         if payload is not None and len(payload) > 0:
-            arbitration_id = int.from_bytes(payload[0], byteorder='little')
+            arbitration_id = payload[0]
             dlc = int.from_bytes(header, byteorder='little')
             data = payload[1:]
 

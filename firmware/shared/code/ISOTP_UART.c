@@ -69,11 +69,11 @@ bool ISOTP_UART_sendISOTPMessage(const ISOTP_UART_channel_E channel, const proto
 
 void ISOTP_UART_frameReceivedCallback(const protocol_message_S * const message, const uint8_t length)
 {
-	if((message != NULL) && (length > 0U) && (length <= 8U))
+	if((message != NULL) && (length > 0U) && (length <= 9U))
 	{
 		if(message->messageID == ISOTP_UART_config.RXMessageID)
 		{
-			isotp_on_can_message(&ISOTP_UART_data.linkHandle, (uint8_t *)&message->message, (uint8_t)length);
+			isotp_on_can_message(&ISOTP_UART_data.linkHandle, (uint8_t *)&message->message, (uint8_t)(length - sizeof(protocol_MID_E)));
 		}
 	}
 }
@@ -86,13 +86,13 @@ uint32_t isotp_user_get_ms(void)
 
 int isotp_user_send_can(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size)
 {
-	uint32_t ret = 0U;
+	uint32_t ret = ISOTP_RET_ERROR;
 	if((data != NULL) && (size <= 8U) && (size > 0U))
 	{
 		protocol_message_S frameToSend;
 		frameToSend.messageID = arbitration_id;
 		memcpy(&frameToSend.message, data, size);
-		ret = UART_writeLen((const uint8_t * const)&frameToSend, size) ? 1U : 0U;
+		ret = UART_writeLen((const uint8_t * const)&frameToSend, size + sizeof(frameToSend.messageID)) ? ISOTP_RET_OK : ISOTP_RET_OVERFLOW;
 	}
 
 	return ret;

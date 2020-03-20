@@ -8,15 +8,16 @@
   ******************************************************************************
 */
 
-
-#include "stm32f4xx.h"
+#include "stm32fx.h"
 
 #include "bootloader.h"
 #include "time.h"
+#include "flashInterface.h"
 
 int main(void)
 {
     time_init();
+    flashInterface_init();
     bootloader_init();
 
     while(1)

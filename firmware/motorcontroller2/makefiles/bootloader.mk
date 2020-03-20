@@ -1,8 +1,10 @@
 
 BOOTLOADER_OBJS += \
 $(OUTPUT_DIR)/obj/bootloader/bootloader/bootloader.o \
+$(OUTPUT_DIR)/obj/bootloader/bootloader_componentSpecific.o \
 $(OUTPUT_DIR)/obj/bootloader/time.o \
 $(OUTPUT_DIR)/obj/bootloader/time_componentSpecific.o \
+$(OUTPUT_DIR)/obj/bootloader/bootloader/flashInterface.o \
 
 BOOTLOADER_C_DEPS += $(BOOTLOADER_OBJS:%.o=%.d)
 
@@ -13,7 +15,7 @@ BOOTLOADER_COMPILER_FLAGS= \
 -Werror \
 -Wswitch-enum \
 -Wswitch-default \
-# -Wextra
+-Wextra
 
 INCLUDE_PATH+= \
 -I$(SHARED_CODE_DIR) \

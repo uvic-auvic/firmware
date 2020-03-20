@@ -8,6 +8,11 @@
 #ifndef BOOTLOADER_H_
 #define BOOTLOADER_H_
 
+typedef struct
+{
+    void (* deinitPeripheralsCallback)(void);
+} bootloader_config_S;
+
 void bootloader_init(void);
 void bootloader_run(void);
 

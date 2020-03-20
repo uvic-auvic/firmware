@@ -12,7 +12,7 @@ static void time_componentSpecific_enablePeripheralsClockCallback(void);
 const time_config_S time_config =
 {
     .TIMPeriph = TIM9,
-    .timerResolution = TIME_TIMER_RESOLUTION_32BITS,
+    .timerResolution = TIME_TIMER_RESOLUTION_16BITS,
     .timerInterruptNumber = TIM1_BRK_TIM9_IRQn,
     .enablePeripheralsClockCallback = time_componentSpecific_enablePeripheralsClockCallback,
 };

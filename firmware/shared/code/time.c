@@ -113,7 +113,10 @@ uint32_t time_getTimeElapsedMicroseconds(const uint32_t timeToCompare_us)
 
 void time_interruptHandler(void)
 {
-    time_data.timerOverflow += timer_private_getTimerOverflowNumber();
-    TIM_ClearFlag(time_config.TIMPeriph, TIM_FLAG_Update);
-    TIM_ClearITPendingBit(time_config.TIMPeriph, TIM_IT_Update);
+    if(TIM_GetFlagStatus(time_config.TIMPeriph, TIM_FLAG_Update) == SET)
+    {
+        time_data.timerOverflow += timer_private_getTimerOverflowNumber();
+        TIM_ClearFlag(time_config.TIMPeriph, TIM_FLAG_Update);
+        TIM_ClearITPendingBit(time_config.TIMPeriph, TIM_IT_Update);
+    }
 }

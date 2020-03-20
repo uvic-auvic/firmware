@@ -13,16 +13,16 @@ const time_config_S time_config =
 {
     .TIMPeriph = TIM9,
     .timerResolution = TIME_TIMER_RESOLUTION_32BITS,
-    .timerInterruptNumber = TIM9_IRQn,
+    .timerInterruptNumber = TIM1_BRK_TIM9_IRQn,
     .enablePeripheralsClockCallback = time_componentSpecific_enablePeripheralsClockCallback,
 };
 
 static void time_componentSpecific_enablePeripheralsClockCallback(void)
 {
-    RCC->APB1ENR |= RCC_APB1Periph_TIM9;
+    RCC->APB2ENR |= RCC_APB2ENR_TIM9EN;
 }
 
-void TIM9_IRQHandler(void)
+void TIM1_BRK_TIM9_IRQHandler(void)
 {
     time_interruptHandler();
 }

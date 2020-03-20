@@ -89,6 +89,6 @@ if serial_handle is None:
 
 motors_tester = test_lib.SerialTester(serial_handle, b'\x15MTR_CONT\x00')
 # motors_tester.run_all_tests(10)
-
+    
 # Comment out if using iPython
 # serial_handle.close()

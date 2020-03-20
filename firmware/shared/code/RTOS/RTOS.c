@@ -10,6 +10,18 @@
 /* INCLUDES */
 
 /* DEFINES */
+#ifndef RTOS_1MS_TASK_STACK_SIZE
+#error "Need to define RTOS_1MS_TASK_STACK_SIZE"
+#endif
+#ifndef RTOS_10MS_TASK_STACK_SIZE
+#error "Need to define RTOS_10MS_TASK_STACK_SIZE"
+#endif
+#ifndef RTOS_100MS_TASK_STACK_SIZE
+#error "Need to define RTOS_100MS_TASK_STACK_SIZE"
+#endif
+#ifndef RTOS_1000MS_TASK_STACK_SIZE
+#error "Need to define RTOS_1000MS_TASK_STACK_SIZE"
+#endif
 
 /* TYPEDEFS */
 typedef struct
@@ -96,28 +108,28 @@ void RTOS_launch(void)
 {
 	(void)xTaskCreate((TaskFunction_t)RTOS_private_task1ms,       /* Function that implements the task. */
 					  "1msTask",          /* Text name for the task. */
-					  configMINIMAL_STACK_SIZE,      /* Stack size in words, not bytes. */
+					  RTOS_1MS_TASK_STACK_SIZE,      /* Stack size in words, not bytes. */
 					  NULL,    /* Parameter passed into the task. */
 					  RTOS_TASK_1MS_PRIORITY,/* Priority at which the task is created. */
 					  NULL);      /* Used to pass out the created task's handle. */
 
 	(void)xTaskCreate((TaskFunction_t)RTOS_private_task10ms,       /* Function that implements the task. */
 					  "10msTask",          /* Text name for the task. */
-					  configMINIMAL_STACK_SIZE,      /* Stack size in words, not bytes. */
+					  RTOS_10MS_TASK_STACK_SIZE,      /* Stack size in words, not bytes. */
 					  NULL,    /* Parameter passed into the task. */
 					  RTOS_TASK_10MS_PRIORITY,/* Priority at which the task is created. */
 					  NULL);      /* Used to pass out the created task's handle. */
 
 	(void)xTaskCreate((TaskFunction_t)RTOS_private_task100ms,       /* Function that implements the task. */
 					  "100msTask",          /* Text name for the task. */
-					  configMINIMAL_STACK_SIZE,      /* Stack size in words, not bytes. */
+					  RTOS_100MS_TASK_STACK_SIZE,      /* Stack size in words, not bytes. */
 					  NULL,    /* Parameter passed into the task. */
 					  RTOS_TASK_100MS_PRIORITY,/* Priority at which the task is created. */
 					  NULL);      /* Used to pass out the created task's handle. */
 
 	(void)xTaskCreate((TaskFunction_t)RTOS_private_task1000ms,       /* Function that implements the task. */
 					  "1000msTask",          /* Text name for the task. */
-					  configMINIMAL_STACK_SIZE,      /* Stack size in words, not bytes. */
+					  RTOS_1000MS_TASK_STACK_SIZE,      /* Stack size in words, not bytes. */
 					  NULL,    /* Parameter passed into the task. */
 					  RTOS_TASK_1000MS_PRIORITY,/* Priority at which the task is created. */
 					  NULL);      /* Used to pass out the created task's handle. */

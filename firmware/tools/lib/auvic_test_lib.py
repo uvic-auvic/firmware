@@ -12,10 +12,9 @@ class SerialTester:
         success_count = 0
         failure_count = 0
         for i in range(10):
-            # header, crc, payload = self.serial_handle.send_and_receive(self.request_MID, 0, 1)
-            header, crc, payload = self.serial_handle.request_message(0) # Message Request 0 is RID
+            header, crc, message_ID, message = self.serial_handle.request_message(0) # Message Request 0 is RID
 
-            if payload == self.RID_response:
+            if message_ID == self.RID_response[0] and message == self.RID_response[1:]:
                 success_count += 1
             else:
                 failure_count += 1
@@ -179,6 +178,12 @@ class SerialTester:
                 pass
             else:
                 print("FAILED: Test Undersized UART packet")
+                return False
+
+            if self.test_ISOTP_loopback(verbose=False):
+                print("SUCCESS: Test ISOTP Loopback")
+            else:
+                print("FAILED: Test ISOTP Loopback")
                 return False
         
         return True

@@ -16,6 +16,7 @@
 #include "motorRPMFeedback.h"
 #include "motorInterface.h"
 #include "ISOTP_UART.h"
+#include "time.h"
 
 /*
  * If a new FreeRTOS task is needed, create it here so that there is one place where
@@ -23,6 +24,7 @@
  */
 void RTOS_init(void)
 {
+	time_init();
 	LED_init();
 	circBuffer1D_init();
 	circBuffer2D_init();

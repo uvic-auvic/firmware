@@ -16,6 +16,8 @@ $(OUTPUT_DIR)/obj/app/motorRPMFeedback.o \
 $(OUTPUT_DIR)/obj/app/motorInterface.o \
 $(OUTPUT_DIR)/obj/app/ISOTP_UART.o \
 $(OUTPUT_DIR)/obj/app/ISOTP_UART_componentSpecific.o \
+$(OUTPUT_DIR)/obj/app/time.o \
+$(OUTPUT_DIR)/obj/app/time_componentSpecific.o \
 
 APP_C_DEPS += $(APP_OBJS:%.o=%.d)
 

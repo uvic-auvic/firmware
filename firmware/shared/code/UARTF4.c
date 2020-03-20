@@ -8,10 +8,9 @@
 #include <stdbool.h>
 #include <string.h>
 #include "utils.h"
-#include "FreeRTOS.h"
-#include "task.h"
 #include "circBuffer2D.h"
-#include "RTOS.h"
+#include "time.h"
+#include "assert.h"
 
 /* DEFINES */
 
@@ -42,7 +41,6 @@ typedef struct
 
 	// TX
 	volatile UARTProtocol_protocol_S TXBuffer;
-	TaskHandle_t					 taskHandle;
 } UART_data_S;
 
 /* PRIVATE DATA */
@@ -59,9 +57,9 @@ static void UART_private_initDMATX(void);
 static void UART_private_configureGPIO(void)
 {
 	// Check that all configs are valid
-	configASSERT(IS_GPIO_PIN_SOURCE(UART_config.HWConfig->rxPin));
-	configASSERT(IS_GPIO_PIN_SOURCE(UART_config.HWConfig->txPin));
-	configASSERT(IS_GPIO_ALL_PERIPH(UART_config.HWConfig->GPIOPort));
+	assert(IS_GPIO_PIN_SOURCE(UART_config.HWConfig->rxPin));
+	assert(IS_GPIO_PIN_SOURCE(UART_config.HWConfig->txPin));
+	assert(IS_GPIO_ALL_PERIPH(UART_config.HWConfig->GPIOPort));
 
 	// Clock should be enabled in the enable clock callback
 
@@ -83,9 +81,9 @@ static void UART_private_configureGPIO(void)
 
 static void UART_private_initDMARX(void)
 {
-	configASSERT(IS_DMA_ALL_PERIPH(UART_config.HWConfig->DMAStreamRX));
-	configASSERT(IS_DMA_ALL_CONTROLLER(UART_config.HWConfig->DMAController));
-	configASSERT(IS_DMA_CHANNEL(UART_config.HWConfig->DMAChannelRX));
+	assert(IS_DMA_ALL_PERIPH(UART_config.HWConfig->DMAStreamRX));
+	assert(IS_DMA_ALL_CONTROLLER(UART_config.HWConfig->DMAController));
+	assert(IS_DMA_CHANNEL(UART_config.HWConfig->DMAChannelRX));
 
 	DMA_InitTypeDef DMA_InitStruct;
 	DMA_StructInit(&DMA_InitStruct);
@@ -126,9 +124,9 @@ static void UART_private_initDMARX(void)
 
 static void UART_private_initDMATX(void)
 {
-	configASSERT(IS_DMA_ALL_PERIPH(UART_config.HWConfig->DMAStreamTX));
-	configASSERT(IS_DMA_ALL_CONTROLLER(UART_config.HWConfig->DMAController));
-	configASSERT(IS_DMA_CHANNEL(UART_config.HWConfig->DMAChannelTX));
+	assert(IS_DMA_ALL_PERIPH(UART_config.HWConfig->DMAStreamTX));
+	assert(IS_DMA_ALL_CONTROLLER(UART_config.HWConfig->DMAController));
+	assert(IS_DMA_CHANNEL(UART_config.HWConfig->DMAChannelTX));
 
 	DMA_InitTypeDef DMA_InitStruct;
 	DMA_StructInit(&DMA_InitStruct);
@@ -159,8 +157,8 @@ static void UART_private_initDMATX(void)
 
 static void UART_private_configureUARTPeriph(void)
 {
-	configASSERT(IS_USART_ALL_PERIPH(UART_config.HWConfig->UARTPeriph));
-	configASSERT(IS_USART_BAUDRATE(UART_config.HWConfig->baudRate));
+	assert(IS_USART_ALL_PERIPH(UART_config.HWConfig->UARTPeriph));
+	assert(IS_USART_BAUDRATE(UART_config.HWConfig->baudRate));
 
 	// Clock should be enabled in the enable clock callback
 
@@ -182,111 +180,12 @@ static void UART_private_configureUARTPeriph(void)
 	USART_Cmd(UART_config.HWConfig->UARTPeriph, ENABLE);
 }
 
-static void UART_private_run(void)
-{
-	uint32_t nextRun_ms = 0xFFFFFFFFU;
-
-	while(1)
-	{
-		const uint32_t ticks = nextRun_ms == 0xFFFFFFFFU ? portMAX_DELAY : pdMS_TO_TICKS(nextRun_ms);
-		ulTaskNotifyTake(pdFALSE, ticks);
-		nextRun_ms = 0xFFFFFFFFU;
-
-		// RX
-		if(UART_data.RXBufferToProcess < UART_RX_BUFFER_COUNT) // This variable will get set by the DMA IRQ when data is ready
-		{
-			// Copy RXBufferToProcess so that it can be safely changed by the DMA IRQ
-			const UART_RXBuffer_E RXBufferToProcess = UART_data.RXBufferToProcess;
-
-			// Copy the data in the DMA buffer so that the buffer can be safely used the DMA peripheral
-			UARTProtocol_protocol_S dataToProcess;
-			const uint16_t sizeToCopy = sizeof(UART_data.RXBuffer[0U].header) + sizeof(UART_data.RXBuffer[0U].data.crc) + UART_data.RXBuffer[RXBufferToProcess].header.length;
-			memcpy(&dataToProcess, (const uint8_t *)&UART_data.RXBuffer[RXBufferToProcess], sizeToCopy);
-
-			UART_data.RXBufferToProcess = UART_RX_BUFFER_COUNT; // Reset this to indicate that the new data has been acknowledged and it is safe for the DMA IRQ to change this variable
-
-			// Verify CRC (do later)
-
-			// Send callback
-			if(UART_config.receiveCallback != NULL)
-			{
-				UART_config.receiveCallback(dataToProcess.data.payload, dataToProcess.header.length);
-			}
-		}
-
-		// TX
-		uint8_t dataToSend[UART_TX_BUFFER_LENGTH];
-		const uint8_t dataLength = circBuffer2D_pop(CIRCBUFFER2D_CHANNEL_UART_TX, dataToSend);
-		if(dataLength > 0U)
-		{
-			// New data available to send. Check if DMA is busy. Number for data remaining to transfer should be 0 and the DMA channel should be disabled
-			const uint16_t bytesRemaining = DMA_GetCurrDataCounter(UART_config.HWConfig->DMAStreamTX);
-			if((bytesRemaining == 0U) && (DMA_GetCmdStatus(UART_config.HWConfig->DMAStreamTX) == DISABLE))
-			{
-				const uint8_t frameLength = dataLength + sizeof(UART_data.TXBuffer.header) + sizeof(UART_data.TXBuffer.data.crc);
-				DMA_SetCurrDataCounter(UART_config.HWConfig->DMAStreamTX, frameLength); // Set the new data length to transfer
-
-				UART_data.TXBuffer.header.length = dataLength;
-				UART_data.TXBuffer.data.crc = 0x00U; // TODO: calculate CRC
-				memcpy((uint8_t * const)UART_data.TXBuffer.data.payload, dataToSend, dataLength);
-
-				DMA_Cmd(UART_config.HWConfig->DMAStreamTX, ENABLE);
-			}
-			else
-			{
-				// Set `nextRun`
-				nextRun_ms = 1U; // Try again in 1ms
-			}
-		}
-
-		// RX ERROR HANDLING
-		switch(UART_data.RXIRQState)
-		{
-			default:
-			case UART_RX_IRQ_STATE_ERROR:
-			{
-				// Re-enable receiver. It should wait for a idle line before starting reception
-				DMA_Cmd(UART_config.HWConfig->DMAStreamRX, DISABLE); // Disable DMA channel
-				USART_DMACmd(UART_config.HWConfig->UARTPeriph, USART_DMAReq_Rx, DISABLE); // Disable DMA Requests
-				UART_config.HWConfig->UARTPeriph->CR1 &= ~USART_CR1_RE; // Turn off receiver
-				UART_config.HWConfig->DMAStreamRX->M0AR = (uint32_t)&UART_data.RXBuffer[UART_data.RXBufferBeingBuffered].header;
-				UART_config.HWConfig->DMAStreamRX->NDTR = sizeof(UART_data.RXBuffer[0U].header);
-				UART_data.RXIRQState = UART_RX_IRQ_STATE_WAITING_FOR_HEADER;
-				DMA_Cmd(UART_config.HWConfig->DMAStreamRX, ENABLE);
-				USART_DMACmd(UART_config.HWConfig->UARTPeriph, USART_DMAReq_Rx, ENABLE); // Enable DMA_reqs from UART periph
-				UART_config.HWConfig->UARTPeriph->CR1 |= USART_CR1_RE; // Enable receiver
-
-				break;
-			}
-			case UART_RX_IRQ_STATE_RECEIVING_PAYLOAD:
-			{
-				const uint32_t timeout_ms = UART_data.RXBuffer[UART_data.RXBufferBeingBuffered].header.length * ((9.0f * MS_IN_SEC)/UART_config.HWConfig->baudRate) + 2U;
-				const uint32_t timeElapsed = RTOS_getTimeElapsedMilliseconds(UART_data.timeStartedPayloadReception);
-				if(timeElapsed >= timeout_ms)
-				{
-					UART_data.RXIRQState = UART_RX_IRQ_STATE_ERROR;
-					nextRun_ms = 0U;
-				}
-				else
-				{
-					nextRun_ms = timeout_ms - timeElapsed;
-				}
-				break;
-			}
-			case UART_RX_IRQ_STATE_WAITING_FOR_HEADER:
-			{
-				break;
-			}
-		}
-	}
-}
-
 /* PUBLIC FUNCTIONS */
 void UART_init()
 {
 	if(UART_config.HWConfig == NULL)
 	{
-		configASSERT(0U);
+		assert(0U);
 	}
 
 	if(UART_config.HWConfig->enablePeripheralsClockCallback != NULL)
@@ -295,7 +194,7 @@ void UART_init()
 	}
 	else
 	{
-		configASSERT(0U);
+		assert(0U);
 	}
 
 	UART_private_configureGPIO();
@@ -303,16 +202,90 @@ void UART_init()
 	UART_private_initDMATX();
 	UART_private_configureUARTPeriph();
 
-	configASSERT(UART_config.taskPriority < configMAX_PRIORITIES);
-	configASSERT(UART_config.taskPriority > tskIDLE_PRIORITY);
-
-	(void)xTaskCreate((TaskFunction_t)UART_private_run,       /* Function that implements the task. */
-					  "UARTTask",          /* Text name for the task. */
-					  configMINIMAL_STACK_SIZE,      /* Stack size in words, not bytes. */
-					  NULL,    /* Parameter passed into the task. */
-					  UART_config.taskPriority,/* Priority at which the task is created. */
-					  &UART_data.taskHandle);      /* Used to pass out the created task's handle. */
+	assert(UART_config.taskPriority < configMAX_PRIORITIES);
+	assert(UART_config.taskPriority > tskIDLE_PRIORITY);
 }
+
+void UART_run(void)
+{
+	// RX
+	if(UART_data.RXBufferToProcess < UART_RX_BUFFER_COUNT) // This variable will get set by the DMA IRQ when data is ready
+	{
+		// Copy RXBufferToProcess so that it can be safely changed by the DMA IRQ
+		const UART_RXBuffer_E RXBufferToProcess = UART_data.RXBufferToProcess;
+
+		// Copy the data in the DMA buffer so that the buffer can be safely used the DMA peripheral
+		UARTProtocol_protocol_S dataToProcess;
+		const uint16_t sizeToCopy = sizeof(UART_data.RXBuffer[0U].header) + sizeof(UART_data.RXBuffer[0U].data.crc) + UART_data.RXBuffer[RXBufferToProcess].header.length;
+		memcpy(&dataToProcess, (const uint8_t *)&UART_data.RXBuffer[RXBufferToProcess], sizeToCopy);
+
+		UART_data.RXBufferToProcess = UART_RX_BUFFER_COUNT; // Reset this to indicate that the new data has been acknowledged and it is safe for the DMA IRQ to change this variable
+
+		// Verify CRC (do later)
+
+		// Send callback
+		if(UART_config.receiveCallback != NULL)
+		{
+			UART_config.receiveCallback(dataToProcess.data.payload, dataToProcess.header.length);
+		}
+	}
+
+	// TX
+	uint8_t dataToSend[UART_TX_BUFFER_LENGTH];
+	const uint8_t dataLength = circBuffer2D_pop(CIRCBUFFER2D_CHANNEL_UART_TX, dataToSend);
+	if(dataLength > 0U)
+	{
+		// New data available to send. Check if DMA is busy. Number for data remaining to transfer should be 0 and the DMA channel should be disabled
+		const uint16_t bytesRemaining = DMA_GetCurrDataCounter(UART_config.HWConfig->DMAStreamTX);
+		if((bytesRemaining == 0U) && (DMA_GetCmdStatus(UART_config.HWConfig->DMAStreamTX) == DISABLE))
+		{
+			const uint8_t frameLength = dataLength + sizeof(UART_data.TXBuffer.header) + sizeof(UART_data.TXBuffer.data.crc);
+			DMA_SetCurrDataCounter(UART_config.HWConfig->DMAStreamTX, frameLength); // Set the new data length to transfer
+
+			UART_data.TXBuffer.header.length = dataLength;
+			UART_data.TXBuffer.data.crc = 0x00U; // TODO: calculate CRC
+			memcpy((uint8_t * const)UART_data.TXBuffer.data.payload, dataToSend, dataLength);
+
+			DMA_Cmd(UART_config.HWConfig->DMAStreamTX, ENABLE);
+		}
+	}
+
+	// RX ERROR HANDLING
+	switch(UART_data.RXIRQState)
+	{
+		default:
+		case UART_RX_IRQ_STATE_ERROR:
+		{
+			// Re-enable receiver. It should wait for a idle line before starting reception
+			DMA_Cmd(UART_config.HWConfig->DMAStreamRX, DISABLE); // Disable DMA channel
+			USART_DMACmd(UART_config.HWConfig->UARTPeriph, USART_DMAReq_Rx, DISABLE); // Disable DMA Requests
+			UART_config.HWConfig->UARTPeriph->CR1 &= ~USART_CR1_RE; // Turn off receiver
+			UART_config.HWConfig->DMAStreamRX->M0AR = (uint32_t)&UART_data.RXBuffer[UART_data.RXBufferBeingBuffered].header;
+			UART_config.HWConfig->DMAStreamRX->NDTR = sizeof(UART_data.RXBuffer[0U].header);
+			UART_data.RXIRQState = UART_RX_IRQ_STATE_WAITING_FOR_HEADER;
+			DMA_Cmd(UART_config.HWConfig->DMAStreamRX, ENABLE);
+			USART_DMACmd(UART_config.HWConfig->UARTPeriph, USART_DMAReq_Rx, ENABLE); // Enable DMA_reqs from UART periph
+			UART_config.HWConfig->UARTPeriph->CR1 |= USART_CR1_RE; // Enable receiver
+
+			break;
+		}
+		case UART_RX_IRQ_STATE_RECEIVING_PAYLOAD:
+		{
+			const uint32_t timeout_ms = UART_data.RXBuffer[UART_data.RXBufferBeingBuffered].header.length * ((9.0f * MS_IN_SEC)/UART_config.HWConfig->baudRate) + 2U;
+			const uint32_t timeElapsed = time_getTimeElapsedMilliseconds(UART_data.timeStartedPayloadReception);
+			if(timeElapsed >= timeout_ms)
+			{
+				UART_data.RXIRQState = UART_RX_IRQ_STATE_ERROR;
+			}
+			break;
+		}
+		case UART_RX_IRQ_STATE_WAITING_FOR_HEADER:
+		{
+			break;
+		}
+	}
+}
+
 
 bool UART_writeLen(const uint8_t * const data, const uint8_t length)
 {
@@ -320,8 +293,6 @@ bool UART_writeLen(const uint8_t * const data, const uint8_t length)
 	if((data != NULL) && (length != 0U) && (length <= UART_TX_BUFFER_LENGTH))
 	{
 		ret = circBuffer2D_push(CIRCBUFFER2D_CHANNEL_UART_TX, data, length);
-
-		xTaskNotifyGive(UART_data.taskHandle);
 	}
 
 	return ret;
@@ -352,7 +323,7 @@ void UART_DMAInterruptHandler(void)
 					// Change the address to write the new data to
 					UART_config.HWConfig->DMAStreamRX->M0AR = (uint32_t)&UART_data.RXBuffer[UART_data.RXBufferBeingBuffered].data.crc;
 					UART_data.RXIRQState = UART_RX_IRQ_STATE_RECEIVING_PAYLOAD;
-					UART_data.timeStartedPayloadReception = RTOS_getTimeMilliseconds();
+					UART_data.timeStartedPayloadReception = time_getTimeMilliseconds();
 					DMA_Cmd(UART_config.HWConfig->DMAStreamRX, ENABLE);
 				}
 				else
@@ -362,11 +333,6 @@ void UART_DMAInterruptHandler(void)
 
 					UART_data.RXIRQState = UART_RX_IRQ_STATE_ERROR;
 				}
-
-				// need to notify the task for watchdog, or to handle error
-				BaseType_t higherPriorityTaskWoken = pdFALSE;
-				vTaskNotifyGiveFromISR(UART_data.taskHandle, &higherPriorityTaskWoken);
-				portYIELD_FROM_ISR(higherPriorityTaskWoken);
 
 				break;
 			}
@@ -386,10 +352,6 @@ void UART_DMAInterruptHandler(void)
 
 				UART_data.RXIRQState = UART_RX_IRQ_STATE_WAITING_FOR_HEADER;
 
-				BaseType_t higherPriorityTaskWoken = pdFALSE;
-				vTaskNotifyGiveFromISR(UART_data.taskHandle, &higherPriorityTaskWoken);
-				portYIELD_FROM_ISR(higherPriorityTaskWoken);
-
 				break;
 			}
 
@@ -408,9 +370,5 @@ void UART_DMAInterruptHandler(void)
 
 		// F0 does not turn off the DMA channel when the Transfer is completed so turn it off here
 		DMA_Cmd(UART_config.HWConfig->DMAStreamTX, DISABLE);
-
-		BaseType_t higherPriorityTaskWoken = pdFALSE;
-		vTaskNotifyGiveFromISR(UART_data.taskHandle, &higherPriorityTaskWoken);
-		portYIELD_FROM_ISR(higherPriorityTaskWoken);
 	}
 }

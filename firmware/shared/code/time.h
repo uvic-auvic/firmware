@@ -14,10 +14,17 @@
 #include <stdbool.h>
 #include "stm32f4xx.h"
 
+typedef enum
+{
+    TIME_TIMER_RESOLUTION_16BITS,
+    TIME_TIMER_RESOLUTION_32BITS,
+} time_timerResolution_E;
+
 typedef struct
 {
     TIM_TypeDef * TIMPeriph; // Must be a 32-bit timer
-    bool          initializationRequired;
+    time_timerResolution_E timerResolution;
+    uint32_t timerInterruptNumber;
     void 		  (* enablePeripheralsClockCallback)(void);
 } time_config_S;
 
@@ -27,5 +34,7 @@ uint32_t time_getTimeElapsedMilliseconds(const uint32_t timeToCompare_ms);
 uint32_t time_getTimeMicroseconds(void);
 uint32_t time_getTimeElapsedMicroseconds(const uint32_t timeToCompare_us);
 
+// Interrupt Handler. Call this function in the interrupt handler in component specific
+void time_interruptHandler(void);
 
 #endif /* TIME_H_ */

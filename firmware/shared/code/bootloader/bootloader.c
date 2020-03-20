@@ -107,7 +107,7 @@ void bootloader_run(void)
         }
         case BOOTLOADER_STATE_VERIFY_FIRMWARE_INFO:
         {
-
+            
             flashInterface_unlockFlash();
             break;
         }

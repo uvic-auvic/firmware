@@ -81,13 +81,13 @@ args = parser.parse_args()
 
 serial_handle = None
 if args.port:
-    serial_handle = serial_lib.SerialLib(port=args.port, baudrate=9600, timeout=0.1, isotp_txid=protocol.protocol_MID_POLARIS_MCISOTP, isotp_rxid=protocol.protocol_MID_MC_ISOTP, message_request_id=protocol.protocol_MID_POLARIS_MCMessageRequest)
+    serial_handle = serial_lib.SerialLib(port=args.port, baudrate=9600, isotp_txid=protocol.protocol_MID_POLARIS_MCISOTP, isotp_rxid=protocol.protocol_MID_MC_ISOTP, message_request_id=protocol.protocol_MID_POLARIS_MCMessageRequest)
 
 if serial_handle is None:
     raise "ERROR"
     quit()
 
-motors_tester = test_lib.SerialTester(serial_handle, b'\x15MTR_CONT\x00')
+motors_tester = test_lib.SerialTester(serial_handle, b'\x15MTR_CONT')
 # motors_tester.run_all_tests(10)
     
 # Comment out if using iPython

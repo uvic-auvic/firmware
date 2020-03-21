@@ -21,7 +21,7 @@ class SerialTester:
 
             if verbose:
                 print("Success: {},   Failure: {}".format(success_count, failure_count))
-                print("Received: {} {} {}".format(header, crc, payload))
+                print("Received: HEADER:{}  CRC:{}  MESSAGE_ID:{}  MESSAGE:{}".format(header, crc, message_ID, message))
             
             time.sleep(0.1) # wait 100ms
         

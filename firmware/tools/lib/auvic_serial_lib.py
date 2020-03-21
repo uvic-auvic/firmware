@@ -49,7 +49,7 @@ class SerialLib(serial.Serial):
 
         while self.exit_requested == False:
             
-            print("RX_THREAD HERE")
+            # print("RX_THREAD HERE")
 
             if self.RX_state == RX_STATE.WAIT_FOR_HEADER:
                 if self.in_waiting > 0:
@@ -57,30 +57,32 @@ class SerialLib(serial.Serial):
                     if self.RX_buffer.header > 0 and self.RX_buffer.header <= 10: 
                         self.RX_state = RX_STATE.WAIT_FOR_PAYLOAD
                         self.timeStartedReception = time.time()
+                        print("RX_THREAD: Header received with length {}".format(self.RX_buffer.header))
                     else:
                         self.RX_state = RX_STATE.INITIALIZE
-                        # print("RX THREAD: Received invalid header. Header:{}".format(self.RX_buffer.header))
+                        print("RX THREAD: Received invalid header. Header:{}".format(self.RX_buffer.header))
 
             elif self.RX_state == RX_STATE.WAIT_FOR_PAYLOAD:
-                if self.in_waiting > (self.RX_buffer.header + 2):
+                if self.in_waiting >= (self.RX_buffer.header + 2):
                     self.RX_buffer.crc = int.from_bytes(self.read(2), byteorder='little')
                     self.RX_buffer.dlc = numpy.clip((self.RX_buffer.header - 1), a_min=0, a_max=8)
                     self.RX_buffer.message_ID = int.from_bytes(self.read(1), byteorder='little')
                     self.RX_buffer.message = self.read((self.RX_buffer.header - 1))
                     self.RX_buffer.message = self.RX_buffer.message[0:8]
 
-                    RX_queue_local.append(copy.deepcopy(self.RX_buffer))
+                    self.RX_queue.append(copy.deepcopy(self.RX_buffer))
 
                     self.RX_state = RX_STATE.INITIALIZE
 
                     print("RX THREAD: LEN:{}, CRC:{}, MID:{}, DLC:{}, MESSAGE:{}, MESSAGE_STR:{}".format(self.RX_buffer.header, self.RX_buffer.crc, self.RX_buffer.message_ID, self.RX_buffer.dlc, self.RX_buffer.message.hex(), self.RX_buffer.message))
                     print("RX THREAD: RX Queue length:{}".format(len(self.RX_queue)))
 
-                elif (time.time() - self.timeStartedReception) > (1.1):
+                elif (time.time() - self.timeStartedReception) > (0.02): # 20ms timeout
                     self.RX_state = RX_STATE.INITIALIZE
                     print("RX THREAD: RX timed out")
                 else:
                     # Do nothing
+                    # print("RX_THREAD: In waiting:{}".format(self.in_waiting))
                     pass
 
             else: # RX_STATE.INITIALIZE and default
@@ -94,7 +96,7 @@ class SerialLib(serial.Serial):
 
                 # self.reset_input_buffer()
 
-        # self.isotp_handle.process() # Also process ISOTP
+            # self.isotp_handle.process() # Also process ISOTP
 
     def construct_frame(self, message_ID, message, message_length=None):
 
@@ -136,9 +138,10 @@ class SerialLib(serial.Serial):
                 break
 
             if (time.time() - time_started) > timeout or timeout == 0: # Basically a do-while loop
+                print("receive_message: Receive timeout")
                 break
 
-            print("RECEIVE_FUNC HERE")
+            # print("RECEIVE_FUNC HERE")
             
             # time.sleep(0.01) # sleep for 10ms
 

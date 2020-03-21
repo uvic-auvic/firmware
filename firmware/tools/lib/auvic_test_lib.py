@@ -44,8 +44,6 @@ class SerialTester:
             if verbose:
                 print("Test Aborted UART Packet: Failed: Sanity check failed")
             return False
-        
-        self.serial_handle.reset_input_buffer()
 
         # Test: Simulate a packet transmission being aborted
         for i in range(10):
@@ -80,8 +78,6 @@ class SerialTester:
             if verbose:
                 print("Test Undersized UART Packet: Failed: Sanity check failed")
             return False
-
-        self.serial_handle.reset_input_buffer()
 
         # Test: Length too small. Send a packet with a payload length of 0. So the packet only has a CRC
         for i in range(10):
@@ -118,8 +114,6 @@ class SerialTester:
                 print("Test Oversized UART Packet: Failed: Sanity check failed")
             return False
 
-        self.serial_handle.reset_input_buffer()
-
         # Test: Length too long. Send a packet with a length that is greater than what the device can support.
         for i in range(10):
             self.serial_handle.reset_output_buffer()
@@ -139,7 +133,7 @@ class SerialTester:
 
 
         # Test that the board still responds after receiveing a bad packet
-        if self.test_RID(False) == False:
+        if self.test_RID(True) == False:
             if verbose: print("Test Oversized UART Packet: Failed: Post test comms check")
             return False
 

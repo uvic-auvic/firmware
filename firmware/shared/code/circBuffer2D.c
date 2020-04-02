@@ -39,11 +39,8 @@ void circBuffer2D_init(void)
 			channelData->empty = 1;
 		} else
 		{
-			// ASSERT??
+			//ASSERT???
 		}
-
-
-	// do some additional checks to make sure there is no overlap in the memory regions
 	}
 }
 
@@ -82,14 +79,9 @@ bool circBuffer2D_push(const circBuffer2D_channel_E channel, uint8_t const * con
 	if((channel < CIRCBUFFER2D_CHANNEL_COUNT) && (data != NULL) && (length > 0))
 	{
 		circBuffer2D_channelData_S * channelData = &circBuffer2D_data.channelData[channel];
-	//	uint16_t * test = &channelData->buffer[channelData->head];
-	//	*test = 0xff;
 		if((circBuffer2D_getSpaceAvailable(channel) > 0) && (channelData->length >= length))
 		{
-			printf("1  %p \n", channelData->buffer[channelData->head]);
 			memset(&channelData->buffer[channelData->head], 0U, channelData->length);
-			printf("2  %p \n\n", &(circBuffer2D_data.channelData[channel]).buffer[circBuffer2D_data.channelData[channel].head]);
-
 			memcpy(&channelData->buffer[channelData->head], data, length);
 			channelData->head = (channelData->head + 1) % (channelData->count);
 			ret = true;
@@ -105,12 +97,14 @@ uint8_t circBuffer2D_pop(const circBuffer2D_channel_E channel, uint8_t * const d
 	uint8_t ret = 0U;
 	if((channel < CIRCBUFFER2D_CHANNEL_COUNT) && (dataToReturn != NULL))
 	{
+		
 		circBuffer2D_channelData_S * channelData = &circBuffer2D_data.channelData[channel];
-		if(channelData->head != channelData->tail)
+		if(channelData->head != channelData->tail || channelData->empty == 0)
 		{
+			
 			memset(dataToReturn, 0U, channelData->length);
 			memcpy(dataToReturn, &channelData->buffer[channelData->tail], channelData->length);
-			channelData->tail = (channelData->tail + 1U)  % (channelData->count + 1);
+			channelData->tail = (channelData->tail + 1U)  % (channelData->count);
 
 			if(channelData->head == channelData->tail)
 			{

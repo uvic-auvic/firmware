@@ -36,7 +36,7 @@ void circBuffer2D_init(void)
 			channelData->buffer = channelConfig->buffer;
 			channelData->length = channelConfig->length;
 			channelData->count = channelConfig->count;
-			channelData->empty = 1;
+			channelData->empty = true;
 		} else
 		{
 			//ASSERT???
@@ -51,10 +51,10 @@ uint8_t circBuffer2D_getSpaceAvailable(const circBuffer2D_channel_E channel)
 	{
 
 		circBuffer2D_channelData_S * channelData = &circBuffer2D_data.channelData[channel];
-		if(channelData->empty == 0 && channelData->head == channelData->tail ){
+		if(channelData->empty == false && channelData->head == channelData->tail ){
 			ret = 0;
 		}
-		else if (channelData->empty == 1){
+		else if (channelData->empty == true){
 			ret = channelData->count;
 		}
 		else if(channelData->head > channelData->tail)
@@ -85,7 +85,7 @@ bool circBuffer2D_push(const circBuffer2D_channel_E channel, uint8_t const * con
 			memcpy(&channelData->buffer[channelData->head], data, length);
 			channelData->head = (channelData->head + 1) % (channelData->count);
 			ret = true;
-			channelData->empty = 0;
+			channelData->empty = false;
 		}
 	}
 
@@ -99,7 +99,7 @@ uint8_t circBuffer2D_pop(const circBuffer2D_channel_E channel, uint8_t * const d
 	{
 		
 		circBuffer2D_channelData_S * channelData = &circBuffer2D_data.channelData[channel];
-		if(channelData->head != channelData->tail || channelData->empty == 0)
+		if(channelData->head != channelData->tail || channelData->empty == false)
 		{
 			
 			memset(dataToReturn, 0U, channelData->length);
@@ -108,7 +108,7 @@ uint8_t circBuffer2D_pop(const circBuffer2D_channel_E channel, uint8_t * const d
 
 			if(channelData->head == channelData->tail)
 			{
-				channelData->empty = 1;
+				channelData->empty = true;
 			}
 
 			ret = channelData->length;

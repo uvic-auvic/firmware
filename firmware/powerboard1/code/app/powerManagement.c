@@ -13,6 +13,8 @@
 #include "protocol.h"
 #include "ADC.h"
 #include "RTOS.h"
+#include "housingMonitor.h"
+
 
 #define SYSTEM_POWER_GPIO		(GPIO_Pin_11)
 #define MOTOR_POWER_GPIO		(GPIO_Pin_12)
@@ -86,9 +88,25 @@ void powerManagement_run100ms(void)
             powerManagement_data.batteryCurrents[POWER_MANAGEMENT_BATTERY_CHANNEL_LEFT] = ADC_VALUE_TO_CURRENT(ADC_getChannelData(ADC_CHANNEL_LEFT_BATT_CURRENT));
             powerManagement_data.batteryCurrents[POWER_MANAGEMENT_BATTERY_CHANNEL_RIGHT] = ADC_VALUE_TO_CURRENT(ADC_getChannelData(ADC_CHANNEL_RIGHT_BATT_CURRENT));
 
-            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_MOTOR, message.POLARIS_powerEnable.motorPowerEnable);
-            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_5V, message.POLARIS_powerEnable._5VPowerEnable);
-            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V_9V, message.POLARIS_powerEnable._12V9VPowerEnable);
+            //powerManagement_setState(POWER_MANAGEMENT_CHANNEL_MOTOR, message.POLARIS_powerEnable.motorPowerEnable);
+            //powerManagement_setState(POWER_MANAGEMENT_CHANNEL_5V, message.POLARIS_powerEnable._5VPowerEnable);
+            //powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V_9V, message.POLARIS_powerEnable._12V9VPowerEnable);
+			
+			//Ckeck if leakage happens in the main housing before turning on power
+			housingMonitor_housing_E Main_housing;
+			if (housingMonitor_getHousingStatus(Main_housing) == Leak)
+			{
+				powerManagement_setState(POWER_MANAGEMENT_CHANNEL_MOTOR, false);
+				powerManagement_setState(POWER_MANAGEMENT_CHANNEL_5V, false);
+				powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V_9V, false);
+			}
+			//No leakage. If power enable is true, turn on the power.
+			else 
+			{
+				powerManagement_setState(POWER_MANAGEMENT_CHANNEL_MOTOR, message.POLARIS_powerEnable.motorPowerEnable);
+				powerManagement_setState(POWER_MANAGEMENT_CHANNEL_5V, message.POLARIS_powerEnable._5VPowerEnable);
+				powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V_9V, message.POLARIS_powerEnable._12V9VPowerEnable);
+			}
 
             break;
         }

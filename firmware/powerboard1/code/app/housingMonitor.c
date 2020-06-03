@@ -15,7 +15,11 @@ uint16_t threshold = 2048;
 
 housingMonitor_housingStatus_E housingMonitor_getHousingStatus(const housingMonitor_housing_E housing)
 {
-	uint16_t SensorValue = ADC_getChannelData(ADC_CHANNEL_WATER_SENSOR);
+	uint16_t SensorValue = 0;
+	if (housing == Main)
+	{
+		SensorValue = ADC_getChannelData(ADC_CHANNEL_WATER_SENSOR);
+	}
 	housingMonitor_housingStatus_E HStatus = No_leak;
 	if (SensorValue >= threshold)
 	{

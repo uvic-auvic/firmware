@@ -15,7 +15,10 @@ typedef enum
 } housingMonitor_housingStatus_E;
 
 
-
+typedef enum
+{
+	Main = 0
+} housingMonitor_housing_E;
 
 //void housingMonitor_init(void);
 housingMonitor_housingStatus_E housingMonitor_getHousingStatus(const housingMonitor_housing_E housing);

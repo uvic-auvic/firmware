@@ -8,10 +8,7 @@
 #include "housingMonitor.h"
 #include "ADC.h"
 
-typedef enum
-{
-	Main = 0
-} housingMonitor_housing_E;
+
 
 uint16_t threshold = 2048;
 

@@ -1,0 +1,258 @@
+commit c8b6095d67eb8fb9ee2a2eac8db0f80fa02b4194
+Author: cartercooper <47931010+cartercooper@users.noreply.github.com>
+Date:   Thu May 14 21:54:20 2020 -0700
+
+    Carter (#27)
+    
+    * modified:   shared/code/circBuffer2D.c
+            modified:   shared/code/circBuffer2D.h
+            modified:   shared/test/code/test_circBuffer2D/circBuffer2D_componentSpecific.c
+            modified:   shared/test/code/test_circBuffer2D/test_circBuffer2D.c
+    
+    * Functional 2D Circular Buffer
+    
+    * Changes to be committed:
+            deleted:    libs/cgreen/gitrevision.h
+            modified:   shared/code/circBuffer2D.c
+
+commit cdd77ec844e58352201623ab823c8ed0387d9404
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Mon Mar 16 03:47:18 2020 -0700
+
+    UART error handling (#25)
+    
+    - UART error handling
+    - Python test infrastructure
+
+commit b1cf0efd83f0f9aecb505a236c577ea37525d131
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Sun Mar 15 06:52:36 2020 -0700
+
+    Started development on ISOTP (#26)
+
+commit 0e8d92b12bb831975ebb52fa7c5d87331c66f742
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Sat Mar 7 00:54:39 2020 -0800
+
+    Added motor control interface (#24)
+    
+    - PWM out for motor control
+    - PWM in for RPMS feedback
+    - Message definitions
+
+commit 66e45724858f36db743c91c4727f12d05bdc621f
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Fri Feb 28 20:26:47 2020 -0800
+
+    Added bootloader script and modified UART_test (#23)
+
+commit 4ebe5eeb8b622d8108db3f1b8ba068eb075bdf79
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Fri Feb 21 22:38:01 2020 -0800
+
+    Fixed header guards (#22)
+
+commit 2462bf150df907173239a7da966fc797e3a084bc
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Fri Feb 21 22:29:14 2020 -0800
+
+    UART for STM32F4 (#21)
+
+commit 5cdd3b0dd737b6e832af94c72cc54ad7e75aa928
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Thu Feb 20 20:39:19 2020 -0800
+
+    Made changes in messageHandler.c so that memcpy is not required when populating a TX message (#18)
+
+commit d8cd1042053fcac2ae323d93c8ddf0ba0676b61f
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Thu Feb 20 20:36:33 2020 -0800
+
+    Added unit test infrastructure (#19)
+
+commit e74f1d08e21a5669d8b7e4b4145b93c5b4fce296
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Wed Feb 19 16:54:23 2020 -0800
+
+    Fixed hard fault issue with some UART messages (#17)
+
+commit e15031f674d422a3535cf747e9763a35eb166b98
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Tue Feb 18 09:13:45 2020 -0800
+
+    Added power management module, batt currents and voltages on UART (#16)
+
+commit 3452364490e10fb94437ed44f4a59014637887e8
+Author: Poorna Chander Kalidas <poornakalidas@gmail.com>
+Date:   Tue Feb 18 07:30:08 2020 -0800
+
+    Fixed mistake in protocol.h
+
+commit a4a8f4aa7feca72493ed6e0065761ab22da2d143
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Tue Feb 18 00:19:32 2020 -0800
+
+    Implemented returning depth sensor data through UART (#15)
+
+commit 0ece7b0af1fd3807fc5027439d67537b85ac459c
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Mon Feb 17 19:24:42 2020 -0800
+
+    UART TX with DMA (#14)
+    
+    * Finished message handler and TX UART
+    * Modified protocol.h to work on Jetson
+
+commit 29d04835d14e56aae87ccc9780bf3db2776af2e2
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Mon Feb 17 03:29:01 2020 -0800
+
+    Added ISO-TP library (#13)
+
+commit 42207f06a3b2ed3796cb31ad6418ced86f690128
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Mon Feb 17 01:26:20 2020 -0800
+
+    Update README.md
+
+commit 378a5c5a015e052a2bed2b84f1dd8dbc2d7abbc4
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Sat Feb 15 23:20:29 2020 -0800
+
+    Basic UART with DMA (#12)
+
+commit a8f8bed861dfa2501790486ad116578b46504adf
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Fri Feb 7 16:36:27 2020 -0800
+
+    Add ADC (#11)
+
+commit 5e8d2da563245aa70757f98aec0a01adc4ea9cd6
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Fri Feb 7 07:35:28 2020 -0800
+
+    Initial Power Board firmware (#10)
+    
+    LED Blinks
+    UART Peripheral configured
+
+commit 1a35360ed08dfff1eaf5c75b145478dae322d774
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Thu Feb 6 20:23:17 2020 -0800
+
+    Added basic implementation for UART using interrupts (#9)
+
+commit eb7214e723bd21432d9c8a629f9afc9ab3bedccf
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Thu Feb 6 00:17:53 2020 -0800
+
+    Fixed build issue on Ubuntu 18.04 (#8)
+
+commit 2f1e5c47afa926e469a5603fcbbe0e579675f03e
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Mon Feb 3 18:39:27 2020 -0800
+
+    Add badge for build status
+
+commit ac4aa497cd422bb7bf2639cad2aac55fc63d72c1
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Mon Feb 3 18:25:03 2020 -0800
+
+    Update README.md
+
+commit 93ccf6a58d0886f92cc1625e325e55a0e2eff9e7
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Mon Feb 3 18:22:42 2020 -0800
+
+    Update README.md
+
+commit 333b507df900689ab2339f05f92a5917efeb163f
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Mon Feb 3 17:59:00 2020 -0800
+
+    Added multiple device support in Eclipse (#4)
+
+commit 37cbc8899bf5da8cc7e24e8ee4639741ddd9ddc6
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Mon Feb 3 16:44:50 2020 -0800
+
+    Fixed build issues with Eclipse (#3)
+
+commit 83fe483c5fa3b69c2dae9079b0b931a9bbfa1251
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Mon Feb 3 16:22:49 2020 -0800
+
+    Added ability to build with device config (#2)
+
+commit 1958a954b14b2375696f6bbe848f12f9199c5986
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Mon Feb 3 15:56:25 2020 -0800
+
+    Fixed file path problem on Windows (#1)
+
+commit d9dcd6b2a1d670cd01bfcad9f79c7c8e7ead740e
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Sat Jan 25 20:18:36 2020 -0800
+
+    Create README.md
+
+commit b5b527e886963c246210359987ec155d74af4c5a
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Fri Jan 24 01:28:18 2020 -0800
+
+    Added CI, unit tests
+    
+    - Builds using Github
+    - Added unit tests
+
+commit 61a0a93604cb196abb31da1ac88bd9c67daa33d2
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Thu Jan 23 22:12:02 2020 -0800
+
+    UART WIP
+    
+    - Switched to STM32F413
+    - Reverted building with Docker
+    - UART kinda workes
+
+commit 5d184d3fa8e28686c4e4d566711d1508130f726a
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Sat Nov 23 02:25:12 2019 -0800
+
+    Added ability to build with Docker
+
+commit 17a886a7c4c4076c1d0d812b291706a3fc2e7910
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Sun Jul 28 19:07:21 2019 -0700
+
+    Added nanopb library (#3)
+
+commit 3575c0ff05004b5e6eb6baecabb4b963dae723e2
+Author: Poorna Chander Kalidas <poornack@users.noreply.github.com>
+Date:   Wed Jul 24 22:20:19 2019 -0700
+
+    Implemented 1D circular buffer (#1)
+
+commit dae25fe689f5564f686b0a0b7773c1bb63a34ac8
+Author: Poorna Chander Kalidas <poornakalidas@gmail.com>
+Date:   Sun Jul 21 22:03:34 2019 -0700
+
+    Moved everything in to sub folder from repo root
+
+commit e49600cd7870c933ca016f7783e192600ac791bf
+Author: Poorna Chander Kalidas <poornakalidas@gmail.com>
+Date:   Sun Jul 21 20:47:48 2019 -0700
+
+    Motor Controller blinky LED with bootloader
+
+commit 9bfeb59d5c4a363a5ea73786736dd56fd69fb0a8
+Author: Poorna Chander Kalidas <poornakalidas@gmail.com>
+Date:   Sat Jul 20 06:47:35 2019 -0700
+
+    Blinky LED on motor controller
+
+commit bf2a9f2aa6392ef6d2bcf724f5d69e373127c717
+Author: Poorna Chander Kalidas <poornakalidas@gmail.com>
+Date:   Sat Jul 20 06:17:51 2019 -0700
+
+    Added .gitignore

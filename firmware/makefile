@@ -11,6 +11,11 @@ _powerboard1:
 	@echo "Building Power Board 1 - $(TARGET) - $(DEVICE)"
 	$(MAKE) --no-print-directory -C powerboard1/makefiles $(TARGET)
 
+pinger: _pinger
+_pinger:
+	@echo "Building pinger - $(TARGET) - $(DEVICE)"
+	$(MAKE) --no-print-directory -C pinger/makefiles $(TARGET)
+
 generated:
 	# Generated Protocol File in Python
 	clang2py shared/data/protocol/protocol.h -o tools/lib/generated/protocol.py --clang-args="-I/usr/lib/gcc/arm-none-eabi/4.9.3/include"
@@ -26,6 +31,9 @@ all:
 	$(MAKE) powerboard1 TARGET=app DEVICE=STM32F091
 	$(MAKE) powerboard1 TARGET=app DEVICE=STM32F051
 
+	# pinger
+	$(MAKE) pinger TARGET=app DEVICE=STM32F091
+
 clean:
 	# Motor Controller
 	$(MAKE) motorcontroller2 TARGET=clean
@@ -34,6 +42,10 @@ clean:
 	# Power Board
 	$(MAKE) powerboard1 TARGET=clean
 	$(MAKE) --no-print-directory -C powerboard1/test clean
+
+	# pinger
+	$(MAKE) pinger TARGET=clean
+	$(MAKE) --no-print-directory -C pinger/test clean
 
 	# Shared Test
 	$(MAKE) --no-print-directory -C shared/test clean
@@ -45,11 +57,15 @@ help:
 	@echo
 	@echo Component: powerboard1
 	@echo       Available TARGET options: app, bootloader
+	@echo
+	@echo Component: pinger
+	@echo       Available TARGET options: app, bootloader
 
 test:
 	$(MAKE) -C shared/test test
 	$(MAKE) -C motorcontroller2/test test
 	$(MAKE) -C powerboard1/test test
+	$(MAKE) -C pinger/test test
 
 sandbox:
 	@echo SANDBOX

@@ -22,7 +22,7 @@ APP_C_DEPS += $(APP_OBJS:%.o=%.d)
 INCLUDE_PATH+= \
 -I$(SHARED_CODE_DIR) \
 -I$(SHARED_CODE_DIR)/RTOS \
--I$(SHARED_DIR)/data/protocol \
+-I$(SHARED_DIR)/data/protocol/protocol \
 -I$(SHARED_CODE_DIR)/utils \
 
 $(shell mkdir -p $(OUTPUT_DIR)/obj/app)

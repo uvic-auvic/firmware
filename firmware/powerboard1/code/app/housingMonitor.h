@@ -22,7 +22,7 @@ typedef enum
 
 //void housingMonitor_init(void);
 housingMonitor_housingStatus_E housingMonitor_getHousingStatus(const housingMonitor_housing_E housing);
-void housingMonitor_run(void);
+void housingMonitor_run(const housingMonitor_housing_E housing);
 
 #endif /* POWERBOARD1_CODE_APP_HOUSINGMONITOR_H_ */
 

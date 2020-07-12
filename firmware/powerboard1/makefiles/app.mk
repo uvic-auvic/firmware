@@ -14,6 +14,7 @@ $(OUTPUT_DIR)/obj/app/messageHandler.o \
 $(OUTPUT_DIR)/obj/app/messageHandler_componentSpecific.o \
 $(OUTPUT_DIR)/obj/app/sensors.o \
 $(OUTPUT_DIR)/obj/app/powerManagement.o \
+$(OUTPUT_DIR)/obj/app/housingMonitor.o \
 
 APP_C_DEPS += $(APP_OBJS:%.o=%.d)
 

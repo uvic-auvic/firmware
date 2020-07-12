@@ -10,14 +10,14 @@
 
 typedef enum
 {
-	No_leak = 0,
-	Leak = 1
+	HOUSINGMONITOR_HOUSINGSTATUS_NO_LEAK = 0,
+	HOUSINGMONITOR_HOUSINGSTATUS_LEAK = 1
 } housingMonitor_housingStatus_E;
 
 
 typedef enum
 {
-	Main = 0
+	HOUSINGMONITOR_HOUSING_MAIN = 0
 } housingMonitor_housing_E;
 
 //void housingMonitor_init(void);

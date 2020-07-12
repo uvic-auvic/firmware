@@ -9,29 +9,35 @@
 #include "ADC.h"
 
 
-
-uint16_t threshold = 2048;
-
+#define threshold 2048
+static housingMonitor_housingStatus_E HStatus;
 
 housingMonitor_housingStatus_E housingMonitor_getHousingStatus(const housingMonitor_housing_E housing)
 {
-	uint16_t SensorValue = 0;
-	if (housing == Main)
+	housingMonitor_housingStatus_E HStatus_copy = HOUSINGMONITOR_HOUSINGSTATUS_NO_LEAK;
+	if (housing == HOUSINGMONITOR_HOUSING_MAIN)
 	{
-		SensorValue = ADC_getChannelData(ADC_CHANNEL_WATER_SENSOR);
+		HStatus_copy = HStatus;
 	}
-	housingMonitor_housingStatus_E HStatus = No_leak;
-	if (SensorValue >= threshold)
-	{
-		HStatus = Leak;
-	}
-	return HStatus;
+	return HStatus_copy;
 }
 
-void housingMonitor_run(void)
+//Actual detection of leakage
+void housingMonitor_run(const housingMonitor_housing_E housing)
 {
-	housingMonitor_housing_E housing = Main;
-	if (housingMonitor_getHousingStatus(housing) == Leak)
+	uint16_t sensorValue = 0;
+	if (housing == HOUSINGMONITOR_HOUSING_MAIN)
+	{
+		sensorValue = ADC_getChannelData(ADC_CHANNEL_WATER_SENSOR);
+	}
+	HStatus = HOUSINGMONITOR_HOUSINGSTATUS_NO_LEAK;
+	if (sensorValue >= threshold)
+	{
+		HStatus = HOUSINGMONITOR_HOUSINGSTATUS_LEAK;
+	}
+	/*//Testing code for leakage detection
+	  housingMonitor_housing_E housing = HOUSINGMONITOR_HOUSING_MAIN;
+	  if (housingMonitor_getHousingStatus(housing) == HOUSINGMONITOR_HOUSINGSTATUS_LEAK)
 	{
 		//Do something here.
 		//Testing: using GPIO, if leaking happened Pin PA2 output high, else is low
@@ -39,4 +45,5 @@ void housingMonitor_run(void)
 
 	}
 	//else GPIOA->ODR &= ~GPIO_PIN_2;
+	 */
 }

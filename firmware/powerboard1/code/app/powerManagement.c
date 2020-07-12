@@ -93,8 +93,8 @@ void powerManagement_run100ms(void)
             //powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V_9V, message.POLARIS_powerEnable._12V9VPowerEnable);
 			
 			//Ckeck if leakage happens in the main housing before turning on power
-			housingMonitor_housing_E Main_housing = Main;
-			if (housingMonitor_getHousingStatus(Main_housing) == Leak)
+			housingMonitor_housing_E Main_housing = HOUSINGMONITOR_HOUSING_MAIN;
+			if (housingMonitor_getHousingStatus(Main_housing) == HOUSINGMONITOR_HOUSINGSTATUS_LEAK)
 			{
 				powerManagement_setState(POWER_MANAGEMENT_CHANNEL_MOTOR, false);
 				powerManagement_setState(POWER_MANAGEMENT_CHANNEL_5V, false);

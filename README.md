@@ -3,6 +3,13 @@ Repo for all AUVIC firmware
 
 ## Getting started
 
+This branch contains submodule(s). You will have to download the submodule after you clone
+1) `git clone https://github.com/uvic-auvic/firmware.git` to clone the repo
+2) `cd firmware`
+3) `git status` to ensure the repo cloned correctly
+4) `git submodule init` to download the submodule(s)
+5) Anytime you switch branches (i.e. by doing `git checkout some_branch`) you have to run `git submodule update`
+
 ### Ubuntu 16.04 or 18.04
 1) Checkout repo into a path without any spaces
 2) Run `sudo provision.sh`. This will install all required dependencies.

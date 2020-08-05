@@ -1,0 +1,3 @@
+[submodule "firmware/shared/data/protocol"]
+	path = firmware/shared/data/protocol
+	url = https://github.com/uvic-auvic/protocol.git

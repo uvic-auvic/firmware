@@ -23,10 +23,10 @@ typedef struct
 } circBuffer1D_channelConfig_S;
 
 void circBuffer1D_init(void);
-uint8_t circBuffer1D_getSpaceAvailable(const circBuffer1D_channel_E channel);
+uint32_t circBuffer1D_getSpaceAvailable(const circBuffer1D_channel_E channel);
 bool circBuffer1D_popByte(const circBuffer1D_channel_E channel, uint8_t * const returnData);
 bool circBuffer1D_pushByte(const circBuffer1D_channel_E channel, const uint8_t data);
-bool circBuffer1D_push(const circBuffer1D_channel_E channel, const uint8_t * const data, const uint8_t size);
+bool circBuffer1D_push(const circBuffer1D_channel_E channel, const uint8_t * const data, const uint32_t size);
 
 uint8_t circBuffer1D_pop(const circBuffer1D_channel_E channel, uint8_t * const dataToReturn);
 

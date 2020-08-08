@@ -8,6 +8,7 @@
 #include "circBuffer1D.h"
 #include <stdlib.h>
 #include "utils.h"
+#include "assert.h"
 
 typedef struct
 {
@@ -40,16 +41,13 @@ void circBuffer1D_init(void)
 			circBuffer1D_data.channelData[channel].endIndex = bufferSize - 1U;
 		}
 
-		if(bufferSize != sizeof(circBuffer1D_data.buffer))
-		{
-
-		}
+		assert(bufferSize <= sizeof(circBuffer1D_data.buffer));
 	}
 }
 
-uint8_t circBuffer1D_getSpaceAvailable(const circBuffer1D_channel_E channel)
+uint32_t circBuffer1D_getSpaceAvailable(const circBuffer1D_channel_E channel)
 {
-	uint8_t ret = 0U;
+	uint32_t ret = 0U;
 	if(channel < CIRCBUFFER1D_CHANNEL_COUNT)
 	{
 		circBuffer1D_channelData_S * channelData = &circBuffer1D_data.channelData[channel];
@@ -100,7 +98,7 @@ bool circBuffer1D_pushByte(const circBuffer1D_channel_E channel, const uint8_t d
 	return ret;
 }
 
-bool circBuffer1D_push(const circBuffer1D_channel_E channel, const uint8_t * const data, const uint8_t size)
+bool circBuffer1D_push(const circBuffer1D_channel_E channel, const uint8_t * const data, const uint32_t size)
 {
 	bool ret = false;
 
@@ -109,7 +107,7 @@ bool circBuffer1D_push(const circBuffer1D_channel_E channel, const uint8_t * con
 		if(circBuffer1D_getSpaceAvailable(channel) >= size)
 		{
 			ret = true;
-			for(uint8_t index = 0U; index < size; index++)
+			for(uint32_t index = 0U; index < size; index++)
 			{
 				if(circBuffer1D_pushByte(channel, data[index]) == false)
 				{

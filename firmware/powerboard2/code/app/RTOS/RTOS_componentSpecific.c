@@ -23,8 +23,8 @@ void RTOS_init(void)
     debug_init();
     CAN_init();
 
-    debug_writeString("*** POWER BOARD 2 ***\n");
-    debug_writeString("Initialization Complete\n");
+    debug_writeStringBlocking("*** POWER BOARD 2 ***");
+    debug_writeStringBlocking("Initialization Complete");
 }
 
 void RTOS_run1ms(void)
@@ -44,6 +44,7 @@ void RTOS_run100ms(void)
 
 void RTOS_run1000ms(void)
 {
-
+    uint8_t data = 'H';
+    CAN_SendMessage(&data, 1);
 }
 

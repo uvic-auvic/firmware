@@ -12,10 +12,13 @@ static void CAN_enablePeripheralsClockCallback(void);
 static const CAN_HWConfig_S CAN_HWConfig =
 {
 	// GPIO
-	.rxPin = GPIO_PinSource12,
-	.txPin = GPIO_PinSource11,
-	.GPIOPort = GPIOA,
-	.AFNumber = GPIO_AF_USART6,
+	.rxPin = 8,
+	.txPin = 9,
+	.GPIOPort = GPIOB,
+	.AFNumber = GPIO_AF_CAN1,
+
+	// CAN
+	.CANPeriph = CAN1,
 
 	// Common
 	.enablePeripheralsClockCallback = CAN_enablePeripheralsClockCallback,
@@ -29,5 +32,6 @@ const CAN_config_S CAN_config =
 
 static void CAN_enablePeripheralsClockCallback(void)
 {
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1ENR_GPIOBEN, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_APB1ENR_CAN1EN, ENABLE);
 }

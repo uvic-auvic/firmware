@@ -17,9 +17,20 @@
 #define UART_BAUD_RATE (115200U)
 
 /* TYPEDEFS */
+typedef enum
+{
+	TX_STATE_READY_TO_SEND,
+	TX_STATE_TRANSMITTING,
+} debug_TXState_E;
+
+typedef struct
+{
+	volatile debug_TXState_E TXState;
+} debug_data_S;
 
 /* PRIVATE DATA */
 extern const debug_config_S debug_config;
+static debug_data_S debug_data;
 
 /* PRIVATE FUNCTIONS DECLARATION */
 static void debug_private_configureGPIO(void);
@@ -72,7 +83,7 @@ static void debug_private_configureUARTPeriph(void)
 	USART_Init(debug_config.HWConfig->UARTPeriph, &USART_InitStruct);
 
 	// Setup interrupt
-	NVIC_SetPriority(debug_config.HWConfig->UARTInterruptNumber, 7);
+	NVIC_SetPriority(debug_config.HWConfig->UARTInterruptNumber, 4);
 	NVIC_EnableIRQ(debug_config.HWConfig->UARTInterruptNumber);
 
 	USART_Cmd(debug_config.HWConfig->UARTPeriph, ENABLE);
@@ -96,20 +107,39 @@ void _debug_init()
 		assert(0U);
 	}
 
+	debug_data.TXState = TX_STATE_READY_TO_SEND;
+
 	debug_private_configureGPIO();
 	debug_private_configureUARTPeriph();
+
+	_debug_writeStringBlocking("debug ready");
 }
 
-bool _debug_writeLen(const uint8_t * const data, const uint16_t length)
+bool _debug_writeLen(const uint8_t * const data, const uint16_t length, const bool blocking)
 {
 	bool ret = false;
 	if((data != NULL) && (length != 0U) && (length <= DEBUG_TX_BUFFER_LENGTH))
 	{
-		ret = circBuffer1D_push(CIRCBUFFER1D_CHANNEL_DEBUG_TX, data, length);
-		if(ret)
+		if(blocking)
 		{
-			// Enable the TXNE interrupt. The IRQ will take care of starting the transmission
-			USART_ITConfig(debug_config.HWConfig->UARTPeriph, USART_IT_TXE, ENABLE);
+			while (debug_data.TXState == TX_STATE_TRANSMITTING) {}
+
+			for(uint16_t dataIndex = 0U; dataIndex < length; dataIndex++)
+			{
+				while(USART_GetFlagStatus(debug_config.HWConfig->UARTPeriph, USART_FLAG_TXE) != SET) {}
+				debug_config.HWConfig->UARTPeriph->DR = data[dataIndex];
+			}
+		}
+		else
+		{
+			ret = circBuffer1D_push(CIRCBUFFER1D_CHANNEL_DEBUG_TX, data, length);
+			if(ret)
+			{
+				debug_data.TXState = TX_STATE_TRANSMITTING;
+
+				// Enable the TXNE interrupt. The IRQ will take care of starting the transmission
+				USART_ITConfig(debug_config.HWConfig->UARTPeriph, USART_IT_TXE, ENABLE);
+			}
 		}
 	}
 
@@ -117,8 +147,21 @@ bool _debug_writeLen(const uint8_t * const data, const uint16_t length)
 }
 
 bool _debug_writeString(const char * const string)
+{	
+	bool ret = false;
+	ret = _debug_writeLen((const uint8_t * const)string, strnlen(string, DEBUG_TX_BUFFER_LENGTH), false);
+	(void)_debug_writeLen((const uint8_t * const)"\n", 1U, false);
+
+	return ret;
+}
+
+bool _debug_writeStringBlocking(const char * const string)
 {
-	return _debug_writeLen((const uint8_t * const)string, strnlen(string, DEBUG_TX_BUFFER_LENGTH));
+	bool ret = false;
+	ret = _debug_writeLen((const uint8_t * const)string, strnlen(string, DEBUG_TX_BUFFER_LENGTH), true);
+	(void)_debug_writeLen((const uint8_t * const)"\n", 1U, false);
+
+	return ret;
 }
 
 /* INTERRUPT HANDLER */
@@ -126,22 +169,26 @@ bool _debug_writeString(const char * const string)
 // Call this function in the UART interrupt handler for this channel. Place the interrupt handler in the debug_componentSpecific file
 void debug_UARTInterruptHandler(void)
 {
-	if(USART_GetFlagStatus(debug_config.HWConfig->UARTPeriph, USART_FLAG_RXNE) == SET)
+	if(USART_GetITStatus(debug_config.HWConfig->UARTPeriph, USART_IT_RXNE) == SET)
 	{
 		// Do nothing for now. RX not yet implemented
-		USART_ITConfig(debug_config.HWConfig->UARTPeriph, USART_IT_RXNE, DISABLE);
+		// Clear interrupt by reading the data register
+		uint8_t temp = debug_config.HWConfig->UARTPeriph->DR;
+		UNUSED(temp);
 	}
-	else if(USART_GetFlagStatus(debug_config.HWConfig->UARTPeriph, USART_FLAG_TXE) == SET)
+	else if(USART_GetITStatus(debug_config.HWConfig->UARTPeriph, USART_IT_TXE) == SET)
 	{
 		uint8_t byteToSend;
 		if(circBuffer1D_popByte(CIRCBUFFER1D_CHANNEL_DEBUG_TX, &byteToSend))
 		{
 			debug_config.HWConfig->UARTPeriph->DR = byteToSend;
+			debug_data.TXState = TX_STATE_TRANSMITTING;
 		}
 		else
 		{
 			// Turn off TXE interrupt
 			USART_ITConfig(debug_config.HWConfig->UARTPeriph, USART_IT_TXE, DISABLE);
+			debug_data.TXState = TX_STATE_READY_TO_SEND;
 		}
 	}
 	else

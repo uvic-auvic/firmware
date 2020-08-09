@@ -15,13 +15,15 @@
 #include <stdint.h>
 
 #ifdef UART_DEBUG
-#define debug_init(...) _debug_init(__VA_ARGS__)
-#define debug_writeLen(...)	_debug_writeLen(__VA_ARGS__)
-#define debug_writeString(...)	_debug_writeString(__VA_ARGS__)
+#define debug_init(...) 				_debug_init(__VA_ARGS__)
+#define debug_writeLen(...)				_debug_writeLen(__VA_ARGS__)
+#define debug_writeString(...)			_debug_writeString(__VA_ARGS__)
+#define debug_writeStringBlocking(...)	_debug_writeStringBlocking(__VA_ARGS__)
 #else
 #define debug_init(...)
 #define debug_writeLen(...)
 #define debug_writeString(...)
+#define debug_writeStringBlocking(...)
 #endif
 
 typedef struct
@@ -48,8 +50,9 @@ typedef struct
 
 
 void _debug_init(void);
-bool _debug_writeLen(const uint8_t * const data, const uint16_t length);
+bool _debug_writeLen(const uint8_t * const data, const uint16_t length, const bool blocking);
 bool _debug_writeString(const char * const string);
+bool _debug_writeStringBlocking(const char * const string);
 
 // Interrupt Handler
 void debug_UARTInterruptHandler(void);

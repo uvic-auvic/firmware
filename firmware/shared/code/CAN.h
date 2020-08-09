@@ -19,7 +19,8 @@ typedef struct
 	uint8_t			AFNumber;
 
     // CAN
-    
+    CAN_TypeDef *   CANPeriph;
+
     //Common
 	void 		(* enablePeripheralsClockCallback)(void);
 } CAN_HWConfig_S;
@@ -30,6 +31,6 @@ typedef struct
 } CAN_config_S;
 
 void CAN_init(void);
-
+void CAN_SendMessage(const uint8_t * const data, const uint8_t dataLength);
 
 #endif /* SHARED_CODE_CAN_H_ */

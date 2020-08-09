@@ -10,6 +10,7 @@
 #include "LED.h"
 #include "circBuffer1D.h"
 #include "debug.h"
+#include "CAN.h"
 
 /*
  * If a new FreeRTOS task is needed, create it here so that there is one place where
@@ -20,6 +21,7 @@ void RTOS_init(void)
     LED_init();
     circBuffer1D_init();
     debug_init();
+    CAN_init();
 
     debug_writeString("*** POWER BOARD 2 ***\n");
     debug_writeString("Initialization Complete\n");

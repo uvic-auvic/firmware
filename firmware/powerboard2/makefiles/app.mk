@@ -6,7 +6,9 @@ $(OUTPUT_DIR)/obj/app/LED.o \
 $(OUTPUT_DIR)/obj/app/circBuffer1D.o \
 $(OUTPUT_DIR)/obj/app/circBuffer1D_componentSpecific.o \
 $(OUTPUT_DIR)/obj/app/debug.o \
-$(OUTPUT_DIR)/obj/app/debug_componentSpecific.o
+$(OUTPUT_DIR)/obj/app/debug_componentSpecific.o \
+$(OUTPUT_DIR)/obj/app/CAN.o \
+$(OUTPUT_DIR)/obj/app/CAN_componentSpecific.o \
 
 APP_C_DEPS += $(APP_OBJS:%.o=%.d)
 

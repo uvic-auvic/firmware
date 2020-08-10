@@ -45,6 +45,6 @@ void RTOS_run100ms(void)
 void RTOS_run1000ms(void)
 {
     uint8_t data = 'H';
-    CAN_SendMessage(&data, 1);
+    CAN_SendMessage(0x11, &data, 1);
 }
 

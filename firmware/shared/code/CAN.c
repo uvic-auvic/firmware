@@ -65,6 +65,8 @@ static void CAN_private_CANPeriphInit(void)
     CAN_InitTypeDef CANInitStruct;
     CAN_StructInit(&CANInitStruct);
 
+    CAN_config.HWConfig->CANPeriph->MCR &= ~(0x10000U);
+
     // Sample point at 90%
     CANInitStruct.CAN_Prescaler = (SystemCoreClock/2) / (BAUD_RATE * NUMBER_OF_TIME_QUANTA);
     CANInitStruct.CAN_SJW = CAN_SJW_1tq;
@@ -92,12 +94,15 @@ static void CAN_private_CANFilterInit(void)
     assert(IS_CAN_ALL_PERIPH(CAN_config.HWConfig->CANPeriph));
 
     CAN_FilterInitTypeDef CANFilterStruct;
+    memset(&CANFilterStruct, 0U, sizeof(CANFilterStruct));
 
-    CANFilterStruct.CAN_FilterIdHigh = 0x011;
+    CANFilterStruct.CAN_FilterIdHigh = 0x11;
     CANFilterStruct.CAN_FilterIdLow = 0;
+    CANFilterStruct.CAN_FilterIdHigh = 0xFFFF;
+    CANFilterStruct.CAN_FilterMaskIdHigh = 0xFFFF;
     CANFilterStruct.CAN_FilterFIFOAssignment = CAN_Filter_FIFO0;
     CANFilterStruct.CAN_FilterNumber = 0;
-    CANFilterStruct.CAN_FilterMode = CAN_FilterMode_IdList;
+    CANFilterStruct.CAN_FilterMode = CAN_FilterMode_IdMask;
     CANFilterStruct.CAN_FilterScale = CAN_FilterScale_16bit;
     CANFilterStruct.CAN_FilterActivation = ENABLE;
 
@@ -118,20 +123,37 @@ void CAN_init(void)
     CAN_private_GPIOInit();
     CAN_private_CANPeriphInit();
     CAN_private_CANFilterInit();
+
+    CAN_ITConfig(CAN_config.HWConfig->CANPeriph, CAN_IT_FMP0, ENABLE);
+	NVIC_SetPriority(CAN1_RX0_IRQn, 4);
+	NVIC_EnableIRQ(CAN1_RX0_IRQn);
+
+
 }
 
-void CAN_SendMessage(const uint8_t * const data, const uint8_t dataLength)
+void CAN_SendMessage(const uint16_t messageID, const uint8_t * const data, const uint8_t dataLength)
 {
     if(CAN_data.initSuccessful)
     {
         CanTxMsg txMsg;
 
-        txMsg.StdId = 0x011;
+        txMsg.StdId = messageID;
         txMsg.IDE = CAN_Id_Standard;
         txMsg.RTR = CAN_RTR_Data;
         txMsg.DLC = dataLength;
         memcpy(txMsg.Data, data, MIN_OF(dataLength, sizeof(txMsg.Data)));
 
-        CAN_Transmit(CAN_config.HWConfig->CANPeriph, &txMsg);
+        if(CAN_Transmit(CAN_config.HWConfig->CANPeriph, &txMsg) == CAN_TxStatus_NoMailBox)
+        {
+            debug_writeString("CAN TX Failed");
+        }
     }
+}
+
+void CAN1_RX0_IRQHandler(void)
+{
+    debug_writeString("CAN RX IRQ");
+    CanRxMsg rxMsg;
+    CAN_Receive(CAN_config.HWConfig->CANPeriph, CAN_FIFO0, &rxMsg);
+
 }

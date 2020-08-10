@@ -15,7 +15,7 @@ static const CAN_HWConfig_S CAN_HWConfig =
 	.rxPin = 8,
 	.txPin = 9,
 	.GPIOPort = GPIOB,
-	.AFNumber = GPIO_AF_CAN1,
+	.AFNumber = GPIO_AF8_CAN1,
 
 	// CAN
 	.CANPeriph = CAN1,

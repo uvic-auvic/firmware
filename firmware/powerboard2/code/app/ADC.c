@@ -49,36 +49,32 @@ static void ADC_private_initGPIOs(void)
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 
-    GPIO_InitTypeDef GPIOA_InitStructure;
-    GPIO_StructInit(&GPIOA_InitStructure);
+    GPIO_InitTypeDef GPIO_InitStructure;
+    GPIO_StructInit(&GPIO_InitStructure);
 
-    GPIOA_InitStructure.GPIO_Pin     = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
-    GPIOA_InitStructure.GPIO_Mode    = GPIO_Mode_AN;
-    GPIOA_InitStructure.GPIO_OType   = GPIO_OType_PP;
-    GPIOA_InitStructure.GPIO_Speed   = GPIO_Speed_50MHz;
-    GPIOA_InitStructure.GPIO_PuPd    = GPIO_PuPd_NOPULL;
+    GPIO_InitStructure.GPIO_Pin     = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
+    GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_AN;
+    GPIO_InitStructure.GPIO_OType   = GPIO_OType_PP;
+    GPIO_InitStructure.GPIO_Speed   = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_PuPd    = GPIO_PuPd_NOPULL;
 
-    GPIO_Init(GPIOA, &GPIOA_InitStructure);
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-    GPIO_InitTypeDef GPIOB_InitStructure;
+    GPIO_InitStructure.GPIO_Pin     = GPIO_Pin_0 | GPIO_Pin_1;
+    GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_AN;
+    GPIO_InitStructure.GPIO_OType   = GPIO_OType_PP;
+    GPIO_InitStructure.GPIO_Speed   = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_PuPd    = GPIO_PuPd_NOPULL;
 
-    GPIOB_InitStructure.GPIO_Pin     = GPIO_Pin_0 | GPIO_Pin_1;
-    GPIOB_InitStructure.GPIO_Mode    = GPIO_Mode_AN;
-    GPIOB_InitStructure.GPIO_OType   = GPIO_OType_PP;
-    GPIOB_InitStructure.GPIO_Speed   = GPIO_Speed_50MHz;
-    GPIOB_InitStructure.GPIO_PuPd    = GPIO_PuPd_NOPULL;
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-    GPIO_Init(GPIOB, &GPIOB_InitStructure);
+    GPIO_InitStructure.GPIO_Pin     = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2;
+    GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_AN;
+    GPIO_InitStructure.GPIO_OType   = GPIO_OType_PP;
+    GPIO_InitStructure.GPIO_Speed   = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_PuPd    = GPIO_PuPd_NOPULL;
 
-    GPIO_InitTypeDef GPIOC_InitStructure;
-
-    GPIOC_InitStructure.GPIO_Pin     = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2;
-    GPIOC_InitStructure.GPIO_Mode    = GPIO_Mode_AN;
-    GPIOC_InitStructure.GPIO_OType   = GPIO_OType_PP;
-    GPIOC_InitStructure.GPIO_Speed   = GPIO_Speed_50MHz;
-    GPIOC_InitStructure.GPIO_PuPd    = GPIO_PuPd_NOPULL;
-
-    GPIO_Init(GPIOC, &GPIOC_InitStructure);
+    GPIO_Init(GPIOC, &GPIO_InitStructure);
 }
 
 static void ADC_private_initADC(void)
@@ -93,7 +89,7 @@ static void ADC_private_initADC(void)
     ADC_InitStructure.ADC_ContinuousConvMode    = ENABLE;
     ADC_InitStructure.ADC_ExternalTrigConvEdge  = ADC_ExternalTrigConvEdge_None;
     ADC_InitStructure.ADC_DataAlign             = ADC_DataAlign_Right;
-    ADC_InitStructure.ADC_NbrOfConversion       = (uint8_t)ADC_CHANNEL_COUNT;
+    //ADC_InitStructure.ADC_NbrOfConversion     = 1;
 
     // Writes the settings above into the the ADC config registers
     ADC_Init(ADC1, &ADC_InitStructure);
@@ -117,7 +113,7 @@ static void ADC_private_initADC(void)
 
 static void ADC_private_initDMA(void)
 {
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA1, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
 
     DMA_InitTypeDef DMA_InitStructure;
     DMA_StructInit(&DMA_InitStructure);
@@ -139,10 +135,10 @@ static void ADC_private_initDMA(void)
     //DMA_InitStructure.DMA_PeripheralBurst       = DMA_PeripheralBurst_Single;
 
     // Writes the settings above into the DMA config registers
-    DMA_Init(DMA1_Stream0, &DMA_InitStructure);
+    DMA_Init(DMA2_Stream0, &DMA_InitStructure);
 
     // Enable the DMA channel
-    DMA_Cmd(DMA1_Stream0, ENABLE);
+    DMA_Cmd(DMA2_Stream0, ENABLE);
 }
 
 /* PUBLIC FUNCTIONS */

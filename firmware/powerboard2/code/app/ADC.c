@@ -45,9 +45,9 @@ static void ADC_private_initDMA(void);
 static void ADC_private_initGPIOs(void)
 {
     //Enable peripheral clock for GPIOA, GPIOB, and GPIOC
-    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
-    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOB, ENABLE);
-    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOC, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 
     GPIO_InitTypeDef GPIOA_InitStructure;
     GPIO_StructInit(&GPIOA_InitStructure);
@@ -83,13 +83,13 @@ static void ADC_private_initGPIOs(void)
 
 static void ADC_private_initADC(void)
 {
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
 
     ADC_InitTypeDef ADC_InitStructure;
     ADC_StructInit(&ADC_InitStructure);
 
     ADC_InitStructure.ADC_Resolution            = ADC_Resolution_12b;
-    ADC_InitStructure.ADC_ScanConvMode          = Single;
+    ADC_InitStructure.ADC_ScanConvMode          = DISABLE;
     ADC_InitStructure.ADC_ContinuousConvMode    = ENABLE;
     ADC_InitStructure.ADC_ExternalTrigConvEdge  = ADC_ExternalTrigConvEdge_None;
     ADC_InitStructure.ADC_DataAlign             = ADC_DataAlign_Right;
@@ -98,13 +98,13 @@ static void ADC_private_initADC(void)
     // Writes the settings above into the the ADC config registers
     ADC_Init(ADC1, &ADC_InitStructure);
 
-    // Do calibration. Must be done before enabling the ADC
-    ADC_GetCalibrationFactor(ADC1);
+    //No ADC Calibration for F4
+    //ADC_GetCalibrationFactor(ADC1);
 
     // Choose which HW ADC channels to sample and the sampling rate.
     for(ADC_channel_E channel = (ADC_channel_E)0U; channel < ADC_CHANNEL_COUNT; channel++)
     {
-    	ADC_RegularChannelConfig(ADC1, ADC_softwareChannelToADCChannelMapping[channel], ADC_SampleTime_28Cycles);
+    	ADC_RegularChannelConfig(ADC1, ADC_softwareChannelToADCChannelMapping[channel], 1, ADC_SampleTime_28Cycles);
     }
 
     // Enable the ADC
@@ -117,7 +117,7 @@ static void ADC_private_initADC(void)
 
 static void ADC_private_initDMA(void)
 {
-    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA1, ENABLE);
 
     DMA_InitTypeDef DMA_InitStructure;
     DMA_StructInit(&DMA_InitStructure);

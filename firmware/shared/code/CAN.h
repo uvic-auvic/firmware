@@ -9,6 +9,7 @@
 #define SHARED_CODE_CAN_H_
 
 #include "stm32f4xx.h"
+#include "protocol.h"
 
 typedef struct
 {
@@ -28,11 +29,12 @@ typedef struct
 typedef struct
 {
     const CAN_HWConfig_S * const HWConfig;
+	void	(* messageReceivedCallback)(const protocol_MID_E messageID, const protocol_allMessages_U * const message);
 } CAN_config_S;
 
 void CAN_init(void);
 void CAN_run1ms(void);
-void CAN_SendMessage(const uint16_t messageID, const uint8_t * const data, const uint8_t dataLength);
-
+bool CAN_sendMessage(const protocol_MID_E messageID, const protocol_allMessages_U * const message, const uint8_t dataLength);
+void CAN_filterAdd(const protocol_MID_E messageID, const uint16_t filterNumber);
 
 #endif /* SHARED_CODE_CAN_H_ */

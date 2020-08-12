@@ -42,7 +42,6 @@ typedef union
     uint16_t asUint16;
 } CAN_FR_U;
 
-
 /* PRIVATE DATA */
 extern const CAN_config_S CAN_config;
 static CAN_data_S CAN_data;
@@ -50,7 +49,7 @@ static CAN_data_S CAN_data;
 /* PRIVATE FUNCTIONS DECLARATION */
 static void CAN_private_GPIOInit(void);
 static void CAN_private_CANPeriphInit(void);
-static void CAN_private_CANFilterInit(void);
+static void CAN_RXIRQ(CAN_TypeDef * CANx, const uint8_t FIFONumber);
 
 /* PRIVATE FUNCTION DEFINITION */
 static void CAN_private_GPIOInit(void)
@@ -107,36 +106,11 @@ static void CAN_private_CANPeriphInit(void)
         debug_writeStringBlocking("CAN init failed");
         CAN_data.initSuccessful = false;
     }
-}
 
-static void CAN_private_CANFilterInit(void)
-{
-    assert(IS_CAN_ALL_PERIPH(CAN_config.HWConfig->CANPeriph));
-
-    CAN_FilterInitTypeDef CANFilterStruct;
-    memset(&CANFilterStruct, 0U, sizeof(CANFilterStruct));
-
-    const CAN_FR_U filterLayout =
-    {
-        .asStruct = {
-            .EXID_17_15 = 0U,
-            .IDE = 0U,
-            .RTR = 0U,
-            .STDID = 0x11U,
-        }
-    };
-    CANFilterStruct.CAN_FilterIdLow = filterLayout.asUint16;
-    CANFilterStruct.CAN_FilterIdHigh = 0x0;
-    CANFilterStruct.CAN_FilterMaskIdLow = 0x0;
-    CANFilterStruct.CAN_FilterMaskIdHigh = 0x0;
-    CANFilterStruct.CAN_FilterFIFOAssignment = CAN_Filter_FIFO0;
-    CANFilterStruct.CAN_FilterNumber = 0;
-    CANFilterStruct.CAN_FilterMode = CAN_FilterMode_IdList;
-    CANFilterStruct.CAN_FilterScale = CAN_FilterScale_16bit;
-    CANFilterStruct.CAN_FilterActivation = ENABLE;
-
-    CAN_FilterInit(CAN_config.HWConfig->CANPeriph, &CANFilterStruct);
-
+    // Enable FIFO 0 not empty interrupt
+    CAN_ITConfig(CAN_config.HWConfig->CANPeriph, CAN_IT_FMP0, ENABLE);
+	NVIC_SetPriority(CAN1_RX0_IRQn, 4);
+	NVIC_EnableIRQ(CAN1_RX0_IRQn);
 }
 
 /* PUBLIC FUNCTIONS */
@@ -146,32 +120,18 @@ void CAN_init(void)
 
     assert(CAN_config.HWConfig != NULL);
     assert(CAN_config.HWConfig->enablePeripheralsClockCallback != NULL);
+    assert(IS_CAN_ALL_PERIPH(CAN_config.HWConfig->CANPeriph));
 
     CAN_config.HWConfig->enablePeripheralsClockCallback();
 
     CAN_private_GPIOInit();
     CAN_private_CANPeriphInit();
-    CAN_private_CANFilterInit();
-
-    CAN_ITConfig(CAN_config.HWConfig->CANPeriph, CAN_IT_FMP0, ENABLE);
-	NVIC_SetPriority(CAN1_RX0_IRQn, 4);
-	NVIC_EnableIRQ(CAN1_RX0_IRQn);
 }
 
-void CAN_run1ms(void)
+bool CAN_sendMessage(const protocol_MID_E messageID, const protocol_allMessages_U * const message, const uint8_t dataLength)
 {
-    // if(CAN_MessagePending(CAN_config.HWConfig->CANPeriph, CAN_FIFO0) > 0U)
-    // {
-    //     CanRxMsg RXMessage;
-    //     memset(&RXMessage, 0U, sizeof(RXMessage));
-    //     protocol_message_S RXMessage;
+    bool ret = false;
 
-    //     CAN_Receive(CAN_config.HWConfig->CANPeriph, CAN_FIFO0, &RXMessage);
-    // }
-}
-
-void CAN_SendMessage(const uint16_t messageID, const uint8_t * const data, const uint8_t dataLength)
-{
     if(CAN_data.initSuccessful)
     {
         CanTxMsg txMsg;
@@ -180,19 +140,60 @@ void CAN_SendMessage(const uint16_t messageID, const uint8_t * const data, const
         txMsg.IDE = CAN_Id_Standard;
         txMsg.RTR = CAN_RTR_Data;
         txMsg.DLC = dataLength;
-        memcpy(txMsg.Data, data, MIN_OF(dataLength, sizeof(txMsg.Data)));
+        memcpy(txMsg.Data, message, MIN_OF(dataLength, sizeof(txMsg.Data)));
 
         if(CAN_Transmit(CAN_config.HWConfig->CANPeriph, &txMsg) == CAN_TxStatus_NoMailBox)
         {
             debug_writeString("CAN TX Failed");
         }
+        else
+        {
+            ret = true;
+        }
     }
+
+    return ret;
+}
+
+void CAN_filterAdd(const protocol_MID_E messageID, const uint16_t filterNumber)
+{
+    CAN_FilterInitTypeDef CANFilterStruct;
+    memset(&CANFilterStruct, 0U, sizeof(CANFilterStruct));
+
+    const CAN_FR_U filterLayout =
+    {
+        .asStruct = {
+            .EXID_17_15 = 0U,
+            .IDE = 0U,
+            .RTR = 0U,
+            .STDID = messageID,
+        }
+    };
+    CANFilterStruct.CAN_FilterIdLow = filterLayout.asUint16;
+    CANFilterStruct.CAN_FilterIdHigh = 0x0;
+    CANFilterStruct.CAN_FilterMaskIdLow = 0x0;
+    CANFilterStruct.CAN_FilterMaskIdHigh = 0x0;
+    CANFilterStruct.CAN_FilterFIFOAssignment = CAN_Filter_FIFO0;
+    CANFilterStruct.CAN_FilterNumber = filterNumber;
+    CANFilterStruct.CAN_FilterMode = CAN_FilterMode_IdList;
+    CANFilterStruct.CAN_FilterScale = CAN_FilterScale_16bit;
+    CANFilterStruct.CAN_FilterActivation = ENABLE;
+
+    CAN_FilterInit(CAN_config.HWConfig->CANPeriph, &CANFilterStruct);
 }
 
 void CAN1_RX0_IRQHandler(void)
 {
-    debug_writeString("CAN RX IRQ");
-    CanRxMsg rxMsg;
-    CAN_Receive(CAN_config.HWConfig->CANPeriph, CAN_FIFO0, &rxMsg);
+    CAN_RXIRQ(CAN1, CAN_FIFO0);
+}
 
+static void CAN_RXIRQ(CAN_TypeDef * CANx, const uint8_t FIFONumber)
+{
+    CanRxMsg rxMsg;
+    CAN_Receive(CANx, FIFONumber, &rxMsg);
+    if(CAN_config.messageReceivedCallback != NULL)
+    {
+        debug_writeString("CAN RX TESTER");
+        CAN_config.messageReceivedCallback(rxMsg.StdId, (protocol_allMessages_U *)rxMsg.Data);
+    }
 }

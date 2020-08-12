@@ -17,13 +17,33 @@
 /* DEFINES */
 #define BAUD_RATE   (500000U)
 #define NUMBER_OF_TIME_QUANTA   (10U)
+#define STDID_BIT0_LOCATION (5U) // Bit 0 of the STDID starts at Bit 5 of the filter registers
+#define PCLK    (SystemCoreClock/2)
+#define MAX_RX_FILTERS  (14U)
 
-/* PRIVATE DATA */
+/* TYPEDEFS */
 typedef struct
 {
     bool initSuccessful;
 } CAN_data_S;
 
+// CANx_FRx register layout
+typedef struct
+{
+    uint8_t EXID_17_15:3; // EXID[17:15]
+    uint8_t IDE:1;
+    uint8_t RTR:1;
+    uint16_t STDID:11;
+} CAN_FR_S;
+
+typedef union
+{
+    CAN_FR_S asStruct;
+    uint16_t asUint16;
+} CAN_FR_U;
+
+
+/* PRIVATE DATA */
 extern const CAN_config_S CAN_config;
 static CAN_data_S CAN_data;
 
@@ -68,7 +88,7 @@ static void CAN_private_CANPeriphInit(void)
     CAN_config.HWConfig->CANPeriph->MCR &= ~(0x10000U);
 
     // Sample point at 90%
-    CANInitStruct.CAN_Prescaler = (SystemCoreClock/2) / (BAUD_RATE * NUMBER_OF_TIME_QUANTA);
+    CANInitStruct.CAN_Prescaler = PCLK / (BAUD_RATE * NUMBER_OF_TIME_QUANTA);
     CANInitStruct.CAN_SJW = CAN_SJW_1tq;
     CANInitStruct.CAN_BS1 = CAN_BS1_8tq;
     CANInitStruct.CAN_BS2 = CAN_BS2_1tq;
@@ -84,7 +104,7 @@ static void CAN_private_CANPeriphInit(void)
 
     if(CAN_Init(CAN_config.HWConfig->CANPeriph, &CANInitStruct) != CAN_InitStatus_Success)
     {
-        debug_writeString("CAN init failed");
+        debug_writeStringBlocking("CAN init failed");
         CAN_data.initSuccessful = false;
     }
 }
@@ -96,18 +116,27 @@ static void CAN_private_CANFilterInit(void)
     CAN_FilterInitTypeDef CANFilterStruct;
     memset(&CANFilterStruct, 0U, sizeof(CANFilterStruct));
 
-    CANFilterStruct.CAN_FilterIdHigh = 0x11;
-    CANFilterStruct.CAN_FilterIdLow = 0;
-    CANFilterStruct.CAN_FilterIdHigh = 0xFFFF;
-    CANFilterStruct.CAN_FilterMaskIdHigh = 0xFFFF;
+    const CAN_FR_U filterLayout =
+    {
+        .asStruct = {
+            .EXID_17_15 = 0U,
+            .IDE = 0U,
+            .RTR = 0U,
+            .STDID = 0x11U,
+        }
+    };
+    CANFilterStruct.CAN_FilterIdLow = filterLayout.asUint16;
+    CANFilterStruct.CAN_FilterIdHigh = 0x0;
+    CANFilterStruct.CAN_FilterMaskIdLow = 0x0;
+    CANFilterStruct.CAN_FilterMaskIdHigh = 0x0;
     CANFilterStruct.CAN_FilterFIFOAssignment = CAN_Filter_FIFO0;
     CANFilterStruct.CAN_FilterNumber = 0;
-    CANFilterStruct.CAN_FilterMode = CAN_FilterMode_IdMask;
+    CANFilterStruct.CAN_FilterMode = CAN_FilterMode_IdList;
     CANFilterStruct.CAN_FilterScale = CAN_FilterScale_16bit;
     CANFilterStruct.CAN_FilterActivation = ENABLE;
 
     CAN_FilterInit(CAN_config.HWConfig->CANPeriph, &CANFilterStruct);
-    
+
 }
 
 /* PUBLIC FUNCTIONS */
@@ -127,8 +156,18 @@ void CAN_init(void)
     CAN_ITConfig(CAN_config.HWConfig->CANPeriph, CAN_IT_FMP0, ENABLE);
 	NVIC_SetPriority(CAN1_RX0_IRQn, 4);
 	NVIC_EnableIRQ(CAN1_RX0_IRQn);
+}
 
+void CAN_run1ms(void)
+{
+    // if(CAN_MessagePending(CAN_config.HWConfig->CANPeriph, CAN_FIFO0) > 0U)
+    // {
+    //     CanRxMsg RXMessage;
+    //     memset(&RXMessage, 0U, sizeof(RXMessage));
+    //     protocol_message_S RXMessage;
 
+    //     CAN_Receive(CAN_config.HWConfig->CANPeriph, CAN_FIFO0, &RXMessage);
+    // }
 }
 
 void CAN_SendMessage(const uint16_t messageID, const uint8_t * const data, const uint8_t dataLength)

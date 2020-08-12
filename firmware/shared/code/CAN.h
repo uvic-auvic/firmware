@@ -31,6 +31,7 @@ typedef struct
 } CAN_config_S;
 
 void CAN_init(void);
+void CAN_run1ms(void);
 void CAN_SendMessage(const uint16_t messageID, const uint8_t * const data, const uint8_t dataLength);
 
 

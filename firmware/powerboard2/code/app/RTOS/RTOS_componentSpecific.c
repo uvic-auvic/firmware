@@ -29,7 +29,7 @@ void RTOS_init(void)
 
 void RTOS_run1ms(void)
 {
-
+    CAN_run1ms();
 }
 
 void RTOS_run10ms(void)

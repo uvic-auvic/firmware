@@ -52,6 +52,8 @@ INCLUDE_PATH+= \
 -I$(CODE_DIR) \
 -I$(CODE_DIR)/RTOS
 
+COMPILER_OPTIMIZATION=-O3
+
 -include $(SHARED_MAKEFILES)/FreeRTOSlib.mk
 -include STMLib.mk
 -include app.mk

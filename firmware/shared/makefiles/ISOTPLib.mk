@@ -12,7 +12,7 @@ INCLUDE_PATH+= \
 $(shell mkdir -p $(OUTPUT_DIR)/obj/isotp)
 
 ISOTP_LIB_COMPILER_FLAGS := \
--O0 \
+$(COMPILER_OPTIMIZATION) \
 -g3 \
 -Wall
 

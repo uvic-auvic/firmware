@@ -14,6 +14,7 @@ BOOTLOADER_COMPILER_FLAGS= \
 -Werror \
 -Wswitch-enum \
 -Wswitch-default \
+-Wno-error=deprecated \
 # -Wextra
 
 INCLUDE_PATH+= \

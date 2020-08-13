@@ -24,7 +24,7 @@ $(shell mkdir -p $(OUTPUT_DIR)/obj/app)
 $(shell mkdir -p $(OUTPUT_DIR)/obj/app/RTOS)
 
 APP_COMPILER_FLAGS := \
--O0 \
+-O3 \
 -g3 \
 -Wall \
 -Werror \

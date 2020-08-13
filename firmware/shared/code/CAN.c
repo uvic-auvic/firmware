@@ -34,6 +34,7 @@ typedef enum
     CAN_TX_MAILBOX_0 = 0,
     CAN_TX_MAILBOX_1 = 1,
     CAN_TX_MAILBOX_2 = 2,
+
     CAN_TX_MAILBOX_COUNT,
 } CAN_TXMailbox_E;
 
@@ -172,10 +173,10 @@ static inline void CAN_private_RXIRQ(CAN_TypeDef * CANx, const uint8_t FIFONumbe
 {
     if(CAN_config.messageReceivedCallback != NULL)
     {
-        uint8_t message[8U];
+        uint32_t message[2U];
 
-        ((uint32_t *)message)[0] = CANx->sFIFOMailBox[FIFONumber].RDLR;
-        ((uint32_t *)message)[1] = CANx->sFIFOMailBox[FIFONumber].RDHR;
+        message[0] = CANx->sFIFOMailBox[FIFONumber].RDLR;
+        message[1] = CANx->sFIFOMailBox[FIFONumber].RDHR;
 
         protocol_MID_E messageID =  (protocol_MID_E)(0x000007FF & (CANx->sFIFOMailBox[FIFONumber].RIR >> 21));
 
@@ -289,6 +290,9 @@ void CAN_filterAdd(const protocol_MID_E messageID, const uint16_t filterNumber)
     CANFilterStruct.CAN_FilterMode = CAN_FilterMode_IdList;
     CANFilterStruct.CAN_FilterScale = CAN_FilterScale_16bit;
     CANFilterStruct.CAN_FilterActivation = ENABLE;
+
+    // This configuration will give us 14 filters.
+    // FilterIDHigh, FilterMaskLow and High can be populated if more filters are required.
 
     CAN_FilterInit(CAN_config.HWConfig->CANPeriph, &CANFilterStruct);
 }

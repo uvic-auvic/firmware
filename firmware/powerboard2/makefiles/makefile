@@ -52,13 +52,15 @@ TARGET_HEX=$(OUTPUT_DIR)/powerboard2_$(TARGET).hex
 TARGET_MAP=$(OUTPUT_DIR)/powerboard2_$(TARGET).map
 
 APP_LINKER_OPTIONS:=\
--Xlinker -nmagic -specs=nano.specs -specs=nosys.specs
+-Xlinker -nmagic
 
 BOOTLOADER_LINKER_OPTIONS:=
 
 ARM_TOOL_LINKER_LIBRARIES := \
 -lm \
 -lc \
+-lgcc \
+--specs=rdimon.specs
 
 ARM_TOOLS_LINKER_SCRIPT := $(LINKER_SCRIPT)
 ARM_TOOLS_LINKER_TARGET_MAP := $(TARGET_MAP)

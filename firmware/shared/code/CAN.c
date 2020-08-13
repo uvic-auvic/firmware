@@ -15,11 +15,9 @@
 #include "debug.h"
 
 /* DEFINES */
-#define BAUD_RATE   (500000U)
-#define NUMBER_OF_TIME_QUANTA   (10U)
-#define STDID_BIT0_LOCATION (5U) // Bit 0 of the STDID starts at Bit 5 of the filter registers
-#define PCLK    (SystemCoreClock/2)
-#define MAX_RX_FILTERS  (14U)
+#define BAUD_RATE   (500000U)   // 500kbps
+#define NUMBER_OF_TIME_QUANTA   (10U)  // Number of clock cycles during 1bit time
+#define PCLK    (SystemCoreClock/2)  // Frequency of the peripheral clock
 
 /* TYPEDEFS */
 typedef enum
@@ -30,6 +28,14 @@ typedef enum
 
     CAN_PERIPH_COUNT,
 } CAN_periph_E;
+
+typedef enum
+{
+    CAN_TX_MAILBOX_0 = 0,
+    CAN_TX_MAILBOX_1 = 1,
+    CAN_TX_MAILBOX_2 = 2,
+    CAN_TX_MAILBOX_COUNT,
+} CAN_TXMailbox_E;
 
 typedef struct
 {
@@ -102,19 +108,21 @@ static void CAN_private_CANPeriphInit(void)
     CAN_StructInit(&CANInitStruct);
 
     // Sample point at 90%
-    CANInitStruct.CAN_Prescaler = PCLK / (BAUD_RATE * NUMBER_OF_TIME_QUANTA);
-    CANInitStruct.CAN_SJW = CAN_SJW_1tq;
-    CANInitStruct.CAN_BS1 = CAN_BS1_8tq;
-    CANInitStruct.CAN_BS2 = CAN_BS2_1tq;
+    CANInitStruct.CAN_Prescaler = PCLK / (BAUD_RATE * NUMBER_OF_TIME_QUANTA); // Specifies the length of a time quantum
+    
+    // The parameters below are described in the CAN standard
+    CANInitStruct.CAN_SJW = CAN_SJW_1tq; // Specifies the maximum number of time quanta the CAN hardware is allowed to lengthen or shorten a bit to perform resynchronization
+    CANInitStruct.CAN_BS1 = CAN_BS1_8tq; // Specifies the number of time quanta in Bit Segment 1
+    CANInitStruct.CAN_BS2 = CAN_BS2_1tq; // Specifies the number of time quanta in Bit Segment 2
 
     // CANInitStruct.CAN_Mode = CAN_Mode_Normal;
-    CANInitStruct.CAN_Mode = CAN_Mode_Silent_LoopBack;
-    CANInitStruct.CAN_TTCM = DISABLE;
-    CANInitStruct.CAN_ABOM = DISABLE;
-    CANInitStruct.CAN_AWUM = DISABLE;
-    CANInitStruct.CAN_NART = DISABLE;
-    CANInitStruct.CAN_RFLM = DISABLE;
-    CANInitStruct.CAN_TXFP = ENABLE;
+    CANInitStruct.CAN_Mode = CAN_Mode_Silent_LoopBack; // Used for testing
+    CANInitStruct.CAN_TTCM = DISABLE; // Time triggered communication mode
+    CANInitStruct.CAN_ABOM = DISABLE; // Automatic bus-off management
+    CANInitStruct.CAN_AWUM = DISABLE; // Automatic wake-up mode
+    CANInitStruct.CAN_NART = DISABLE; // Non-automatic retransmission mode
+    CANInitStruct.CAN_RFLM = DISABLE; // Receive FIFO Locked mode
+    CANInitStruct.CAN_TXFP = ENABLE; // Transmit FIFO priority
 
     if(CAN_Init(CAN_config.HWConfig->CANPeriph, &CANInitStruct) != CAN_InitStatus_Success)
     {
@@ -122,6 +130,7 @@ static void CAN_private_CANPeriphInit(void)
         CAN_data.initSuccessful = false;
     }
 
+    // Hard coded to only use FIFO_0
     // Enable FIFO 0 not empty interrupt
     CAN_ITConfig(CAN_config.HWConfig->CANPeriph, CAN_IT_FMP0, ENABLE);
 	NVIC_SetPriority(CAN_private_getIRQNumber(CAN_config.HWConfig->CANPeriph), 5);
@@ -131,6 +140,7 @@ static void CAN_private_CANPeriphInit(void)
 static uint32_t CAN_private_getIRQNumber(const CAN_TypeDef * periph)
 {
     uint32_t ret;
+
     switch((uint32_t)periph)
     {
         case (uint32_t)CAN1:
@@ -169,19 +179,19 @@ static inline void CAN_private_RXIRQ(CAN_TypeDef * CANx, const uint8_t FIFONumbe
 
         protocol_MID_E messageID =  (protocol_MID_E)(0x000007FF & (CANx->sFIFOMailBox[FIFONumber].RIR >> 21));
 
-        /* Release the FIFO */
-        /* Release FIFO0 */
-        if (FIFONumber == CAN_FIFO0)
-        {
-            CANx->RF0R |= CAN_RF0R_RFOM0;
-        }
-        /* Release FIFO1 */
-        else /* FIFONumber == CAN_FIFO1 */
-        {
-            CANx->RF1R |= CAN_RF1R_RFOM1;
-        }
-
         CAN_config.messageReceivedCallback(messageID, (protocol_allMessages_U *)message);
+    }
+
+    /* Release the FIFO */
+    /* Release FIFO0 */
+    if (FIFONumber == CAN_FIFO0)
+    {
+        CANx->RF0R |= CAN_RF0R_RFOM0;
+    }
+    /* Release FIFO1 */
+    else /* FIFONumber == CAN_FIFO1 */
+    {
+        CANx->RF1R |= CAN_RF1R_RFOM1;
     }
 }
 
@@ -206,22 +216,50 @@ bool CAN_sendMessage(const protocol_MID_E messageID, const protocol_allMessages_
 
     if(CAN_data.initSuccessful)
     {
-        CanTxMsg txMsg;
+        CAN_TypeDef * CAN = CAN_config.HWConfig->CANPeriph;
+        CAN_TXMailbox_E TXMailbox;
 
-        txMsg.StdId = messageID;
-        txMsg.IDE = CAN_Id_Standard;
-        txMsg.RTR = CAN_RTR_Data;
-        txMsg.DLC = dataLength;
-        memcpy(txMsg.Data, message, MIN_OF(dataLength, sizeof(txMsg.Data)));
-
-        if(CAN_Transmit(CAN_config.HWConfig->CANPeriph, &txMsg) == CAN_TxStatus_NoMailBox)
+        // Select one empty transmit mailbox
+        if ((CAN->TSR & CAN_TSR_TME0) == CAN_TSR_TME0)
         {
-            debug_writeString("CAN TX Failed");
+            TXMailbox = CAN_TX_MAILBOX_0;
+        }
+        else if ((CAN->TSR & CAN_TSR_TME1) == CAN_TSR_TME1)
+        {
+            TXMailbox = CAN_TX_MAILBOX_1;
+        }
+        else if ((CAN->TSR & CAN_TSR_TME2) == CAN_TSR_TME2)
+        {
+            TXMailbox = CAN_TX_MAILBOX_2;
         }
         else
         {
+            TXMailbox = CAN_TX_MAILBOX_COUNT;
+        }
+
+        if(TXMailbox < CAN_TX_MAILBOX_COUNT)
+        {
+            // Program the message ID, RTR=0, IDE=0, Standard ID
+            CAN->sTxMailBox[TXMailbox].TIR = (messageID << 21) & CAN_TI0R_STID;
+
+            // Program the data length (DLC) into the register
+            CAN->sTxMailBox[TXMailbox].TDTR &= ~(CAN_TDT0R_DLC);
+            CAN->sTxMailBox[TXMailbox].TDTR |= dataLength;
+
+            // Fill in the data to transmit in the data registers
+            CAN->sTxMailBox[TXMailbox].TDLR = ((const uint32_t * const)message)[0U];
+            CAN->sTxMailBox[TXMailbox].TDHR = ((const uint32_t * const)message)[1U];
+
+            // Request transmission
+            CAN->sTxMailBox[TXMailbox].TIR |= CAN_TI0R_TXRQ;
+
             ret = true;
         }
+    }
+
+    if(ret == false)
+    {
+        debug_writeString("CAN TX Failed");
     }
 
     return ret;
@@ -234,7 +272,8 @@ void CAN_filterAdd(const protocol_MID_E messageID, const uint16_t filterNumber)
 
     const CAN_FR_U filterLayout =
     {
-        .asStruct = {
+        .asStruct =
+        {
             .EXID_17_15 = 0U,
             .IDE = 0U,
             .RTR = 0U,
@@ -245,7 +284,7 @@ void CAN_filterAdd(const protocol_MID_E messageID, const uint16_t filterNumber)
     CANFilterStruct.CAN_FilterIdHigh = 0x0;
     CANFilterStruct.CAN_FilterMaskIdLow = 0x0;
     CANFilterStruct.CAN_FilterMaskIdHigh = 0x0;
-    CANFilterStruct.CAN_FilterFIFOAssignment = CAN_Filter_FIFO0;
+    CANFilterStruct.CAN_FilterFIFOAssignment = CAN_Filter_FIFO0; // Hard coded to only use FIFO_0
     CANFilterStruct.CAN_FilterNumber = filterNumber;
     CANFilterStruct.CAN_FilterMode = CAN_FilterMode_IdList;
     CANFilterStruct.CAN_FilterScale = CAN_FilterScale_16bit;

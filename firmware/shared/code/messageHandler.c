@@ -162,23 +162,20 @@ void messageHandler_run1ms(void)
 
                 // Add message to the UART queue
                 UART_writeLen((const uint8_t * const)&frame, channelConfig->messageLength + sizeof(frame.messageID));
+
+#endif
+
+#if USE_CAN
+                (void)CAN_sendMessage(channelConfig->messageID, &message, channelConfig->messageLength);
+                
+#endif
+                // If TX, is not successful, skip this round and transmit when the timer expires again
+                // This is to prevent bombarding the CAN_sendMessage with the same message every 1ms incase something is momentarily wrong with the CAN peripheral
                 channelData->dispatchRequested = false;
                 channelData->timeDispatched = RTOS_getTimeMilliseconds();
 
                 // Only send one message per 1ms period. This is done to spread out transmissions on the bus
                 break;
-#endif
-
-#if USE_CAN
-                if(CAN_sendMessage(channelConfig->messageID, &message, channelConfig->messageLength))
-                {
-                    channelData->dispatchRequested = false;
-                    channelData->timeDispatched = RTOS_getTimeMilliseconds();
-
-                    // Only send one message per 1ms period. This is done to spread out transmissions on the bus
-                    break;
-                }
-#endif
             }
         }
     }

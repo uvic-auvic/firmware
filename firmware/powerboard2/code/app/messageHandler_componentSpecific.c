@@ -27,10 +27,10 @@ const messageHandler_config_S messageHandler_config =
             {  
                 .POLARIS_powerEnable2 =
                 {
-                    .VBattPowerEnable = true,
+                    .VBattPowerEnable = false,
                     ._5VPowerEnable = false,
                     ._12VPowerEnable = false,
-                    ._16VPowerEnable = false,
+                    ._16VPowerEnable = true,
                 },
             },
         },

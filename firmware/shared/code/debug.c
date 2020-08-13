@@ -140,7 +140,7 @@ bool _debug_writeLen(const uint8_t * const data, const uint16_t length, const bo
 			{
 				debug_data.TXState = TX_STATE_TRANSMITTING;
 
-				// Enable the TXNE interrupt. The IRQ will take care of starting the transmission
+				// Enable the TXE interrupt. The IRQ will take care of starting the transmission
 				USART_ITConfig(debug_config.HWConfig->UARTPeriph, USART_IT_TXE, ENABLE);
 			}
 		}
@@ -157,8 +157,8 @@ bool _debug_writeString(const char * const format, ...)
 	va_start (args, format);
 	uint16_t length = vsnprintf((char *)debug_data.TXSprintfBuffer, sizeof(debug_data.TXSprintfBuffer), format, args);
 
-	ret = _debug_writeLen(debug_data.TXSprintfBuffer, length, false);
-	(void)_debug_writeLen((const uint8_t * const)"\n", 1U, false);
+	debug_data.TXSprintfBuffer[length] = (uint8_t)'\n';
+	ret = _debug_writeLen(debug_data.TXSprintfBuffer, length + 1, false);
 
 	return ret;
 }
@@ -171,8 +171,9 @@ bool _debug_writeStringBlocking(const char * const format, ...)
 	va_start (args, format);
 	uint16_t length = vsnprintf((char *)debug_data.TXSprintfBuffer, sizeof(debug_data.TXSprintfBuffer), format, args);
 	
-	ret = _debug_writeLen(debug_data.TXSprintfBuffer, length, true);
-	(void)_debug_writeLen((const uint8_t * const)"\n", 1U, true);
+	debug_data.TXSprintfBuffer[length] = (uint8_t)'\n';
+	ret = _debug_writeLen(debug_data.TXSprintfBuffer, length + 1, false);
+
 
 	return ret;
 }

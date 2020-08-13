@@ -47,7 +47,5 @@ void RTOS_run100ms(void)
 
 void RTOS_run1000ms(void)
 {
-    protocol_allMessages_U message;
-    messageHandler_getMessage(MESSAGE_HANDLER_RX_CHANNEL_TESTER, &message, NULL);
-    message.PB_deviceName.name[7U] = 0;
+
 }

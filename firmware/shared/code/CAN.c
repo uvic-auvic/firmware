@@ -22,6 +22,15 @@
 #define MAX_RX_FILTERS  (14U)
 
 /* TYPEDEFS */
+typedef enum
+{
+    CAN_PERIPH_1,
+    CAN_PERIPH_2,
+    CAN_PERIPH_3,
+
+    CAN_PERIPH_COUNT,
+} CAN_periph_E;
+
 typedef struct
 {
     bool initSuccessful;
@@ -46,10 +55,18 @@ typedef union
 extern const CAN_config_S CAN_config;
 static CAN_data_S CAN_data;
 
+static const uint32_t CAN_interruptNumberMaping[CAN_PERIPH_COUNT] =
+{
+    [CAN_PERIPH_1] = CAN1_RX0_IRQn,
+    [CAN_PERIPH_2] = CAN2_RX0_IRQn,
+    [CAN_PERIPH_3] = CAN3_RX0_IRQn,
+};
+
 /* PRIVATE FUNCTIONS DECLARATION */
 static void CAN_private_GPIOInit(void);
 static void CAN_private_CANPeriphInit(void);
-static void CAN_RXIRQ(CAN_TypeDef * CANx, const uint8_t FIFONumber);
+static uint32_t CAN_private_getIRQNumber(const CAN_TypeDef * periph);
+static inline void CAN_private_RXIRQ(CAN_TypeDef * CANx, const uint8_t FIFONumber);
 
 /* PRIVATE FUNCTION DEFINITION */
 static void CAN_private_GPIOInit(void)
@@ -84,8 +101,6 @@ static void CAN_private_CANPeriphInit(void)
     CAN_InitTypeDef CANInitStruct;
     CAN_StructInit(&CANInitStruct);
 
-    CAN_config.HWConfig->CANPeriph->MCR &= ~(0x10000U);
-
     // Sample point at 90%
     CANInitStruct.CAN_Prescaler = PCLK / (BAUD_RATE * NUMBER_OF_TIME_QUANTA);
     CANInitStruct.CAN_SJW = CAN_SJW_1tq;
@@ -109,8 +124,65 @@ static void CAN_private_CANPeriphInit(void)
 
     // Enable FIFO 0 not empty interrupt
     CAN_ITConfig(CAN_config.HWConfig->CANPeriph, CAN_IT_FMP0, ENABLE);
-	NVIC_SetPriority(CAN1_RX0_IRQn, 4);
-	NVIC_EnableIRQ(CAN1_RX0_IRQn);
+	NVIC_SetPriority(CAN_private_getIRQNumber(CAN_config.HWConfig->CANPeriph), 5);
+	NVIC_EnableIRQ(CAN_private_getIRQNumber(CAN_config.HWConfig->CANPeriph));
+}
+
+static uint32_t CAN_private_getIRQNumber(const CAN_TypeDef * periph)
+{
+    uint32_t ret;
+    switch((uint32_t)periph)
+    {
+        case (uint32_t)CAN1:
+        {
+            ret = CAN_interruptNumberMaping[CAN_PERIPH_1];
+            break;
+        }                
+        case (uint32_t)CAN2:
+        {
+            ret = CAN_interruptNumberMaping[CAN_PERIPH_2];
+            break;
+        }            
+        case (uint32_t)CAN3:
+        {
+            ret = CAN_interruptNumberMaping[CAN_PERIPH_3];
+            break;
+        }            
+        default:
+        {
+            ret = 500; // Unreasonably large number
+            break;
+        }
+    }
+
+    return ret;
+}
+
+static inline void CAN_private_RXIRQ(CAN_TypeDef * CANx, const uint8_t FIFONumber)
+{
+    if(CAN_config.messageReceivedCallback != NULL)
+    {
+        uint8_t message[8U];
+
+        ((uint32_t *)message)[0] = CANx->sFIFOMailBox[FIFONumber].RDLR;
+        ((uint32_t *)message)[1] = CANx->sFIFOMailBox[FIFONumber].RDHR;
+
+        protocol_MID_E messageID =  (protocol_MID_E)(0x000007FF & (CANx->sFIFOMailBox[FIFONumber].RIR >> 21));
+
+        /* Release the FIFO */
+        /* Release FIFO0 */
+        if (FIFONumber == CAN_FIFO0)
+        {
+            CANx->RF0R |= CAN_RF0R_RFOM0;
+        }
+        /* Release FIFO1 */
+        else /* FIFONumber == CAN_FIFO1 */
+        {
+            CANx->RF1R |= CAN_RF1R_RFOM1;
+        }
+
+        CAN_config.messageReceivedCallback(messageID, (protocol_allMessages_U *)message);
+    }
 }
 
 /* PUBLIC FUNCTIONS */
@@ -184,16 +256,15 @@ void CAN_filterAdd(const protocol_MID_E messageID, const uint16_t filterNumber)
 
 void CAN1_RX0_IRQHandler(void)
 {
-    CAN_RXIRQ(CAN1, CAN_FIFO0);
+    CAN_private_RXIRQ(CAN1, CAN_FIFO0);
 }
 
-static void CAN_RXIRQ(CAN_TypeDef * CANx, const uint8_t FIFONumber)
+void CAN2_RX0_IRQHandler(void)
 {
-    CanRxMsg rxMsg;
-    CAN_Receive(CANx, FIFONumber, &rxMsg);
-    if(CAN_config.messageReceivedCallback != NULL)
-    {
-        debug_writeString("CAN RX TESTER");
-        CAN_config.messageReceivedCallback(rxMsg.StdId, (protocol_allMessages_U *)rxMsg.Data);
-    }
+    CAN_private_RXIRQ(CAN2, CAN_FIFO0);
+}
+
+void CAN3_RX0_IRQHandler(void)
+{
+    CAN_private_RXIRQ(CAN3, CAN_FIFO0);
 }

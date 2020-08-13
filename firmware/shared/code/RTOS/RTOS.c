@@ -8,6 +8,7 @@
 #include "RTOS.h"
 
 /* INCLUDES */
+#include "debug.h"
 
 /* DEFINES */
 
@@ -68,6 +69,14 @@ static void RTOS_private_task1000ms(void)
 	}
 }
 
+static void RTOS_private_taskCreationFailedHandler(void)
+{
+	debug_init();
+	debug_writeStringBlocking("Task create failed");
+
+	configASSERT(0U);
+}
+
 /* PUBLIC FUNCTIONS */
 uint32_t RTOS_getTimeMilliseconds(void)
 {
@@ -94,33 +103,54 @@ uint32_t RTOS_getTimeElapsedMilliseconds(const uint32_t timeToCompare)
 extern void RTOS_launch(void);
 void RTOS_launch(void)
 {
-	(void)xTaskCreate((TaskFunction_t)RTOS_private_task1ms,       /* Function that implements the task. */
+	BaseType_t ret;
+	ret = xTaskCreate((TaskFunction_t)RTOS_private_task1ms,       /* Function that implements the task. */
 					  "1msTask",          /* Text name for the task. */
-					  configMINIMAL_STACK_SIZE,      /* Stack size in words, not bytes. */
+					  RTOS_TASK_STACK_SIZE_1MS,      /* Stack size in words, not bytes. */
 					  NULL,    /* Parameter passed into the task. */
 					  RTOS_TASK_1MS_PRIORITY,/* Priority at which the task is created. */
 					  NULL);      /* Used to pass out the created task's handle. */
 
-	(void)xTaskCreate((TaskFunction_t)RTOS_private_task10ms,       /* Function that implements the task. */
+	if(ret != pdPASS)
+	{
+		RTOS_private_taskCreationFailedHandler();
+	}
+
+	ret = xTaskCreate((TaskFunction_t)RTOS_private_task10ms,       /* Function that implements the task. */
 					  "10msTask",          /* Text name for the task. */
-					  configMINIMAL_STACK_SIZE,      /* Stack size in words, not bytes. */
+					  RTOS_TASK_STACK_SIZE_10MS,      /* Stack size in words, not bytes. */
 					  NULL,    /* Parameter passed into the task. */
 					  RTOS_TASK_10MS_PRIORITY,/* Priority at which the task is created. */
 					  NULL);      /* Used to pass out the created task's handle. */
 
-	(void)xTaskCreate((TaskFunction_t)RTOS_private_task100ms,       /* Function that implements the task. */
+	if(ret != pdPASS)
+	{
+		RTOS_private_taskCreationFailedHandler();
+	}
+
+	ret = xTaskCreate((TaskFunction_t)RTOS_private_task100ms,       /* Function that implements the task. */
 					  "100msTask",          /* Text name for the task. */
-					  configMINIMAL_STACK_SIZE,      /* Stack size in words, not bytes. */
+					  RTOS_TASK_STACK_SIZE_100MS,      /* Stack size in words, not bytes. */
 					  NULL,    /* Parameter passed into the task. */
 					  RTOS_TASK_100MS_PRIORITY,/* Priority at which the task is created. */
 					  NULL);      /* Used to pass out the created task's handle. */
 
-	(void)xTaskCreate((TaskFunction_t)RTOS_private_task1000ms,       /* Function that implements the task. */
+	if(ret != pdPASS)
+	{
+		RTOS_private_taskCreationFailedHandler();
+	}
+
+	ret = xTaskCreate((TaskFunction_t)RTOS_private_task1000ms,       /* Function that implements the task. */
 					  "1000msTask",          /* Text name for the task. */
-					  configMINIMAL_STACK_SIZE,      /* Stack size in words, not bytes. */
+					  RTOS_TASK_STACK_SIZE_1000MS,      /* Stack size in words, not bytes. */
 					  NULL,    /* Parameter passed into the task. */
 					  RTOS_TASK_1000MS_PRIORITY,/* Priority at which the task is created. */
 					  NULL);      /* Used to pass out the created task's handle. */
+
+	if(ret != pdPASS)
+	{
+		RTOS_private_taskCreationFailedHandler();
+	}
 
 	RTOS_init();
 

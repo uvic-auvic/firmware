@@ -1,7 +1,7 @@
 /*
  * messageHandler_componentSpecific.h
  *
- *  Created on: Feb 9, 2020
+ *  Created on: Aug 12, 2020
  *      Author: Poorna Chander Kalidas
  */
 
@@ -13,6 +13,7 @@
 
 typedef enum
 {
+    MESSAGE_HANDLER_RX_CHANNEL_POWER_ENABLE,
     MESSAGE_HANDLER_RX_CHANNEL_TESTER,
 
     MESSAGE_HANDLER_RX_CHANNEL_COUNT,

@@ -11,7 +11,7 @@
 #include "debug.h"
 
 
-static void messageHandler_componentSpecific_messageReceivedCallback(const messageHandler_RXMessageChannel_E channel, const protocol_allMessages_U * const receivedData);
+static void messageHandler_componentSpecific_messageReceivedCallback(const messageHandler_RXMessageChannel_E channel, const protocol_allMessages_U * const message);
 static void messageHandler_componentSpecific_messagePopulateCallback(const messageHandler_TXMessageChannel_E channel, protocol_allMessages_U * const message);
 
 extern const messageHandler_config_S messageHandler_config;
@@ -19,10 +19,25 @@ const messageHandler_config_S messageHandler_config =
 {
     .RXMessageConfig =
     {
+        [MESSAGE_HANDLER_RX_CHANNEL_POWER_ENABLE] =
+        {
+            .messageID = protocol_MID_POLARIS_powerEnable,
+            .callbackEnable = false,
+            .initValue = 
+            {  
+                .POLARIS_powerEnable2 =
+                {
+                    .VBattPowerEnable = true,
+                    ._5VPowerEnable = false,
+                    ._12VPowerEnable = false,
+                    ._16VPowerEnable = false,
+                },
+            },
+        },
         [MESSAGE_HANDLER_RX_CHANNEL_TESTER] =
         {
             .messageID = protocol_MID_PB_deviceName,
-            .callbackEnable = false,
+            .callbackEnable = true,
             .initValue = 
             {  
                 .PB_deviceName =
@@ -39,24 +54,26 @@ const messageHandler_config_S messageHandler_config =
         {
             .messageID = protocol_MID_PB_deviceName,
             .messageLength = sizeof(protocol_deviceName_S),
-            .messagePeriod = MESSAGE_HANDLER_PERIOD_100MS,
+            .messagePeriod = MESSAGE_HANDLER_PERIOD_1000MS,
         },
     },
     .messageReceivedCallback = messageHandler_componentSpecific_messageReceivedCallback,
     .messagePopulateCallback = messageHandler_componentSpecific_messagePopulateCallback,
 };
 
-static void messageHandler_componentSpecific_messageReceivedCallback(const messageHandler_RXMessageChannel_E channel, const protocol_allMessages_U * const receivedData)
+static void messageHandler_componentSpecific_messageReceivedCallback(const messageHandler_RXMessageChannel_E channel, const protocol_allMessages_U * const message)
 {
-    if(receivedData != NULL)
+    if(message != NULL)
     {
         switch(channel)
         {
             case MESSAGE_HANDLER_RX_CHANNEL_TESTER:
             {
+                debug_writeString("REC: %s", message->PB_deviceName.name);
                 break;
             }
 
+            case MESSAGE_HANDLER_RX_CHANNEL_POWER_ENABLE:
             case MESSAGE_HANDLER_RX_CHANNEL_COUNT:
             default:
             {
@@ -75,7 +92,6 @@ static void messageHandler_componentSpecific_messagePopulateCallback(const messa
         {
             case MESSAGE_HANDLER_TX_CHANNEL_RID:
             {
-                memset(message, 0U, sizeof(*message));
                 memcpy(message->PB_deviceName.name, "PWR_BRD", 7U);
 
                 break;

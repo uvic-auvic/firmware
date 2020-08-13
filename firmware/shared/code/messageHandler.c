@@ -19,8 +19,6 @@
 #include "CAN.h"
 #endif
 
-#include "debug.h"
-
 /* DEFINES */
 
 /* TYPEDEFS */
@@ -49,9 +47,12 @@ static messageHandler_data_S messageHandler_data;
 extern const messageHandler_config_S messageHandler_config;
 
 /* PRIVATE FUNCTIONS DECLARATION */
+#if USE_CAN
 static uint32_t messageHandler_private_getMessagePeriodms(const messageHandler_TXMessageChannel_E channel);
+#endif
 
 /* PRIVATE FUNCTION DEFINITIONS */
+#if USE_CAN
 static uint32_t messageHandler_private_getMessagePeriodms(const messageHandler_TXMessageChannel_E channel)
 {
     uint32_t ret = 0U;
@@ -81,9 +82,9 @@ static uint32_t messageHandler_private_getMessagePeriodms(const messageHandler_T
             }
         }
     }
-
     return ret;
 }
+#endif
 
 /* PUBLIC FUNCTION DEFINITIONS */
 void messageHandler_init(void)
@@ -96,17 +97,19 @@ void messageHandler_init(void)
         
         // Init message
         memcpy(&RXChannelData->message, &RXChannelConfig->initValue, sizeof(RXChannelConfig->initValue));
-
+#if USE_CAN
         // Add RX message to filter, use RX message channel as filter number
         CAN_filterAdd(RXChannelConfig->messageID, (uint16_t)channel);
+#endif
     }
-
+#if USE_CAN
     for (messageHandler_TXMessageChannel_E channel = (messageHandler_TXMessageChannel_E)0U; channel < MESSAGE_HANDLER_TX_CHANNEL_COUNT; channel++)
     {
         messageHandler_TXChannelData_S * const TXChannelData = &messageHandler_data.TXChannelData[channel];
 
         TXChannelData->dispatchRequested = true;
     }
+#endif
 }
 
 void messageHandler_run1ms(void)
@@ -137,10 +140,12 @@ void messageHandler_run1ms(void)
         messageHandler_TXChannelData_S * const channelData = &messageHandler_data.TXChannelData[channel];
         const messageHandler_TXMessageConfig_S * const channelConfig = &messageHandler_config.TXMessageConfig[channel];
 
+#if USE_CAN
         if(RTOS_getTimeElapsedMilliseconds(channelData->timeDispatched) >= messageHandler_private_getMessagePeriodms(channel))
         {
             channelData->dispatchRequested = true;
         }
+#endif
 
         if(channelData->dispatchRequested)
         {
@@ -148,6 +153,7 @@ void messageHandler_run1ms(void)
             {
                 // Fill message
                 protocol_allMessages_U message; // A separate variable is passed into the function below to get around the memory alignment problem
+                memset(&message, 0U, sizeof(message));
                 messageHandler_config.messagePopulateCallback(channel, &message);
 #if USE_UART
                 protocol_message_S frame;
@@ -158,6 +164,9 @@ void messageHandler_run1ms(void)
                 UART_writeLen((const uint8_t * const)&frame, channelConfig->messageLength + sizeof(frame.messageID));
                 channelData->dispatchRequested = false;
                 channelData->timeDispatched = RTOS_getTimeMilliseconds();
+
+                // Only send one message per 1ms period. This is done to spread out transmissions on the bus
+                break;
 #endif
 
 #if USE_CAN
@@ -165,6 +174,9 @@ void messageHandler_run1ms(void)
                 {
                     channelData->dispatchRequested = false;
                     channelData->timeDispatched = RTOS_getTimeMilliseconds();
+
+                    // Only send one message per 1ms period. This is done to spread out transmissions on the bus
+                    break;
                 }
 #endif
             }
@@ -198,6 +210,27 @@ void messageHandler_dispatchMessage(const messageHandler_TXMessageChannel_E chan
     }
 }
 
+#if USE_UART
+void messageHandler_messageReceivedCallback(protocol_message_S const * const receiveData)
+{
+    if(receiveData != NULL)
+    {
+        for(messageHandler_RXMessageChannel_E channel = (messageHandler_RXMessageChannel_E)0U; channel < MESSAGE_HANDLER_RX_CHANNEL_COUNT; channel++)
+        {
+            if(receiveData->messageID == messageHandler_config.RXMessageConfig[channel].messageID)
+            {
+                messageHandler_data.RXChannelData[channel].timeReceived = RTOS_getTimeMilliseconds();
+                memcpy(&messageHandler_data.RXChannelData[channel].message, &receiveData->message, sizeof(protocol_allMessages_U));
+                messageHandler_data.RXChannelData[channel].newDataAvailable = true;
+
+                break;
+            }
+        }
+    }
+}
+#endif
+
+#if USE_CAN
 void messageHandler_messageReceivedCallback(const protocol_MID_E messageID, const protocol_allMessages_U * const message)
 {
     if(message != NULL)
@@ -215,3 +248,4 @@ void messageHandler_messageReceivedCallback(const protocol_MID_E messageID, cons
         }
     }
 }
+#endif

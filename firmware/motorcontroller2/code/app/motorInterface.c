@@ -23,7 +23,7 @@ void motorInterface_run10ms(void)
 {
     protocol_allMessages_U motorSpeedMessage;
     uint32_t timeReceived = 0U;
-    messageHandler_getMessage(MESSAGE_HANDLER_RX_MESSAGE_CHANNEL_MOTOR_SPEED, &motorSpeedMessage, &timeReceived);
+    messageHandler_getMessage(MESSAGE_HANDLER_RX_CHANNEL_MOTOR_SPEED, &motorSpeedMessage, &timeReceived);
 
     const uint32_t timeSinceLastUpdate = RTOS_getTimeElapsedMilliseconds(timeReceived);
 

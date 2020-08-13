@@ -52,7 +52,7 @@ TARGET_HEX=$(OUTPUT_DIR)/powerboard2_$(TARGET).hex
 TARGET_MAP=$(OUTPUT_DIR)/powerboard2_$(TARGET).map
 
 APP_LINKER_OPTIONS:=\
--Xlinker -nmagic
+-Xlinker -nmagic -specs=nano.specs -specs=nosys.specs
 
 BOOTLOADER_LINKER_OPTIONS:=
 

@@ -8,6 +8,8 @@
 #include "debug.h"
 
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdarg.h>
 #include <string.h>
 #include "utils.h"
 #include "assert.h"
@@ -25,6 +27,7 @@ typedef enum
 
 typedef struct
 {
+	uint8_t TXSprintfBuffer[DEBUG_TX_BUFFER_LENGTH];
 	volatile debug_TXState_E TXState;
 } debug_data_S;
 
@@ -146,20 +149,30 @@ bool _debug_writeLen(const uint8_t * const data, const uint16_t length, const bo
 	return ret;
 }
 
-bool _debug_writeString(const char * const string)
+bool _debug_writeString(const char * const format, ...)
 {	
 	bool ret = false;
-	ret = _debug_writeLen((const uint8_t * const)string, strnlen(string, DEBUG_TX_BUFFER_LENGTH), false);
+
+	va_list args;
+	va_start (args, format);
+	uint16_t length = vsnprintf((char *)debug_data.TXSprintfBuffer, sizeof(debug_data.TXSprintfBuffer), format, args);
+
+	ret = _debug_writeLen(debug_data.TXSprintfBuffer, length, false);
 	(void)_debug_writeLen((const uint8_t * const)"\n", 1U, false);
 
 	return ret;
 }
 
-bool _debug_writeStringBlocking(const char * const string)
+bool _debug_writeStringBlocking(const char * const format, ...)
 {
 	bool ret = false;
-	ret = _debug_writeLen((const uint8_t * const)string, strnlen(string, DEBUG_TX_BUFFER_LENGTH), true);
-	(void)_debug_writeLen((const uint8_t * const)"\n", 1U, false);
+
+	va_list args;
+	va_start (args, format);
+	uint16_t length = vsnprintf((char *)debug_data.TXSprintfBuffer, sizeof(debug_data.TXSprintfBuffer), format, args);
+	
+	ret = _debug_writeLen(debug_data.TXSprintfBuffer, length, true);
+	(void)_debug_writeLen((const uint8_t * const)"\n", 1U, true);
 
 	return ret;
 }

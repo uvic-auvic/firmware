@@ -61,6 +61,7 @@ ARM_TOOL_LINKER_LIBRARIES := \
 -lc \
 -lgcc \
 --specs=rdimon.specs
+# -lgcc and --specs=rdimon.specs is required for `vsnprintf`
 
 ARM_TOOLS_LINKER_SCRIPT := $(LINKER_SCRIPT)
 ARM_TOOLS_LINKER_TARGET_MAP := $(TARGET_MAP)

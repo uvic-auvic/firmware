@@ -268,6 +268,10 @@ bool CAN_sendMessage(const protocol_MID_E messageID, const protocol_allMessages_
 
 void CAN_filterAdd(const protocol_MID_E messageID, const uint16_t filterNumber)
 {
+    // The CAN bus will have many messages, but only a few of those messages will need to be received by this node
+    // Filters are used to filter out irrelevant messages at the hardware level
+    // An interrupt will only be fired when a message required by the application is received.
+
     CAN_FilterInitTypeDef CANFilterStruct;
     memset(&CANFilterStruct, 0U, sizeof(CANFilterStruct));
 

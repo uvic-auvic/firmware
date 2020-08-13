@@ -11,11 +11,11 @@ BOOTLOADER_COMPILER_FLAGS = \
 $(COMPILER_OPTIMIZATION) \
 -g3 \
 -Wall \
--Werror \
 -Wswitch-enum \
 -Wswitch-default \
 -Wno-error=deprecated \
-# -Wextra
+# -Wextra \
+# -Werror \
 
 INCLUDE_PATH+= \
 -I$(SHARED_CODE_DIR) \

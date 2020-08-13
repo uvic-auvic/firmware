@@ -27,7 +27,7 @@ INCLUDE_PATH+= \
 $(shell mkdir -p $(OUTPUT_DIR)/obj/FreeRTOS)
 
 FREE_RTOS_COMPILER_FLAGS := \
--O3 \
+$(COMPILER_OPTIMIZATION) \
 -g3 \
 -Wall
 

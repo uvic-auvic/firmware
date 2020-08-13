@@ -33,7 +33,6 @@ typedef struct
 } CAN_config_S;
 
 void CAN_init(void);
-void CAN_run1ms(void);
 bool CAN_sendMessage(const protocol_MID_E messageID, const protocol_allMessages_U * const message, const uint8_t dataLength);
 void CAN_filterAdd(const protocol_MID_E messageID, const uint16_t filterNumber);
 

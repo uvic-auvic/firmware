@@ -14,6 +14,7 @@
 #include "utils.h"
 #include "assert.h"
 #include "circBuffer1D.h"
+#include "RCCHelper.h"
 
 /* DEFINES */
 #define UART_BAUD_RATE (115200U)
@@ -47,7 +48,8 @@ static void debug_private_configureGPIO(void)
 	assert(IS_GPIO_PIN_SOURCE(debug_config.HWConfig->txPin));
 	assert(IS_GPIO_ALL_PERIPH(debug_config.HWConfig->GPIOPort));
 
-	// Clock should be enabled in the enable clock callback
+	// Enable GPIO port clock
+	RCCHelper_clockCmd(debug_config.HWConfig->GPIOPort, ENABLE);
 
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_StructInit(&GPIO_InitStructure);
@@ -70,7 +72,8 @@ static void debug_private_configureUARTPeriph(void)
 	assert(IS_USART_ALL_PERIPH(debug_config.HWConfig->UARTPeriph));
 	assert(IS_USART_BAUDRATE(UART_BAUD_RATE));
 
-	// Clock should be enabled in the enable clock callback
+	// Enable UART Periph clock
+	RCCHelper_clockCmd(debug_config.HWConfig->UARTPeriph, ENABLE);
 
 	USART_InitTypeDef USART_InitStruct;
 	USART_StructInit(&USART_InitStruct);
@@ -97,15 +100,6 @@ static void debug_private_configureUARTPeriph(void)
 void _debug_init()
 {
 	if(debug_config.HWConfig == NULL)
-	{
-		assert(0U);
-	}
-
-	if(debug_config.HWConfig->enablePeripheralsClockCallback != NULL)
-	{
-		debug_config.HWConfig->enablePeripheralsClockCallback();
-	}
-	else
 	{
 		assert(0U);
 	}

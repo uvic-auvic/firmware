@@ -41,9 +41,6 @@ typedef struct
 	USART_TypeDef * UARTPeriph;
 	IRQn_Type 		UARTInterruptNumber;
 
-	//Common
-	void 		(* enablePeripheralsClockCallback)(void);
-
 } debug_HWConfig_S;
 
 typedef struct

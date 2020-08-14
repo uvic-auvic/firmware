@@ -11,6 +11,7 @@ $(OUTPUT_DIR)/obj/app/CAN.o \
 $(OUTPUT_DIR)/obj/app/CAN_componentSpecific.o \
 $(OUTPUT_DIR)/obj/app/messageHandler.o \
 $(OUTPUT_DIR)/obj/app/messageHandler_componentSpecific.o \
+$(OUTPUT_DIR)/obj/app/RCCHelper.o \
 
 APP_C_DEPS += $(APP_OBJS:%.o=%.d)
 

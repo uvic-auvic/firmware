@@ -13,6 +13,7 @@
 #include "string.h"
 #include <stdbool.h>
 #include "debug.h"
+#include "RCCHelper.h"
 
 /* DEFINES */
 #define BAUD_RATE   (500000U)   // 500kbps
@@ -83,7 +84,8 @@ static void CAN_private_GPIOInit(void)
 	assert(IS_GPIO_PIN_SOURCE(CAN_config.HWConfig->txPin));
 	assert(IS_GPIO_ALL_PERIPH(CAN_config.HWConfig->GPIOPort));
 
-	// Clock should be enabled in the enable clock callback
+	// Enable GPIO port clock
+    RCCHelper_clockCmd(CAN_config.HWConfig->GPIOPort, ENABLE);
 
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_StructInit(&GPIO_InitStructure);
@@ -104,6 +106,9 @@ static void CAN_private_GPIOInit(void)
 static void CAN_private_CANPeriphInit(void)
 {
     assert(IS_CAN_ALL_PERIPH(CAN_config.HWConfig->CANPeriph));
+
+    // Enable CAN periph clock
+    RCCHelper_clockCmd(CAN_config.HWConfig->CANPeriph, ENABLE);
 
     CAN_InitTypeDef CANInitStruct;
     CAN_StructInit(&CANInitStruct);
@@ -202,10 +207,7 @@ void CAN_init(void)
     CAN_data.initSuccessful = true;
 
     assert(CAN_config.HWConfig != NULL);
-    assert(CAN_config.HWConfig->enablePeripheralsClockCallback != NULL);
     assert(IS_CAN_ALL_PERIPH(CAN_config.HWConfig->CANPeriph));
-
-    CAN_config.HWConfig->enablePeripheralsClockCallback();
 
     CAN_private_GPIOInit();
     CAN_private_CANPeriphInit();

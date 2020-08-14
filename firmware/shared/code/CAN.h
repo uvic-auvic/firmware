@@ -22,8 +22,6 @@ typedef struct
     // CAN
     CAN_TypeDef *   CANPeriph;
 
-    //Common
-	void 		(* enablePeripheralsClockCallback)(void);
 } CAN_HWConfig_S;
 
 typedef struct

@@ -5,7 +5,7 @@ Repo for all AUVIC firmware
 
 This branch contains submodule(s). You will have to download the submodule after you clone.
 Run the following commands in your command line
-1) `git clone https://github.com/uvic-auvic/firmware.git` to clone the repo
+1) `git clone https://github.com/uvic-auvic/firmware.git` to clone the repo. **IMPORTANT**: Clone it to a locationn without any spaces in the file path.
 2) `cd firmware`
 3) `git status` to ensure the repo cloned correctly
 4) `git submodule init` to download the submodule(s)

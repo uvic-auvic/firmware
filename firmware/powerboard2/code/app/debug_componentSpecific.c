@@ -12,8 +12,8 @@ static void debug_enablePeripheralsClockCallback(void);
 static const debug_HWConfig_S debug_HWConfig =
 {
 	// GPIO
-	.rxPin = GPIO_PinSource12,
-	.txPin = GPIO_PinSource11,
+	.rxPin = 12,
+	.txPin = 11,
 	.GPIOPort = GPIOA,
 	.AFNumber = GPIO_AF_USART6,
 

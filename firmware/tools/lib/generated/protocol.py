@@ -14,12 +14,12 @@ import ctypes
 # values for enumeration 'c__EA_protocol_MID_E'
 c__EA_protocol_MID_E__enumvalues = {
     0: 'protocol_RESERVED',
-    1: 'protocol_MID_POLARIS_deviceName',
-    2: 'protocol_MID_POLARIS_motorSetSpeed',
-    3: 'protocol_MID_POLARIS_powerEnable',
-    4: 'protocol_MID_POLARIS_PBMessageRequest',
-    5: 'protocol_MID_POLARIS_MCMessageRequest',
-    6: 'protocol_MID_POLARIS_MCISOTP',
+    1: 'protocol_MID_TRIDENT_deviceName',
+    2: 'protocol_MID_TRIDENT_motorSetSpeed',
+    3: 'protocol_MID_TRIDENT_powerEnable',
+    4: 'protocol_MID_TRIDENT_PBMessageRequest',
+    5: 'protocol_MID_TRIDENT_MCMessageRequest',
+    6: 'protocol_MID_TRIDENT_MCISOTP',
     21: 'protocol_MID_MC_deviceName',
     22: 'protocol_MID_MC_motorRPMLow',
     23: 'protocol_MID_MC_motorRPMHigh',
@@ -30,12 +30,12 @@ c__EA_protocol_MID_E__enumvalues = {
     44: 'protocol_MID_PB_battCurrents',
 }
 protocol_RESERVED = 0
-protocol_MID_POLARIS_deviceName = 1
-protocol_MID_POLARIS_motorSetSpeed = 2
-protocol_MID_POLARIS_powerEnable = 3
-protocol_MID_POLARIS_PBMessageRequest = 4
-protocol_MID_POLARIS_MCMessageRequest = 5
-protocol_MID_POLARIS_MCISOTP = 6
+protocol_MID_TRIDENT_deviceName = 1
+protocol_MID_TRIDENT_motorSetSpeed = 2
+protocol_MID_TRIDENT_powerEnable = 3
+protocol_MID_TRIDENT_PBMessageRequest = 4
+protocol_MID_TRIDENT_MCMessageRequest = 5
+protocol_MID_TRIDENT_MCISOTP = 6
 protocol_MID_MC_deviceName = 21
 protocol_MID_MC_motorRPMLow = 22
 protocol_MID_MC_motorRPMHigh = 23
@@ -174,12 +174,12 @@ protocol_ISOTP_S = struct_c__SA_protocol_ISOTP_S
 class union_c__UA_protocol_allMessages_U(ctypes.Union):
     _pack_ = True # source:False
     _fields_ = [
-    ('POLARIS_deviceName', protocol_deviceName_S),
-    ('POLARIS_motorSetSpeed', protocol_motorSetSpeed_S),
-    ('POLARIS_powerEnable', protocol_powerEnable_S),
-    ('POLARIS_PBMessageRequest', protocol_PBMessageRequest_S),
-    ('POLARIS_MCMessageRequest', protocol_MCMessageRequest_S),
-    ('POLARIS_MCISOTP', protocol_ISOTP_S),
+    ('TRIDENT_deviceName', protocol_deviceName_S),
+    ('TRIDENT_motorSetSpeed', protocol_motorSetSpeed_S),
+    ('TRIDENT_powerEnable', protocol_powerEnable_S),
+    ('TRIDENT_PBMessageRequest', protocol_PBMessageRequest_S),
+    ('TRIDENT_MCMessageRequest', protocol_MCMessageRequest_S),
+    ('TRIDENT_MCISOTP', protocol_ISOTP_S),
     ('MC_deviceName', protocol_deviceName_S),
     ('MC_motorRPMLow', protocol_motorRPM_S),
     ('MC_motorRPMHigh', protocol_motorRPM_S),
@@ -226,12 +226,12 @@ __all__ = \
     'protocol_MID_MC_motorRPMHigh', 'protocol_MID_MC_motorRPMLow',
     'protocol_MID_PB_battCurrents', 'protocol_MID_PB_battVoltages',
     'protocol_MID_PB_deviceName', 'protocol_MID_PB_envData',
-    'protocol_MID_POLARIS_MCISOTP',
-    'protocol_MID_POLARIS_MCMessageRequest',
-    'protocol_MID_POLARIS_PBMessageRequest',
-    'protocol_MID_POLARIS_deviceName',
-    'protocol_MID_POLARIS_motorSetSpeed',
-    'protocol_MID_POLARIS_powerEnable', 'protocol_PBBattCurrents_S',
+    'protocol_MID_TRIDENT_MCISOTP',
+    'protocol_MID_TRIDENT_MCMessageRequest',
+    'protocol_MID_TRIDENT_PBMessageRequest',
+    'protocol_MID_TRIDENT_deviceName',
+    'protocol_MID_TRIDENT_motorSetSpeed',
+    'protocol_MID_TRIDENT_powerEnable', 'protocol_PBBattCurrents_S',
     'protocol_PBBattVoltages_S', 'protocol_PBEnvData_S',
     'protocol_PBMessageRequest_S',
     'protocol_PBMessageRequest_message_E',

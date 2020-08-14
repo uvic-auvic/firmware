@@ -6,7 +6,11 @@ $(OUTPUT_DIR)/obj/app/LED.o \
 $(OUTPUT_DIR)/obj/app/circBuffer1D.o \
 $(OUTPUT_DIR)/obj/app/circBuffer1D_componentSpecific.o \
 $(OUTPUT_DIR)/obj/app/debug.o \
-$(OUTPUT_DIR)/obj/app/debug_componentSpecific.o
+$(OUTPUT_DIR)/obj/app/debug_componentSpecific.o \
+$(OUTPUT_DIR)/obj/app/CAN.o \
+$(OUTPUT_DIR)/obj/app/CAN_componentSpecific.o \
+$(OUTPUT_DIR)/obj/app/messageHandler.o \
+$(OUTPUT_DIR)/obj/app/messageHandler_componentSpecific.o \
 
 APP_C_DEPS += $(APP_OBJS:%.o=%.d)
 
@@ -20,7 +24,7 @@ $(shell mkdir -p $(OUTPUT_DIR)/obj/app)
 $(shell mkdir -p $(OUTPUT_DIR)/obj/app/RTOS)
 
 APP_COMPILER_FLAGS := \
--O0 \
+-O3 \
 -g3 \
 -Wall \
 -Werror \

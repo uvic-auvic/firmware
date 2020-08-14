@@ -22,7 +22,7 @@ if serial_handle is None:
     raise "ERROR"
     quit()
 
-pb_tester = test_lib.SerialTester(serial_handle, b')PWR_BRD\x00\x00', protocol.protocol_MID_POLARIS_PBMessageRequest)
+pb_tester = test_lib.SerialTester(serial_handle, b')PWR_BRD\x00\x00', protocol.protocol_MID_TRIDENT_PBMessageRequest)
 pb_tester.run_all_tests(10)
 
 # Comment out if using iPython

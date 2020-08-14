@@ -23,7 +23,7 @@ void motorInterface_run10ms(void)
 {
     protocol_allMessages_U motorSpeedMessage;
     uint32_t timeReceived = 0U;
-    messageHandler_getMessage(MESSAGE_HANDLER_RX_MESSAGE_CHANNEL_MOTOR_SPEED, &motorSpeedMessage, &timeReceived);
+    messageHandler_getMessage(MESSAGE_HANDLER_RX_CHANNEL_MOTOR_SPEED, &motorSpeedMessage, &timeReceived);
 
     const uint32_t timeSinceLastUpdate = RTOS_getTimeElapsedMilliseconds(timeReceived);
 
@@ -31,10 +31,10 @@ void motorInterface_run10ms(void)
     {
         for(motorDriver_channel_E channel = (motorDriver_channel_E)0U; channel < MOTOR_DRIVER_CHANNEL_COUNT; channel++)
         {
-            const uint16_t motorPowerLevelPercent = (abs(motorSpeedMessage.POLARIS_motorSetSpeed.motorSpeed[channel]) * MOTOR_DRIVER_PERCENT_BASE) / 127U;
+            const uint16_t motorPowerLevelPercent = (abs(motorSpeedMessage.TRIDENT_motorSetSpeed.motorSpeed[channel]) * MOTOR_DRIVER_PERCENT_BASE) / 127U;
             motorDriver_direction_E direction = MOTOR_DRIVER_DIRECTION_FORWARD;
 
-            if(motorSpeedMessage.POLARIS_motorSetSpeed.motorSpeed[channel] < 0)
+            if(motorSpeedMessage.TRIDENT_motorSetSpeed.motorSpeed[channel] < 0)
             {
                 direction = MOTOR_DRIVER_DIRECTION_BACKWARD;
             }

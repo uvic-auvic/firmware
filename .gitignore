@@ -1,10 +1,11 @@
 # Build Output
 # Let's explicitly ignore build output folders
-firmware/motorcontroller2/MOTORCONTROLLER/*
-firmware/powerboard/POWERBOARD/*
-firmware/motorcontroller2/test/MC_TEST/*
+firmware/deprecated/motorcontroller2/MOTORCONTROLLER/*
+firmware/deprecated/powerboard/POWERBOARD/*
+firmware/deprecated/motorcontroller2/test/MC_TEST/*
+firmware/deprecated/powerboard1/test/PB_TEST/*
 firmware/shared/test/SHARED_TEST/*
-firmware/powerboard1/test/PB_TEST/*
+firmware/powerboard2/POWERBOARD2/*
 
 # Object files
 *.o

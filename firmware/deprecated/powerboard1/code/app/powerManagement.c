@@ -78,7 +78,7 @@ void powerManagement_run100ms(void)
         case POWER_MANAGEMENT_STATE_RUN:
         {
             protocol_allMessages_U message;
-            messageHandler_getMessage(MESSAGE_HANDLER_RX_MESSAGE_CHANNEL_POWER_ENABLE, &message, NULL);
+            messageHandler_getMessage(MESSAGE_HANDLER_RX_CHANNEL_POWER_ENABLE, &message, NULL);
 
             powerManagement_data.batteryVoltages[POWER_MANAGEMENT_BATTERY_CHANNEL_LEFT] = ADC_VALUE_TO_BAT_VOLTAGE(ADC_getChannelData(ADC_CHANNEL_LEFT_BATT_VOLTAGE));
             powerManagement_data.batteryVoltages[POWER_MANAGEMENT_BATTERY_CHANNEL_RIGHT] = ADC_VALUE_TO_BAT_VOLTAGE(ADC_getChannelData(ADC_CHANNEL_RIGHT_BATT_VOLTAGE));
@@ -86,9 +86,9 @@ void powerManagement_run100ms(void)
             powerManagement_data.batteryCurrents[POWER_MANAGEMENT_BATTERY_CHANNEL_LEFT] = ADC_VALUE_TO_CURRENT(ADC_getChannelData(ADC_CHANNEL_LEFT_BATT_CURRENT));
             powerManagement_data.batteryCurrents[POWER_MANAGEMENT_BATTERY_CHANNEL_RIGHT] = ADC_VALUE_TO_CURRENT(ADC_getChannelData(ADC_CHANNEL_RIGHT_BATT_CURRENT));
 
-            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_MOTOR, message.POLARIS_powerEnable.motorPowerEnable);
-            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_5V, message.POLARIS_powerEnable._5VPowerEnable);
-            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V_9V, message.POLARIS_powerEnable._12V9VPowerEnable);
+            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_MOTOR, message.TRIDENT_powerEnable.motorPowerEnable);
+            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_5V, message.TRIDENT_powerEnable._5VPowerEnable);
+            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V_9V, message.TRIDENT_powerEnable._12V9VPowerEnable);
 
             break;
         }

@@ -16,4 +16,7 @@
 
 #define UNUSED(x)   ((void)(x))
 
+#define MIN_OF(x, y)      ( (x) < (y) ? x : y )
+#define MAX_OF(x, y)      ( (x) > (y) ? x : y )  
+
 #endif /* UTILS_H_ */

@@ -11,18 +11,14 @@ INCLUDE_PATH+= \
 
 $(shell mkdir -p $(OUTPUT_DIR)/obj/bootloader/startup)
 
-BOOTLOADER_STARTUP_COMPILER_FLAGS = \
-$(COMPILER_OPTIMIZATION) \
+ARM_TOOLS_COMPILER_FLAGS := \
+-O0 \
 -g3 \
--Wall \
--Wswitch-enum \
--Wswitch-default \
--Wno-error=deprecated \
-# -Wextra
+-Wall
 
 # Each subdirectory must supply rules for building sources it contributes
 $(OUTPUT_DIR)/obj/bootloader/startup/%.o: $(CODE_DIR)/startup/%.c
-	@$(MAKE) --no-print-directory arm-complier ARM_TOOLS_COMPILER_FLAGS="$(BOOTLOADER_STARTUP_COMPILER_FLAGS)" ARM_TOOLS_COMPILER_SOURCE_FILE=$< ARM_TOOLS_COMPILER_OBJECT_FILE=$@ ARM_TOOLS_COMPILER_DEFS_FILE=$(@:%.o=%.d)
+	@$(MAKE) --no-print-directory arm-complier ARM_TOOLS_COMPILER_SOURCE_FILE=$< ARM_TOOLS_COMPILER_OBJECT_FILE=$@ ARM_TOOLS_COMPILER_DEFS_FILE=$(@:%.o=%.d)
 
 # Each subdirectory must supply rules for building sources it contributes
 $(OUTPUT_DIR)/obj/bootloader/startup/startup_stm32f411xe.o: $(CODE_DIR)/startup/startup_stm32f411xe.s

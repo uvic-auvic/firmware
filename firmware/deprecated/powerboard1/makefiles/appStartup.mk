@@ -6,19 +6,16 @@ $(OUTPUT_DIR)/obj/app/startup/main.o
 
 APP_C_DEPS += $(APP_OBJS:%.o=%.d)
 
-$(shell mkdir -p $(OUTPUT_DIR)/obj/app/startup)
-
-APP_STARTUP_COMPILER_FLAGS = \
-$(COMPILER_OPTIMIZATION) \
+ARM_TOOLS_COMPILER_FLAGS := \
+-O0 \
 -g3 \
--Wall \
--Wswitch-enum \
--Wswitch-default \
--Wextra
+-Wall
+
+$(shell mkdir -p $(OUTPUT_DIR)/obj/app/startup)
 
 # Each subdirectory must supply rules for building sources it contributes
 $(OUTPUT_DIR)/obj/app/startup/%.o: $(CODE_DIR)/startup/%.c
-	@$(MAKE) --no-print-directory arm-complier ARM_TOOLS_COMPILER_FLAGS="$(APP_STARTUP_COMPILER_FLAGS)" ARM_TOOLS_COMPILER_SOURCE_FILE=$< ARM_TOOLS_COMPILER_OBJECT_FILE=$@ ARM_TOOLS_COMPILER_DEFS_FILE=$(@:%.o=%.d)
+	@$(MAKE) --no-print-directory arm-complier ARM_TOOLS_COMPILER_SOURCE_FILE=$< ARM_TOOLS_COMPILER_OBJECT_FILE=$@ ARM_TOOLS_COMPILER_DEFS_FILE=$(@:%.o=%.d)
 
 	# Each subdirectory must supply rules for building sources it contributes
 $(OUTPUT_DIR)/obj/app/startup/startup_stm32.o: $(CODE_DIR)/startup/startup_stm32.s

@@ -26,8 +26,8 @@ INCLUDE_PATH+= \
 $(shell mkdir -p $(OUTPUT_DIR)/obj/app)
 $(shell mkdir -p $(OUTPUT_DIR)/obj/app/RTOS)
 
-APP_COMPILER_FLAGS = \
-$(COMPILER_OPTIMIZATION) \
+APP_COMPILER_FLAGS := \
+-O0 \
 -g3 \
 -Wall \
 -Werror \

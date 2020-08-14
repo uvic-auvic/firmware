@@ -7,15 +7,14 @@ $(OUTPUT_DIR)/obj/bootloader/bootloader/Flash_Interface.o
 
 BOOTLOADER_C_DEPS += $(BOOTLOADER_OBJS:%.o=%.d)
 
-BOOTLOADER_COMPILER_FLAGS = \
-$(COMPILER_OPTIMIZATION) \
+BOOTLOADER_COMPILER_FLAGS= \
+-O0 \
 -g3 \
 -Wall \
+-Werror \
 -Wswitch-enum \
 -Wswitch-default \
--Wno-error=deprecated \
-# -Wextra \
-# -Werror \
+# -Wextra
 
 INCLUDE_PATH+= \
 -I$(SHARED_CODE_DIR) \

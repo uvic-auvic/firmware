@@ -12,7 +12,7 @@ static void ISOTP_UART_componentSpecific_messageReceivedCallback(const uint8_t *
 
 const ISOTP_UART_config_S ISOTP_UART_config =
 {
-	.RXMessageID = protocol_MID_POLARIS_MCISOTP,
+	.RXMessageID = protocol_MID_TRIDENT_MCISOTP,
 	.TXMessageID = protocol_MID_MC_ISOTP,
 	.messageReceivedCallback = ISOTP_UART_componentSpecific_messageReceivedCallback,
 };

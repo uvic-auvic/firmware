@@ -10,7 +10,6 @@
 #include <string.h>
 #include "debug.h"
 
-
 static void messageHandler_componentSpecific_messageReceivedCallback(const messageHandler_RXMessageChannel_E channel, const protocol_allMessages_U * const message);
 static void messageHandler_componentSpecific_messagePopulateCallback(const messageHandler_TXMessageChannel_E channel, protocol_allMessages_U * const message);
 
@@ -21,11 +20,11 @@ const messageHandler_config_S messageHandler_config =
     {
         [MESSAGE_HANDLER_RX_CHANNEL_POWER_ENABLE] =
         {
-            .messageID = protocol_MID_POLARIS_powerEnable,
+            .messageID = protocol_MID_TRIDENT_powerEnable,
             .callbackEnable = false,
             .initValue = 
             {  
-                .POLARIS_powerEnable2 =
+                .TRIDENT_powerEnable =
                 {
                     .VBattPowerEnable = false,
                     ._5VPowerEnable = false,

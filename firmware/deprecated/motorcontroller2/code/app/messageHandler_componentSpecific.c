@@ -13,22 +13,22 @@
 
 static void messageHandler_componentSpecific_messageReceivedCallback(const messageHandler_RXMessageChannel_E channel, const protocol_allMessages_U * const receivedData);
 static void messageHandler_componentSpecific_messagePopulateCallback(const messageHandler_TXMessageChannel_E channel, protocol_allMessages_U * const message);
-static inline messageHandler_TXMessageChannel_E messageHandler_componentSpecific_translatePolarisMessageRequest(const protocol_MCMessageRequest_message_E message);
+static inline messageHandler_TXMessageChannel_E messageHandler_componentSpecific_translateTridentMessageRequest(const protocol_MCMessageRequest_message_E message);
 
 extern const messageHandler_config_S messageHandler_config;
 const messageHandler_config_S messageHandler_config =
 {
     .RXMessageConfig =
     {
-        [MESSAGE_HANDLER_RX_CHANNEL_POLARIS_REQUEST] =
+        [MESSAGE_HANDLER_RX_CHANNEL_TRIDENT_REQUEST] =
         {
-            .messageID = protocol_MID_POLARIS_MCMessageRequest,
-            .initValue = {.POLARIS_MCMessageRequest = {.requestedMessage = PROTOCOL_MC_MESSAGE_REQUEST_MESSAGE_COUNT}},
+            .messageID = protocol_MID_TRIDENT_MCMessageRequest,
+            .initValue = {.TRIDENT_MCMessageRequest = {.requestedMessage = PROTOCOL_MC_MESSAGE_REQUEST_MESSAGE_COUNT}},
         },
         [MESSAGE_HANDLER_RX_CHANNEL_MOTOR_SPEED] =
         {
-            .messageID = protocol_MID_POLARIS_motorSetSpeed,
-            .initValue = {.POLARIS_motorSetSpeed = {.motorSpeed = {0U}}},
+            .messageID = protocol_MID_TRIDENT_motorSetSpeed,
+            .initValue = {.TRIDENT_motorSetSpeed = {.motorSpeed = {0U}}},
         },
     },
 
@@ -60,9 +60,9 @@ static void messageHandler_componentSpecific_messageReceivedCallback(const messa
     {
         switch(channel)
         {
-            case MESSAGE_HANDLER_RX_CHANNEL_POLARIS_REQUEST:
+            case MESSAGE_HANDLER_RX_CHANNEL_TRIDENT_REQUEST:
             {
-                const messageHandler_TXMessageChannel_E TXChannel = messageHandler_componentSpecific_translatePolarisMessageRequest(receivedData->POLARIS_PBMessageRequest.requestedMessage);
+                const messageHandler_TXMessageChannel_E TXChannel = messageHandler_componentSpecific_translateTridentMessageRequest(receivedData->TRIDENT_PBMessageRequest.requestedMessage);
                 messageHandler_dispatchMessage(TXChannel);
 
                 break;
@@ -119,7 +119,7 @@ static void messageHandler_componentSpecific_messagePopulateCallback(const messa
     }
 }
 
-static inline messageHandler_TXMessageChannel_E messageHandler_componentSpecific_translatePolarisMessageRequest(const protocol_MCMessageRequest_message_E message)
+static inline messageHandler_TXMessageChannel_E messageHandler_componentSpecific_translateTridentMessageRequest(const protocol_MCMessageRequest_message_E message)
 {
     messageHandler_TXMessageChannel_E ret = MESSAGE_HANDLER_TX_CHANNEL_COUNT;
     switch(message)

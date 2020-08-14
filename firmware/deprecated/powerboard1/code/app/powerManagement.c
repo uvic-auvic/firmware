@@ -86,9 +86,9 @@ void powerManagement_run100ms(void)
             powerManagement_data.batteryCurrents[POWER_MANAGEMENT_BATTERY_CHANNEL_LEFT] = ADC_VALUE_TO_CURRENT(ADC_getChannelData(ADC_CHANNEL_LEFT_BATT_CURRENT));
             powerManagement_data.batteryCurrents[POWER_MANAGEMENT_BATTERY_CHANNEL_RIGHT] = ADC_VALUE_TO_CURRENT(ADC_getChannelData(ADC_CHANNEL_RIGHT_BATT_CURRENT));
 
-            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_MOTOR, message.POLARIS_powerEnable.motorPowerEnable);
-            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_5V, message.POLARIS_powerEnable._5VPowerEnable);
-            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V_9V, message.POLARIS_powerEnable._12V9VPowerEnable);
+            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_MOTOR, message.TRIDENT_powerEnable.motorPowerEnable);
+            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_5V, message.TRIDENT_powerEnable._5VPowerEnable);
+            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V_9V, message.TRIDENT_powerEnable._12V9VPowerEnable);
 
             break;
         }

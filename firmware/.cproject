@@ -32,6 +32,19 @@
 									<listOptionValue builtIn="false" value="STM32"/>
 									<listOptionValue builtIn="false" value="STM32F4"/>
 									<listOptionValue builtIn="false" value="STM32F413_423xx"/>
+									<listOptionValue builtIn="false" value="UART_DEBUG=1"/>
+								</option>
+								<option id="gnu.c.compiler.option.include.paths.1300025944" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/utils}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/data/protocol/protocol}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/RTOS}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/bootloader}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/CMSIS/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/CMSIS/Device/ST/STM32F4xx/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/STM32F4xx_StdPeriph_Driver/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/FreeRTOS/FreeRTOS/Source/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/FreeRTOS/FreeRTOS/Source/portable/GCC/ARM_CM4F}&quot;"/>
 								</option>
 								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.1253361925" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c"/>
 								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s.112646579" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s"/>
@@ -61,6 +74,18 @@
 							</tool>
 							<tool id="fr.ac6.managedbuild.tool.gnu.archiver.1594042214" name="MCU GCC Archiver" superClass="fr.ac6.managedbuild.tool.gnu.archiver"/>
 							<tool errorParsers="org.eclipse.cdt.core.GASErrorParser" id="fr.ac6.managedbuild.tool.gnu.cross.assembler.1855077558" name="MCU GCC Assembler" superClass="fr.ac6.managedbuild.tool.gnu.cross.assembler">
+								<option id="gnu.both.asm.option.include.paths.47248938" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/CMSIS/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/CMSIS/Device/ST/STM32F4xx/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/STM32F4xx_StdPeriph_Driver/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/FreeRTOS/FreeRTOS/Source/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/FreeRTOS/FreeRTOS/Source/portable/GCC/ARM_CM4F}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/data/protocol/protocol}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/utils}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/RTOS}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/bootloader}&quot;"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1914974631" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.assembler.input.1064252914" superClass="fr.ac6.managedbuild.tool.gnu.cross.assembler.input"/>
 							</tool>
@@ -75,7 +100,9 @@
 		</cconfiguration>
 		<cconfiguration id="fr.ac6.managedbuild.toolchain.gnu.cross.base.680406637.272139944.1086020057.916675390">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="fr.ac6.managedbuild.toolchain.gnu.cross.base.680406637.272139944.1086020057.916675390" moduleId="org.eclipse.cdt.core.settings" name="Power Board 2 - STM32F413 - App">
-				<externalSettings/>
+				<externalSettings>
+					<externalSetting/>
+				</externalSettings>
 				<extensions>
 					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
@@ -91,19 +118,42 @@
 						<toolChain errorParsers="" id="fr.ac6.managedbuild.toolchain.gnu.cross.base.2041819956" name="Ac6 STM32 MCU GCC" superClass="fr.ac6.managedbuild.toolchain.gnu.cross.base">
 							<option id="fr.ac6.managedbuild.option.gnu.cross.prefix.1610661567" name="Prefix" superClass="fr.ac6.managedbuild.option.gnu.cross.prefix"/>
 							<option id="fr.ac6.managedbuild.option.gnu.cross.path.1133611611" name="Path" superClass="fr.ac6.managedbuild.option.gnu.cross.path"/>
-							<option id="fr.ac6.managedbuild.option.gnu.cross.mcu.39921308" name="Mcu" superClass="fr.ac6.managedbuild.option.gnu.cross.mcu" value="STM32F411VETx" valueType="string"/>
-							<option id="fr.ac6.managedbuild.option.gnu.cross.board.1373548313" name="Board" superClass="fr.ac6.managedbuild.option.gnu.cross.board" value="STM32F411E-DISCO" valueType="string"/>
+							<option id="fr.ac6.managedbuild.option.gnu.cross.mcu.39921308" name="Mcu" superClass="fr.ac6.managedbuild.option.gnu.cross.mcu" value="STM32F413VGTx" valueType="string"/>
+							<option id="fr.ac6.managedbuild.option.gnu.cross.board.1373548313" name="Board" superClass="fr.ac6.managedbuild.option.gnu.cross.board" value="genericBoard" valueType="string"/>
 							<option id="fr.ac6.managedbuild.option.gnu.cross.core.785064948" name="Core" superClass="fr.ac6.managedbuild.option.gnu.cross.core"/>
 							<option id="fr.ac6.managedbuild.option.gnu.cross.fpu.484004892" name="Floating point hardware" superClass="fr.ac6.managedbuild.option.gnu.cross.fpu" value="fr.ac6.managedbuild.option.gnu.cross.fpu.fpv4-sp-d16" valueType="enumerated"/>
 							<option id="fr.ac6.managedbuild.option.gnu.cross.floatabi.578202720" name="Floating-point ABI" superClass="fr.ac6.managedbuild.option.gnu.cross.floatabi" value="fr.ac6.managedbuild.option.gnu.cross.floatabi.hard" valueType="enumerated"/>
 							<option id="fr.ac6.managedbuild.option.gnu.cross.instructionSet.1500673157" name="Instruction Set" superClass="fr.ac6.managedbuild.option.gnu.cross.instructionSet"/>
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="fr.ac6.managedbuild.targetPlatform.gnu.cross.2062728136" isAbstract="false" osList="all" superClass="fr.ac6.managedbuild.targetPlatform.gnu.cross"/>
-							<builder arguments="" cleanBuildTarget="powerboard2 TARGET=clean" command="make" enableCleanBuild="true" enabledIncrementalBuild="true" errorParsers="org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.CWDLocator" id="fr.ac6.managedbuild.builder.gnu.cross.2719737" incrementalBuildTarget="powerboard2 TARGET=app" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="fr.ac6.managedbuild.builder.gnu.cross"/>
+							<builder arguments="" cleanBuildTarget="powerboard2 TARGET=clean" command="make" enableCleanBuild="true" enabledIncrementalBuild="true" errorParsers="org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.CWDLocator" id="fr.ac6.managedbuild.builder.gnu.cross.2719737" incrementalBuildTarget="powerboard2 TARGET=app" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="fr.ac6.managedbuild.builder.gnu.cross">
+								<outputEntries>
+									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name=""/>
+								</outputEntries>
+							</builder>
 							<tool errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.1210167173" name="MCU GCC Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler">
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1142024229" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="STM32"/>
 									<listOptionValue builtIn="false" value="STM32F4"/>
 									<listOptionValue builtIn="false" value="STM32F413_423xx"/>
+									<listOptionValue builtIn="false" value="USE_STDPERIPH_DRIVER"/>
+									<listOptionValue builtIn="false" value="DEVICE_STM32F413=1"/>
+									<listOptionValue builtIn="false" value="MCU_ARCHITECTURE_M4=1"/>
+									<listOptionValue builtIn="false" value="DEVICE_FAMILY_STM32F4=1"/>
+									<listOptionValue builtIn="false" value="UART_DEBUG=1"/>
+								</option>
+								<option id="gnu.c.compiler.option.include.paths.714153340" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/powerboard2/code/app/RTOS}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/powerboard2/code/app}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/data/protocol/protocol}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/utils}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/RTOS}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/bootloader}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/CMSIS/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/CMSIS/Device/ST/STM32F4xx/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/STM32F4xx_StdPeriph_Driver/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/FreeRTOS/FreeRTOS/Source/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/FreeRTOS/FreeRTOS/Source/portable/GCC/ARM_CM4F}&quot;"/>
 								</option>
 								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.1015195703" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c"/>
 								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s.281481444" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s"/>
@@ -133,13 +183,26 @@
 							</tool>
 							<tool id="fr.ac6.managedbuild.tool.gnu.archiver.899361909" name="MCU GCC Archiver" superClass="fr.ac6.managedbuild.tool.gnu.archiver"/>
 							<tool errorParsers="org.eclipse.cdt.core.GASErrorParser" id="fr.ac6.managedbuild.tool.gnu.cross.assembler.1044835238" name="MCU GCC Assembler" superClass="fr.ac6.managedbuild.tool.gnu.cross.assembler">
+								<option id="gnu.both.asm.option.include.paths.7488399" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/powerboard2/code}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/data/protocol/protocol}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/CMSIS/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/CMSIS/Device/ST/STM32F4xx/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/STM32F4xx_StdPeriph_Driver/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/FreeRTOS/FreeRTOS/Source/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/FreeRTOS/FreeRTOS/Source/portable/GCC/ARM_CM4F}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/utils}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/RTOS}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/bootloader}&quot;"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.199953995" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.assembler.input.165505647" superClass="fr.ac6.managedbuild.tool.gnu.cross.assembler.input"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="motorcontroller2/code/app" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="deprecated" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

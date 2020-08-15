@@ -3,7 +3,7 @@ export REPO_ROOT=$(CURDIR)
 
 powerboard2: _powerboard2
 _powerboard2:
-	@echo "Building Power Board 2 - $(TARGET) - $(DEVICE)"
+	@echo "Building Power Board 2 - $(TARGET)"
 	$(MAKE) --no-print-directory -C powerboard2/makefiles $(TARGET)
 
 generated:

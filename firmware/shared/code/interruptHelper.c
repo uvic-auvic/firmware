@@ -6,7 +6,7 @@
  * 
  *  A HAL for interrupts.
  *  This can be used by shared code that require interrupts,
- *  but are designed to work my a user configurable peripheral number
+ *  but are designed to work with a user configurable peripheral number
  */
 
 #ifndef SHARED_CODE_INTERRUPTHELPER_C_

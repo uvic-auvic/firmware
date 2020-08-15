@@ -40,7 +40,7 @@ static debug_data_S debug_data;
 /* PRIVATE FUNCTIONS DECLARATION */
 static void debug_private_configureGPIO(void);
 static void debug_private_configureUARTPeriph(void);
-static void debug_UARTInterruptHandler(void);
+static void debug_private_UARTInterruptHandler(void);
 
 /* PRIVATE FUNCTION DEFINITION */
 static void debug_private_configureGPIO(void)
@@ -91,7 +91,7 @@ static void debug_private_configureUARTPeriph(void)
 	USART_Init(debug_config.HWConfig->UARTPeriph, &USART_InitStruct);
 
 	// Setup interrupt
-	interruptHelper_registerCallback_USART(debug_config.HWConfig->UARTPeriph, debug_UARTInterruptHandler);
+	interruptHelper_registerCallback_USART(debug_config.HWConfig->UARTPeriph, debug_private_UARTInterruptHandler);
 	NVIC_SetPriority(interruptHelper_getIRQn_USART(debug_config.HWConfig->UARTPeriph), 4);
 	NVIC_EnableIRQ(interruptHelper_getIRQn_USART(debug_config.HWConfig->UARTPeriph));
 
@@ -99,7 +99,7 @@ static void debug_private_configureUARTPeriph(void)
 }
 
 /* INTERRUPT HANDLER */
-static void debug_UARTInterruptHandler(void)
+static void debug_private_UARTInterruptHandler(void)
 {
 	if(USART_GetITStatus(debug_config.HWConfig->UARTPeriph, USART_IT_RXNE) == SET)
 	{

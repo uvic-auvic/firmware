@@ -85,7 +85,7 @@ void LED_run100ms(void)
 		{
 			case LED_STATE_ON:
 			{
-				channelConfig->GPIOPort->BSRRL = BITVALUE(channelConfig->pin);
+				channelConfig->GPIOPort->BSRRL = (uint16_t)BITVALUE(channelConfig->pin);
 				break;
 			}
 			case LED_STATE_BLINK_NORMAL:
@@ -110,7 +110,7 @@ void LED_run100ms(void)
 			case LED_STATE_OFF:
 			default:
 			{
-				channelConfig->GPIOPort->BSRRH = BITVALUE(channelConfig->pin);
+				channelConfig->GPIOPort->BSRRH = (uint16_t)BITVALUE(channelConfig->pin);
 				break;
 			}
 		}

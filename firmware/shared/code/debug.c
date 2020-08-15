@@ -23,6 +23,7 @@
 /* TYPEDEFS */
 typedef enum
 {
+	TX_STATE_INIT,
 	TX_STATE_READY_TO_SEND,
 	TX_STATE_TRANSMITTING,
 } debug_TXState_E;
@@ -95,7 +96,12 @@ static void debug_private_configureUARTPeriph(void)
 	NVIC_SetPriority(interruptHelper_getIRQn_USART(debug_config.HWConfig->UARTPeriph), 4);
 	NVIC_EnableIRQ(interruptHelper_getIRQn_USART(debug_config.HWConfig->UARTPeriph));
 
+	// Enable the UART transmitter and receiver
+	// Peripheral will start reading from/writing to pins after this
 	USART_Cmd(debug_config.HWConfig->UARTPeriph, ENABLE);
+
+	// UART is ready to send data at this point
+	debug_data.TXState = TX_STATE_READY_TO_SEND;
 }
 
 /* INTERRUPT HANDLER */
@@ -137,7 +143,7 @@ void _debug_init()
 		assert(0U);
 	}
 
-	debug_data.TXState = TX_STATE_READY_TO_SEND;
+	debug_data.TXState = TX_STATE_INIT;
 
 	debug_private_configureGPIO();
 	debug_private_configureUARTPeriph();
@@ -148,30 +154,35 @@ void _debug_init()
 bool _debug_writeLen(const uint8_t * const data, const uint16_t length, const bool blocking)
 {
 	bool ret = false;
-	if((data != NULL) && (length != 0U) && (length <= DEBUG_TX_BUFFER_LENGTH))
+
+	if((debug_data.TXState == TX_STATE_READY_TO_SEND) || (debug_data.TXState == TX_STATE_TRANSMITTING))
 	{
-		if(blocking)
+		if((data != NULL) && (length != 0U) && (length <= DEBUG_TX_BUFFER_LENGTH))
 		{
-			while (debug_data.TXState == TX_STATE_TRANSMITTING) {}
-
-			for(uint16_t dataIndex = 0U; dataIndex < length; dataIndex++)
+			if(blocking)
 			{
-				while(USART_GetFlagStatus(debug_config.HWConfig->UARTPeriph, USART_FLAG_TXE) != SET) {}
-				debug_config.HWConfig->UARTPeriph->DR = data[dataIndex];
+				while (debug_data.TXState == TX_STATE_TRANSMITTING) {}
+
+				for(uint16_t dataIndex = 0U; dataIndex < length; dataIndex++)
+				{
+					while(USART_GetFlagStatus(debug_config.HWConfig->UARTPeriph, USART_FLAG_TXE) != SET) {}
+					debug_config.HWConfig->UARTPeriph->DR = data[dataIndex];
+				}
 			}
-		}
-		else
-		{
-			ret = circBuffer1D_push(CIRCBUFFER1D_CHANNEL_DEBUG_TX, data, length);
-			if(ret)
+			else
 			{
-				debug_data.TXState = TX_STATE_TRANSMITTING;
+				ret = circBuffer1D_push(CIRCBUFFER1D_CHANNEL_DEBUG_TX, data, length);
+				if(ret)
+				{
+					debug_data.TXState = TX_STATE_TRANSMITTING;
 
-				// Enable the TXE interrupt. The IRQ will take care of starting the transmission
-				USART_ITConfig(debug_config.HWConfig->UARTPeriph, USART_IT_TXE, ENABLE);
+					// Enable the TXE interrupt. The IRQ will take care of starting the transmission
+					USART_ITConfig(debug_config.HWConfig->UARTPeriph, USART_IT_TXE, ENABLE);
+				}
 			}
 		}
 	}
+
 
 	return ret;
 }
@@ -180,12 +191,15 @@ bool _debug_writeString(const char * const format, ...)
 {	
 	bool ret = false;
 
-	va_list args;
-	va_start (args, format);
-	uint16_t length = vsnprintf((char *)debug_data.TXSprintfBuffer, sizeof(debug_data.TXSprintfBuffer), format, args);
+	if((debug_data.TXState == TX_STATE_READY_TO_SEND) || (debug_data.TXState == TX_STATE_TRANSMITTING))
+	{
+		va_list args;
+		va_start (args, format);
+		uint16_t length = vsnprintf((char *)debug_data.TXSprintfBuffer, sizeof(debug_data.TXSprintfBuffer), format, args);
 
-	debug_data.TXSprintfBuffer[length] = (uint8_t)'\n';
-	ret = _debug_writeLen(debug_data.TXSprintfBuffer, length + 1, false);
+		debug_data.TXSprintfBuffer[length] = (uint8_t)'\n';
+		ret = _debug_writeLen(debug_data.TXSprintfBuffer, length + 1, false);
+	}
 
 	return ret;
 }
@@ -194,13 +208,15 @@ bool _debug_writeStringBlocking(const char * const format, ...)
 {
 	bool ret = false;
 
-	va_list args;
-	va_start (args, format);
-	uint16_t length = vsnprintf((char *)debug_data.TXSprintfBuffer, sizeof(debug_data.TXSprintfBuffer), format, args);
-	
-	debug_data.TXSprintfBuffer[length] = (uint8_t)'\n';
-	ret = _debug_writeLen(debug_data.TXSprintfBuffer, length + 1, false);
-
+	if((debug_data.TXState == TX_STATE_READY_TO_SEND) || (debug_data.TXState == TX_STATE_TRANSMITTING))
+	{
+		va_list args;
+		va_start (args, format);
+		uint16_t length = vsnprintf((char *)debug_data.TXSprintfBuffer, sizeof(debug_data.TXSprintfBuffer), format, args);
+		
+		debug_data.TXSprintfBuffer[length] = (uint8_t)'\n';
+		ret = _debug_writeLen(debug_data.TXSprintfBuffer, length + 1, false);
+	}
 
 	return ret;
 }

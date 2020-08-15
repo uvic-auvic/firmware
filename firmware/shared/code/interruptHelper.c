@@ -263,4 +263,171 @@ void UART10_IRQHandler(void)
     }
 }
 
+/* CAN */
+
+/**
+  * @brief  Returned the IRQn of the specific CAN peripheral and interrupt combination
+  * @param  CANPeriph: CAN Peripheral Handel
+  * @param  CAN_IT: specifies the CAN interrupt sources
+  *          This parameter can be: 
+  *            @arg CAN_IT_TME: Transmit mailbox empty Interrupt 
+  *            @arg CAN_IT_FMP0: FIFO 0 message pending Interrupt 
+  *            @arg CAN_IT_FF0: FIFO 0 full Interrupt
+  *            @arg CAN_IT_FOV0: FIFO 0 overrun Interrupt
+  *            @arg CAN_IT_FMP1: FIFO 1 message pending Interrupt 
+  *            @arg CAN_IT_FF1: FIFO 1 full Interrupt
+  *            @arg CAN_IT_FOV1: FIFO 1 overrun Interrupt
+  *            @arg CAN_IT_WKU: Wake-up Interrupt
+  *            @arg CAN_IT_SLK: Sleep acknowledge Interrupt  
+  *            @arg CAN_IT_EWG: Error warning Interrupt
+  *            @arg CAN_IT_EPV: Error passive Interrupt
+  *            @arg CAN_IT_BOF: Bus-off Interrupt  
+  *            @arg CAN_IT_LEC: Last error code Interrupt
+  *            @arg CAN_IT_ERR: Error Interrupt
+  * @note   CAN3 peripheral is available only for STM32F413_423xx devices
+  *          This parameter can be: ENABLE or DISABLE.
+  * @retval None
+  */
+IRQn_Type interruptHelper_getIRQn_CAN(const CAN_TypeDef * const CANPeriph, const uint32_t CANIT)
+{
+    IRQn_Type ret = ~((IRQn_Type)0U); // Maximum number for type IRQn_Type
+
+    switch((uint32_t)CANPeriph)
+    {
+        case (uint32_t)CAN1:
+        {
+            switch(CANIT)
+            {
+                case CAN_IT_TME:
+                {
+                    ret = CAN1_TX_IRQn;
+                    break;
+                }
+                case CAN_IT_FMP0:
+                case CAN_IT_FF0:
+                case CAN_IT_FOV0:
+                {
+                    ret = CAN1_RX0_IRQn;
+                    break;
+                }
+                case CAN_IT_FMP1:
+                case CAN_IT_FF1:
+                case CAN_IT_FOV1:
+                {
+                    ret = CAN1_RX1_IRQn;
+                    break;
+                }
+                case CAN_IT_WKU:
+                case CAN_IT_SLK:
+                case CAN_IT_EWG:
+                case CAN_IT_EPV:
+                case CAN_IT_BOF:
+                case CAN_IT_LEC:
+                case CAN_IT_ERR:
+                {
+                    ret = CAN1_SCE_IRQn;
+                    break;
+                }
+                default:
+                {
+                    ret = ~((IRQn_Type)0U); // Maximum number for type IRQn_Type
+                    break;
+                }
+            }
+            break;
+        }
+        case (uint32_t)CAN2:
+        {
+            switch(CANIT)
+            {
+                case CAN_IT_TME:
+                {
+                    ret = CAN2_TX_IRQn;
+                    break;
+                }
+                case CAN_IT_FMP0:
+                case CAN_IT_FF0:
+                case CAN_IT_FOV0:
+                {
+                    ret = CAN2_RX0_IRQn;
+                    break;
+                }
+                case CAN_IT_FMP1:
+                case CAN_IT_FF1:
+                case CAN_IT_FOV1:
+                {
+                    ret = CAN2_RX1_IRQn;
+                    break;
+                }
+                case CAN_IT_WKU:
+                case CAN_IT_SLK:
+                case CAN_IT_EWG:
+                case CAN_IT_EPV:
+                case CAN_IT_BOF:
+                case CAN_IT_LEC:
+                case CAN_IT_ERR:
+                {
+                    ret = CAN2_SCE_IRQn;
+                    break;
+                }
+                default:
+                {
+                    ret = ~((IRQn_Type)0U); // Maximum number for type IRQn_Type
+                    break;
+                }
+            }
+            break;
+        }
+        case (uint32_t)CAN3:
+        {
+            switch(CANIT)
+            {
+                case CAN_IT_TME:
+                {
+                    ret = CAN3_TX_IRQn;
+                    break;
+                }
+                case CAN_IT_FMP0:
+                case CAN_IT_FF0:
+                case CAN_IT_FOV0:
+                {
+                    ret = CAN3_RX0_IRQn;
+                    break;
+                }
+                case CAN_IT_FMP1:
+                case CAN_IT_FF1:
+                case CAN_IT_FOV1:
+                {
+                    ret = CAN3_RX1_IRQn;
+                    break;
+                }
+                case CAN_IT_WKU:
+                case CAN_IT_SLK:
+                case CAN_IT_EWG:
+                case CAN_IT_EPV:
+                case CAN_IT_BOF:
+                case CAN_IT_LEC:
+                case CAN_IT_ERR:
+                {
+                    ret = CAN3_SCE_IRQn;
+                    break;
+                }
+                default:
+                {
+                    ret = ~((IRQn_Type)0U); // Maximum number for type IRQn_Type
+                    break;
+                }
+            }
+            break;
+        }
+        default:
+        {
+            ret = ~((IRQn_Type)0U); // Maximum number for type IRQn_Type
+            break;
+        }
+    }
+
+    return ret;
+}
+
 #endif /* SHARED_CODE_INTERRUPTHELPER_C_ */

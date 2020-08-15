@@ -12,7 +12,11 @@
 
 typedef void (* IRQCallback)(void);
 
+// USART
 IRQn_Type interruptHelper_getIRQn_USART(const USART_TypeDef * const UARTPeriph);
 void interruptHelper_registerCallback_USART(const USART_TypeDef * const UARTPeriph, const IRQCallback callback);
+
+// CAN
+IRQn_Type interruptHelper_getIRQn_CAN(const CAN_TypeDef * const CANPeriph, const uint32_t CANIT);
 
 #endif /* SHARED_CODE_INTERRUPTHELPER_H_ */

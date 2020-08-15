@@ -14,6 +14,7 @@
 #include <stdbool.h>
 #include "debug.h"
 #include "RCCHelper.h"
+#include "interruptHelper.h"
 
 /* DEFINES */
 #define BAUD_RATE   (500000U)   // 500kbps
@@ -23,15 +24,6 @@
 /* TYPEDEFS */
 typedef enum
 {
-    CAN_PERIPH_1,
-    CAN_PERIPH_2,
-    CAN_PERIPH_3,
-
-    CAN_PERIPH_COUNT,
-} CAN_periph_E;
-
-typedef enum
-{
     CAN_TX_MAILBOX_0 = 0,
     CAN_TX_MAILBOX_1 = 1,
     CAN_TX_MAILBOX_2 = 2,
@@ -39,9 +31,16 @@ typedef enum
     CAN_TX_MAILBOX_COUNT,
 } CAN_TXMailbox_E;
 
+typedef enum
+{
+    CAN_STATE_INIT,
+    CAN_STATE_ERROR,
+    CAN_STATE_READY,
+} CAN_state_E;
+
 typedef struct
 {
-    bool initSuccessful;
+    CAN_state_E state;
 } CAN_data_S;
 
 // CANx_FRx register layout
@@ -63,17 +62,9 @@ typedef union
 extern const CAN_config_S CAN_config;
 static CAN_data_S CAN_data;
 
-static const IRQn_Type CAN_interruptNumberMaping[CAN_PERIPH_COUNT] =
-{
-    [CAN_PERIPH_1] = CAN1_RX0_IRQn,
-    [CAN_PERIPH_2] = CAN2_RX0_IRQn,
-    [CAN_PERIPH_3] = CAN3_RX0_IRQn,
-};
-
 /* PRIVATE FUNCTIONS DECLARATION */
 static void CAN_private_GPIOInit(void);
 static void CAN_private_CANPeriphInit(void);
-static IRQn_Type CAN_private_getIRQNumber(const CAN_TypeDef * periph);
 static inline void CAN_private_RXIRQ(CAN_TypeDef * CANx, const uint8_t FIFONumber);
 
 /* PRIVATE FUNCTION DEFINITION */
@@ -133,46 +124,18 @@ static void CAN_private_CANPeriphInit(void)
     if(CAN_Init(CAN_config.HWConfig->CANPeriph, &CANInitStruct) != CAN_InitStatus_Success)
     {
         debug_writeStringBlocking("CAN init failed");
-        CAN_data.initSuccessful = false;
+        CAN_data.state = CAN_STATE_ERROR;
+    }
+    else
+    {
+        CAN_data.state = CAN_STATE_READY;
     }
 
     // Hard coded to only use FIFO_0
     // Enable FIFO 0 not empty interrupt
     CAN_ITConfig(CAN_config.HWConfig->CANPeriph, CAN_IT_FMP0, ENABLE);
-	NVIC_SetPriority(CAN_private_getIRQNumber(CAN_config.HWConfig->CANPeriph), 5);
-	NVIC_EnableIRQ(CAN_private_getIRQNumber(CAN_config.HWConfig->CANPeriph));
-}
-
-static IRQn_Type CAN_private_getIRQNumber(const CAN_TypeDef * periph)
-{
-    IRQn_Type ret;
-
-    switch((uint32_t)periph)
-    {
-        case (uint32_t)CAN1:
-        {
-            ret = CAN_interruptNumberMaping[CAN_PERIPH_1];
-            break;
-        }                
-        case (uint32_t)CAN2:
-        {
-            ret = CAN_interruptNumberMaping[CAN_PERIPH_2];
-            break;
-        }            
-        case (uint32_t)CAN3:
-        {
-            ret = CAN_interruptNumberMaping[CAN_PERIPH_3];
-            break;
-        }            
-        default:
-        {
-            ret = 0;
-            ret = ~ret; // Max value that IRQn_Type can hold;
-            break;
-        }
-    }
-
-    return ret;
+	NVIC_SetPriority(interruptHelper_getIRQn_CAN(CAN_config.HWConfig->CANPeriph, CAN_IT_FMP0), 5);
+	NVIC_EnableIRQ(interruptHelper_getIRQn_CAN(CAN_config.HWConfig->CANPeriph, CAN_IT_FMP0));
 }
 
 static inline void CAN_private_RXIRQ(CAN_TypeDef * CANx, const uint8_t FIFONumber)
@@ -205,7 +168,7 @@ static inline void CAN_private_RXIRQ(CAN_TypeDef * CANx, const uint8_t FIFONumbe
 /* PUBLIC FUNCTIONS */
 void CAN_init(void)
 {
-    CAN_data.initSuccessful = true;
+    CAN_data.state = CAN_STATE_INIT;
 
     assert(CAN_config.HWConfig != NULL);
     assert(IS_CAN_ALL_PERIPH(CAN_config.HWConfig->CANPeriph));
@@ -218,7 +181,7 @@ bool CAN_sendMessage(const protocol_MID_E messageID, const protocol_allMessages_
 {
     bool ret = false;
 
-    if(CAN_data.initSuccessful)
+    if(CAN_data.state == CAN_STATE_READY)
     {
         CAN_TypeDef * CAN = CAN_config.HWConfig->CANPeriph;
         CAN_TXMailbox_E TXMailbox;

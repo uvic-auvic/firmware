@@ -5,7 +5,10 @@ on: [push]
 jobs:
   build:
 
-    runs-on: ubuntu-16.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-16.04, ubuntu-latest]
 
     steps:
     - uses: actions/checkout@v2
@@ -14,12 +17,11 @@ jobs:
     - name: Setup
       run: |
         ./provision.sh
-        apt-cache policy gcc-arm-none-eabi
 
     - name: Build all firmware
       run: |
-        make -C firmware all
+        make -j2 -C firmware all
 
     - name: Test
       run: |
-        make -C firmware test
+        make -j2 -C firmware test

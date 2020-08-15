@@ -56,8 +56,8 @@ INCLUDE_PATH += \
 
 $(shell mkdir -p $(OUTPUT_DIR)/obj/STM_Std_Periph)
 
-STM_LIB_COMPILER_FLAGS := \
--O3 \
+STM_LIB_COMPILER_FLAGS = \
+$(COMPILER_OPTIMIZATION) \
 -g3 \
 -Wall
 

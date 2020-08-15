@@ -63,7 +63,7 @@ typedef union
 extern const CAN_config_S CAN_config;
 static CAN_data_S CAN_data;
 
-static const uint32_t CAN_interruptNumberMaping[CAN_PERIPH_COUNT] =
+static const IRQn_Type CAN_interruptNumberMaping[CAN_PERIPH_COUNT] =
 {
     [CAN_PERIPH_1] = CAN1_RX0_IRQn,
     [CAN_PERIPH_2] = CAN2_RX0_IRQn,
@@ -73,7 +73,7 @@ static const uint32_t CAN_interruptNumberMaping[CAN_PERIPH_COUNT] =
 /* PRIVATE FUNCTIONS DECLARATION */
 static void CAN_private_GPIOInit(void);
 static void CAN_private_CANPeriphInit(void);
-static uint32_t CAN_private_getIRQNumber(const CAN_TypeDef * periph);
+static IRQn_Type CAN_private_getIRQNumber(const CAN_TypeDef * periph);
 static inline void CAN_private_RXIRQ(CAN_TypeDef * CANx, const uint8_t FIFONumber);
 
 /* PRIVATE FUNCTION DEFINITION */
@@ -143,9 +143,9 @@ static void CAN_private_CANPeriphInit(void)
 	NVIC_EnableIRQ(CAN_private_getIRQNumber(CAN_config.HWConfig->CANPeriph));
 }
 
-static uint32_t CAN_private_getIRQNumber(const CAN_TypeDef * periph)
+static IRQn_Type CAN_private_getIRQNumber(const CAN_TypeDef * periph)
 {
-    uint32_t ret;
+    IRQn_Type ret;
 
     switch((uint32_t)periph)
     {
@@ -166,7 +166,8 @@ static uint32_t CAN_private_getIRQNumber(const CAN_TypeDef * periph)
         }            
         default:
         {
-            ret = 500; // Unreasonably large number
+            ret = 0;
+            ret = ~ret; // Max value that IRQn_Type can hold;
             break;
         }
     }

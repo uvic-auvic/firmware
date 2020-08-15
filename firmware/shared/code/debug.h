@@ -32,9 +32,9 @@
 typedef struct
 {
 	// GPIO
+	GPIO_TypeDef *	GPIOPort;
 	uint8_t 		rxPin;
 	uint8_t 		txPin;
-	GPIO_TypeDef *	GPIOPort;
 	uint8_t			AFNumber;
 
 	// UART

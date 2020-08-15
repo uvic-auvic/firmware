@@ -15,7 +15,17 @@
             "compilerPath": "/usr/bin/arm-none-eabi-gcc",
             "cStandard": "c11",
             "cppStandard": "c++17",
-            "intelliSenseMode": "gcc-arm"
+            "intelliSenseMode": "gcc-arm",
+            "defines": [
+                "UART_DEBUG",
+                "STM32",
+                "STM32F4",
+                "STM32F413_423xx",
+                "DEVICE_STM32F413=1",
+                "MCU_ARCHITECTURE_M4=1",
+                "DEVICE_FAMILY_STM32F4=1",
+                "USE_STDPERIPH_DRIVER"
+            ]
         }
     ],
     "version": 4

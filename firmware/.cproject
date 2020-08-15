@@ -118,8 +118,8 @@
 						<toolChain errorParsers="" id="fr.ac6.managedbuild.toolchain.gnu.cross.base.2041819956" name="Ac6 STM32 MCU GCC" superClass="fr.ac6.managedbuild.toolchain.gnu.cross.base">
 							<option id="fr.ac6.managedbuild.option.gnu.cross.prefix.1610661567" name="Prefix" superClass="fr.ac6.managedbuild.option.gnu.cross.prefix"/>
 							<option id="fr.ac6.managedbuild.option.gnu.cross.path.1133611611" name="Path" superClass="fr.ac6.managedbuild.option.gnu.cross.path"/>
-							<option id="fr.ac6.managedbuild.option.gnu.cross.mcu.39921308" name="Mcu" superClass="fr.ac6.managedbuild.option.gnu.cross.mcu" value="STM32F411VETx" valueType="string"/>
-							<option id="fr.ac6.managedbuild.option.gnu.cross.board.1373548313" name="Board" superClass="fr.ac6.managedbuild.option.gnu.cross.board" value="STM32F411E-DISCO" valueType="string"/>
+							<option id="fr.ac6.managedbuild.option.gnu.cross.mcu.39921308" name="Mcu" superClass="fr.ac6.managedbuild.option.gnu.cross.mcu" value="STM32F413VGTx" valueType="string"/>
+							<option id="fr.ac6.managedbuild.option.gnu.cross.board.1373548313" name="Board" superClass="fr.ac6.managedbuild.option.gnu.cross.board" value="genericBoard" valueType="string"/>
 							<option id="fr.ac6.managedbuild.option.gnu.cross.core.785064948" name="Core" superClass="fr.ac6.managedbuild.option.gnu.cross.core"/>
 							<option id="fr.ac6.managedbuild.option.gnu.cross.fpu.484004892" name="Floating point hardware" superClass="fr.ac6.managedbuild.option.gnu.cross.fpu" value="fr.ac6.managedbuild.option.gnu.cross.fpu.fpv4-sp-d16" valueType="enumerated"/>
 							<option id="fr.ac6.managedbuild.option.gnu.cross.floatabi.578202720" name="Floating-point ABI" superClass="fr.ac6.managedbuild.option.gnu.cross.floatabi" value="fr.ac6.managedbuild.option.gnu.cross.floatabi.hard" valueType="enumerated"/>

@@ -40,6 +40,7 @@ static LED_data_S LED_data;
 
 /* PRIVATE FUNCTION DEFINITION */
 
+/* PUBLIC FUNCTIONS */
 void LED_init(void)
 {
 	for(LED_channel_E channel = (LED_channel_E)0U; channel < LED_CHANNEL_COUNT; channel++)
@@ -58,7 +59,7 @@ void LED_init(void)
 
 		initTypeDef.GPIO_Mode = GPIO_Mode_OUT;
 		initTypeDef.GPIO_OType = GPIO_OType_PP;
-		initTypeDef.GPIO_Speed = GPIO_Speed_2MHz;
+		initTypeDef.GPIO_Speed = GPIO_High_Speed;
 		initTypeDef.GPIO_PuPd = GPIO_PuPd_NOPULL;
 
 		// Set the GPIO pin to configure

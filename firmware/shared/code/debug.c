@@ -15,6 +15,7 @@
 #include "assert.h"
 #include "circBuffer1D.h"
 #include "RCCHelper.h"
+#include "interruptHelper.h"
 
 /* DEFINES */
 #define UART_BAUD_RATE (115200U)
@@ -39,6 +40,7 @@ static debug_data_S debug_data;
 /* PRIVATE FUNCTIONS DECLARATION */
 static void debug_private_configureGPIO(void);
 static void debug_private_configureUARTPeriph(void);
+static void debug_UARTInterruptHandler(void);
 
 /* PRIVATE FUNCTION DEFINITION */
 static void debug_private_configureGPIO(void)
@@ -89,12 +91,43 @@ static void debug_private_configureUARTPeriph(void)
 	USART_Init(debug_config.HWConfig->UARTPeriph, &USART_InitStruct);
 
 	// Setup interrupt
-	NVIC_SetPriority(debug_config.HWConfig->UARTInterruptNumber, 4);
-	NVIC_EnableIRQ(debug_config.HWConfig->UARTInterruptNumber);
+	interruptHelper_registerCallback_USART(debug_config.HWConfig->UARTPeriph, debug_UARTInterruptHandler);
+	NVIC_SetPriority(interruptHelper_getIRQn_USART(debug_config.HWConfig->UARTPeriph), 4);
+	NVIC_EnableIRQ(interruptHelper_getIRQn_USART(debug_config.HWConfig->UARTPeriph));
 
 	USART_Cmd(debug_config.HWConfig->UARTPeriph, ENABLE);
 }
 
+/* INTERRUPT HANDLER */
+static void debug_UARTInterruptHandler(void)
+{
+	if(USART_GetITStatus(debug_config.HWConfig->UARTPeriph, USART_IT_RXNE) == SET)
+	{
+		// Do nothing for now. RX not yet implemented
+		// Clear interrupt by reading the data register
+		uint8_t temp = debug_config.HWConfig->UARTPeriph->DR;
+		UNUSED(temp);
+	}
+	else if(USART_GetITStatus(debug_config.HWConfig->UARTPeriph, USART_IT_TXE) == SET)
+	{
+		uint8_t byteToSend;
+		if(circBuffer1D_popByte(CIRCBUFFER1D_CHANNEL_DEBUG_TX, &byteToSend))
+		{
+			debug_config.HWConfig->UARTPeriph->DR = byteToSend;
+			debug_data.TXState = TX_STATE_TRANSMITTING;
+		}
+		else
+		{
+			// Turn off TXE interrupt
+			USART_ITConfig(debug_config.HWConfig->UARTPeriph, USART_IT_TXE, DISABLE);
+			debug_data.TXState = TX_STATE_READY_TO_SEND;
+		}
+	}
+	else
+	{
+		// Do nothing
+	}
+}
 
 /* PUBLIC FUNCTIONS */
 void _debug_init()
@@ -170,37 +203,4 @@ bool _debug_writeStringBlocking(const char * const format, ...)
 
 
 	return ret;
-}
-
-/* INTERRUPT HANDLER */
-
-// Call this function in the UART interrupt handler for this channel. Place the interrupt handler in the debug_componentSpecific file
-void debug_UARTInterruptHandler(void)
-{
-	if(USART_GetITStatus(debug_config.HWConfig->UARTPeriph, USART_IT_RXNE) == SET)
-	{
-		// Do nothing for now. RX not yet implemented
-		// Clear interrupt by reading the data register
-		uint8_t temp = debug_config.HWConfig->UARTPeriph->DR;
-		UNUSED(temp);
-	}
-	else if(USART_GetITStatus(debug_config.HWConfig->UARTPeriph, USART_IT_TXE) == SET)
-	{
-		uint8_t byteToSend;
-		if(circBuffer1D_popByte(CIRCBUFFER1D_CHANNEL_DEBUG_TX, &byteToSend))
-		{
-			debug_config.HWConfig->UARTPeriph->DR = byteToSend;
-			debug_data.TXState = TX_STATE_TRANSMITTING;
-		}
-		else
-		{
-			// Turn off TXE interrupt
-			USART_ITConfig(debug_config.HWConfig->UARTPeriph, USART_IT_TXE, DISABLE);
-			debug_data.TXState = TX_STATE_READY_TO_SEND;
-		}
-	}
-	else
-	{
-		// Do nothing
-	}
 }

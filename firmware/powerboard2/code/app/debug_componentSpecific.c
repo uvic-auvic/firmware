@@ -17,8 +17,6 @@ static const debug_HWConfig_S debug_HWConfig =
 
 	// UART
 	.UARTPeriph = USART6,
-	.UARTInterruptNumber = USART6_IRQn,
-
 };
 
 extern const debug_config_S debug_config;
@@ -26,10 +24,4 @@ const debug_config_S debug_config =
 {
 	.HWConfig = &debug_HWConfig
 };
-
-/* UART Interrupt Handler */
-void USART6_IRQHandler(void)
-{
-	debug_UARTInterruptHandler();
-}
 

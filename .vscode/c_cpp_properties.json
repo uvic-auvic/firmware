@@ -6,11 +6,11 @@
                 "${workspaceFolder}/firmware/shared/code/**",
                 "${workspaceFolder}/firmware/shared/data/**",
                 "${workspaceFolder}/firmware/powerboard2/code/**",
-                "${workspaceFolder}/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/STM32F4xx_StdPeriph_Driver/inc/**",
-                "${workspaceFolder}/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/CMSIS/Include/**",
-                "${workspaceFolder}/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/CMSIS/Device/ST/STM32F4xx/Include/**",
-                "${workspaceFolder}/firmware/libs/FreeRTOS/FreeRTOS/Source/include/**",
-                "${workspaceFolder}/firmware/libs/FreeRTOS/FreeRTOS/Source/portable/GCC/ARM_CM4F/**"
+                "${workspaceFolder}/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/STM32F4xx_StdPeriph_Driver/inc/*",
+                "${workspaceFolder}/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/CMSIS/Include/*",
+                "${workspaceFolder}/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/CMSIS/Device/ST/STM32F4xx/Include/*",
+                "${workspaceFolder}/firmware/libs/FreeRTOS/FreeRTOS/Source/include/*",
+                "${workspaceFolder}/firmware/libs/FreeRTOS/FreeRTOS/Source/portable/GCC/ARM_CM4F/*"
             ],
             "compilerPath": "/usr/bin/arm-none-eabi-gcc",
             "cStandard": "c11",

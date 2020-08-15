@@ -39,7 +39,6 @@ typedef struct
 
 	// UART
 	USART_TypeDef * UARTPeriph;
-	IRQn_Type 		UARTInterruptNumber;
 
 } debug_HWConfig_S;
 
@@ -53,9 +52,6 @@ void _debug_init(void);
 bool _debug_writeLen(const uint8_t * const data, const uint16_t length, const bool blocking);
 bool _debug_writeString(const char * const format, ...);
 bool _debug_writeStringBlocking(const char * const format, ...);
-
-// Interrupt Handler
-void debug_UARTInterruptHandler(void);
 
 #endif /* UART_DEBUG */
 

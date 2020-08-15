@@ -33,6 +33,18 @@
 									<listOptionValue builtIn="false" value="STM32F4"/>
 									<listOptionValue builtIn="false" value="STM32F413_423xx"/>
 								</option>
+								<option id="gnu.c.compiler.option.include.paths.1300025944" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/utils}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/data/protocol/protocol}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/RTOS}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/bootloader}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/CMSIS/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/CMSIS/Device/ST/STM32F4xx/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/STM32F4xx_StdPeriph_Driver/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/FreeRTOS/FreeRTOS/Source/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/FreeRTOS/FreeRTOS/Source/portable/GCC/ARM_CM4F}&quot;"/>
+								</option>
 								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.1253361925" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c"/>
 								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s.112646579" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s"/>
 							</tool>
@@ -61,6 +73,18 @@
 							</tool>
 							<tool id="fr.ac6.managedbuild.tool.gnu.archiver.1594042214" name="MCU GCC Archiver" superClass="fr.ac6.managedbuild.tool.gnu.archiver"/>
 							<tool errorParsers="org.eclipse.cdt.core.GASErrorParser" id="fr.ac6.managedbuild.tool.gnu.cross.assembler.1855077558" name="MCU GCC Assembler" superClass="fr.ac6.managedbuild.tool.gnu.cross.assembler">
+								<option id="gnu.both.asm.option.include.paths.47248938" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/CMSIS/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/CMSIS/Device/ST/STM32F4xx/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/STM32F4xx_StdPeriph_Driver/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/FreeRTOS/FreeRTOS/Source/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/FreeRTOS/FreeRTOS/Source/portable/GCC/ARM_CM4F}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/data/protocol/protocol}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/utils}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/RTOS}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/bootloader}&quot;"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1914974631" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.assembler.input.1064252914" superClass="fr.ac6.managedbuild.tool.gnu.cross.assembler.input"/>
 							</tool>
@@ -104,6 +128,25 @@
 									<listOptionValue builtIn="false" value="STM32"/>
 									<listOptionValue builtIn="false" value="STM32F4"/>
 									<listOptionValue builtIn="false" value="STM32F413_423xx"/>
+									<listOptionValue builtIn="false" value="USE_STDPERIPH_DRIVER"/>
+									<listOptionValue builtIn="false" value="DEVICE_STM32F413=1"/>
+									<listOptionValue builtIn="false" value="MCU_ARCHITECTURE_M4=1"/>
+									<listOptionValue builtIn="false" value="DEVICE_FAMILY_STM32F4=1"/>
+									<listOptionValue builtIn="false" value="UART_DEBUG"/>
+								</option>
+								<option id="gnu.c.compiler.option.include.paths.714153340" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/powerboard2/code/app/RTOS}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/powerboard2/code/app}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/data/protocol/protocol}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/utils}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/RTOS}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/bootloader}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/CMSIS/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/CMSIS/Device/ST/STM32F4xx/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/STM32F4xx_StdPeriph_Driver/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/FreeRTOS/FreeRTOS/Source/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/FreeRTOS/FreeRTOS/Source/portable/GCC/ARM_CM4F}&quot;"/>
 								</option>
 								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.1015195703" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c"/>
 								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s.281481444" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s"/>
@@ -133,6 +176,19 @@
 							</tool>
 							<tool id="fr.ac6.managedbuild.tool.gnu.archiver.899361909" name="MCU GCC Archiver" superClass="fr.ac6.managedbuild.tool.gnu.archiver"/>
 							<tool errorParsers="org.eclipse.cdt.core.GASErrorParser" id="fr.ac6.managedbuild.tool.gnu.cross.assembler.1044835238" name="MCU GCC Assembler" superClass="fr.ac6.managedbuild.tool.gnu.cross.assembler">
+								<option id="gnu.both.asm.option.include.paths.7488399" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/powerboard2/code}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/data/protocol/protocol}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/CMSIS/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/CMSIS/Device/ST/STM32F4xx/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/STM32F4xx_StdPeriph_Driver/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/FreeRTOS/FreeRTOS/Source/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/FreeRTOS/FreeRTOS/Source/portable/GCC/ARM_CM4F}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/utils}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/RTOS}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/bootloader}&quot;"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.199953995" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.assembler.input.165505647" superClass="fr.ac6.managedbuild.tool.gnu.cross.assembler.input"/>
 							</tool>

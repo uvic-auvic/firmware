@@ -59,7 +59,7 @@ void LED_init(void)
 
 		initTypeDef.GPIO_Mode = GPIO_Mode_OUT;
 		initTypeDef.GPIO_OType = GPIO_OType_PP;
-		initTypeDef.GPIO_Speed = GPIO_High_Speed;
+		initTypeDef.GPIO_Speed = GPIO_Low_Speed;
 		initTypeDef.GPIO_PuPd = GPIO_PuPd_NOPULL;
 
 		// Set the GPIO pin to configure

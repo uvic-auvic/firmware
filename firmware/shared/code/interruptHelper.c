@@ -3,6 +3,10 @@
  *
  *  Created on: Aug 14, 2020
  *      Author: Poornachander
+ * 
+ *  A HAL for interrupts.
+ *  This can be used by shared code that require interrupts,
+ *  but are designed to work my a user configurable peripheral number
  */
 
 #ifndef SHARED_CODE_INTERRUPTHELPER_C_
@@ -42,7 +46,7 @@ static interruptHelper_data_S interruptHelper_data;
 /* PUBLIC FUNCTIONS */
 
 /* USART/UART */
-IRQn_Type interruptHelper_getIRQn_USART(USART_TypeDef * UARTPeriph)
+IRQn_Type interruptHelper_getIRQn_USART(const USART_TypeDef * const UARTPeriph)
 {
     IRQn_Type ret = ~((IRQn_Type)0U); // Maximum number for type IRQn_Type
 
@@ -111,7 +115,7 @@ IRQn_Type interruptHelper_getIRQn_USART(USART_TypeDef * UARTPeriph)
     return ret;
 }
 
-void interruptHelper_registerCallback_USART(USART_TypeDef * UARTPeriph, IRQCallback callback)
+void interruptHelper_registerCallback_USART(const USART_TypeDef * const UARTPeriph, const IRQCallback callback)
 {
     if(IS_USART_ALL_PERIPH(UARTPeriph))
     {

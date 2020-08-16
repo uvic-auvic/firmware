@@ -93,8 +93,13 @@ static void debug_private_configureUARTPeriph(void)
 
 	// Setup interrupt
 	interruptHelper_registerCallback_USART(debug_config.HWConfig->UARTPeriph, debug_private_UARTInterruptHandler);
-	NVIC_SetPriority(interruptHelper_getIRQn_USART(debug_config.HWConfig->UARTPeriph), 4);
-	NVIC_EnableIRQ(interruptHelper_getIRQn_USART(debug_config.HWConfig->UARTPeriph));
+
+	NVIC_InitTypeDef NVICInitStruct;
+    NVICInitStruct.NVIC_IRQChannel = interruptHelper_getIRQn_USART(debug_config.HWConfig->UARTPeriph);
+    NVICInitStruct.NVIC_IRQChannelPreemptionPriority = 4;
+    NVICInitStruct.NVIC_IRQChannelSubPriority = 0; // This value is not used
+    NVICInitStruct.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVICInitStruct);
 
 	// Enable the UART transmitter and receiver
 	// Peripheral will start reading from/writing to pins after this
@@ -182,7 +187,6 @@ bool _debug_writeLen(const uint8_t * const data, const uint16_t length, const bo
 			}
 		}
 	}
-
 
 	return ret;
 }

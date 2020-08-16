@@ -134,50 +134,15 @@ static void CAN_private_CANPeriphInit(void)
     // Hard coded to only use FIFO_0
     // Enable FIFO 0 not empty interrupt
     CAN_ITConfig(CAN_config.HWConfig->CANPeriph, CAN_IT_FMP0, ENABLE);
-<<<<<<< d211d1a25e9b29dea75db81b4dbc7b069c5ab49d
-	NVIC_SetPriority(interruptHelper_getIRQn_CAN(CAN_config.HWConfig->CANPeriph, CAN_IT_FMP0), 5);
-	NVIC_EnableIRQ(interruptHelper_getIRQn_CAN(CAN_config.HWConfig->CANPeriph, CAN_IT_FMP0));
-=======
 
     NVIC_InitTypeDef NVICInitStruct;
-    NVICInitStruct.NVIC_IRQChannel = CAN_private_getIRQNumber(CAN_config.HWConfig->CANPeriph);
+    NVICInitStruct.NVIC_IRQChannel = interruptHelper_getIRQn_CAN(CAN_config.HWConfig->CANPeriph, CAN_IT_FMP0);
     NVICInitStruct.NVIC_IRQChannelPreemptionPriority = 5;
     NVICInitStruct.NVIC_IRQChannelSubPriority = 0; // This value is not used
     NVICInitStruct.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVICInitStruct);
 }
 
-static uint32_t CAN_private_getIRQNumber(const CAN_TypeDef * periph)
-{
-    uint32_t ret;
-
-    switch((uint32_t)periph)
-    {
-        case (uint32_t)CAN1:
-        {
-            ret = CAN_interruptNumberMaping[CAN_PERIPH_1];
-            break;
-        }                
-        case (uint32_t)CAN2:
-        {
-            ret = CAN_interruptNumberMaping[CAN_PERIPH_2];
-            break;
-        }            
-        case (uint32_t)CAN3:
-        {
-            ret = CAN_interruptNumberMaping[CAN_PERIPH_3];
-            break;
-        }            
-        default:
-        {
-            ret = 500; // Unreasonably large number
-            break;
-        }
-    }
-
-    return ret;
->>>>>>> Interrupt improvements working
-}
 
 static inline void CAN_private_RXIRQ(CAN_TypeDef * CANx, const uint8_t FIFONumber)
 {

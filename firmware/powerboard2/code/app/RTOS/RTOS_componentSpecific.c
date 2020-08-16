@@ -13,6 +13,7 @@
 #include "CAN.h"
 #include "messageHandler.h"
 #include "string.h"
+#include "ADC.h"
 
 /*
  * If a new FreeRTOS task is needed, create it here so that there is one place where
@@ -23,6 +24,7 @@ void RTOS_init(void)
     LED_init();
     circBuffer1D_init();
     debug_init();
+    ADC_init();
     CAN_init();
     messageHandler_init();
 
@@ -47,5 +49,6 @@ void RTOS_run100ms(void)
 
 void RTOS_run1000ms(void)
 {
-
+    uint16_t adc = ADC_getChannelData(0);
+    debug_writeString("adc: %d", adc);
 }

@@ -77,11 +77,12 @@ static void ADC_private_initADC(void)
     ADC_StructInit(&ADC_InitStructure);
 
     ADC_InitStructure.ADC_Resolution            = ADC_Resolution_12b;
-    ADC_InitStructure.ADC_ScanConvMode          = DISABLE;
+    ADC_InitStructure.ADC_ScanConvMode          = ENABLE;
     ADC_InitStructure.ADC_ContinuousConvMode    = ENABLE;
     ADC_InitStructure.ADC_ExternalTrigConvEdge  = ADC_ExternalTrigConvEdge_None;
+    // ADC_InitStructure.ADC_ExternalTrigConv  = ;
     ADC_InitStructure.ADC_DataAlign             = ADC_DataAlign_Right;
-    //ADC_InitStructure.ADC_NbrOfConversion     = 1;
+    ADC_InitStructure.ADC_NbrOfConversion     = 13;
 
     // Writes the settings above into the the ADC config registers
     ADC_Init(ADC1, &ADC_InitStructure);
@@ -92,8 +93,10 @@ static void ADC_private_initADC(void)
     // Choose which HW ADC channels to sample and the sampling rate.
     for(ADC_channel_E channel = (ADC_channel_E)0U; channel < ADC_CHANNEL_COUNT; channel++)
     {
-    	ADC_RegularChannelConfig(ADC1, ADC_softwareChannelToADCChannelMapping[channel], 1, ADC_SampleTime_28Cycles);
+    	ADC_RegularChannelConfig(ADC1, ADC_softwareChannelToADCChannelMapping[channel], channel + 1, ADC_SampleTime_28Cycles);
     }
+
+    // ADC_EOCOnEachRegularChannelCmd(ADC1, ENABLE);
 
     // Enable the ADC
     ADC_Cmd(ADC1, ENABLE);

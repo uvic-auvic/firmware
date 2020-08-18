@@ -5,6 +5,11 @@ powerboard2: _powerboard2
 _powerboard2:
 	@echo "Building Power Board 2 - $(TARGET)"
 	$(MAKE) --no-print-directory -C powerboard2/makefiles $(TARGET)
+	
+motorcontroller3: _motorcontroller3
+_motorcontroller3:
+	@echo "Building Motor Controller 3 - $(TARGET)"
+	$(MAKE) --no-print-directory -C motorcontroller3/makefiles $(TARGET)
 
 generated:
 	# Generated Protocol File in Python
@@ -13,19 +18,28 @@ generated:
 all:
 	# Power Board 2
 	$(MAKE) powerboard2 TARGET=app
-	# $(MAKE) powerboard1 TARGET=bootloader
+	
+	# Motor Controller 3
+	$(MAKE) motorcontroller3 TARGET=app
+	
 
 clean:
 	# Power Board 2
 	$(MAKE) powerboard2 TARGET=clean
 	# $(MAKE) --no-print-directory -C powerboard2/test clean
+	
+	# Motor Controller 3
+	$(MAKE) motorcontroller3 TARGET=clean
 
 	# Shared Test
 	$(MAKE) --no-print-directory -C shared/test clean
 
 help:
 	@echo Component: powerboard2
-	@echo       Available TARGET options: app, bootloader
+	@echo       Available TARGET options: app
+	@echo
+	@echo Component: motorcontroller3
+	@echo		Available TARGET options: app
 
 test:
 	$(MAKE) -C shared/test test

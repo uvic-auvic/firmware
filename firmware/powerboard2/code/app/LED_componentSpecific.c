@@ -26,8 +26,8 @@ const LED_config_S LED_config =
         },
         [LED_CHANNEL_GREEN] =
         {
-            .pin = 15,
-            .GPIOPort = GPIOA,
+            .pin = 0,
+            .GPIOPort = GPIOB,
             .initState = LED_STATE_ON,
         },
     },

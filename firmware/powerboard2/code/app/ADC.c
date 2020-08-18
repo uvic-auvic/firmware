@@ -21,19 +21,20 @@ static ADC_data_S ADC_data;
 
 static const uint32_t ADC_softwareChannelToADCChannelMapping[ADC_CHANNEL_COUNT] =
 {
-    [ADC_CHANNEL_ADC_BAT0_1]          = ADC_Channel_0,
-    [ADC_CHANNEL_ADC_BAT0_2]          = ADC_Channel_1,
-    [ADC_CHANNEL_ADC_BAT0_3]          = ADC_Channel_2,
-    [ADC_CHANNEL_ADC_BAT0_4]          = ADC_Channel_3,
-    [ADC_CHANNEL_ADC_BAT0_5]          = ADC_Channel_4,
-    [ADC_CHANNEL_ADC_BAT0_6]          = ADC_Channel_5,
-	[ADC_CHANNEL_ADC_BAT1_1]          = ADC_Channel_6,
-	[ADC_CHANNEL_ADC_BAT1_2]          = ADC_Channel_7,
-    [ADC_CHANNEL_ADC_BAT1_3]          = ADC_Channel_8,
-    [ADC_CHANNEL_ADC_BAT1_4]          = ADC_Channel_9,
-    [ADC_CHANNEL_ADC_BAT1_5]          = ADC_Channel_10,
-	[ADC_CHANNEL_ADC_BAT1_6]          = ADC_Channel_11,
-	[ADC_CHANNEL_ADC_EXT_PRESSURE]    = ADC_Channel_12,
+    [ADC_CHANNEL_ADC_BAT0_1]          = ADC_Channel_15,
+    [ADC_CHANNEL_ADC_BAT0_2]          = ADC_Channel_14,
+    [ADC_CHANNEL_ADC_BAT0_3]          = ADC_Channel_7,
+    [ADC_CHANNEL_ADC_BAT0_4]          = ADC_Channel_6,
+    [ADC_CHANNEL_ADC_BAT0_5]          = ADC_Channel_5,
+    [ADC_CHANNEL_ADC_BAT0_6]          = ADC_Channel_4,
+	[ADC_CHANNEL_ADC_BAT1_1]          = ADC_Channel_3,
+	[ADC_CHANNEL_ADC_BAT1_2]          = ADC_Channel_2,
+    [ADC_CHANNEL_ADC_BAT1_3]          = ADC_Channel_1,
+    [ADC_CHANNEL_ADC_BAT1_4]          = ADC_Channel_0,
+    [ADC_CHANNEL_ADC_BAT1_5]          = ADC_Channel_13,
+	[ADC_CHANNEL_ADC_BAT1_6]          = ADC_Channel_12,
+	[ADC_CHANNEL_ADC_EXT_PRESSURE]    = ADC_Channel_10,
+	[ADC_CHANNEL_ADC_WATER_SENSE]     = ADC_Channel_11,
 };
 
 /* PRIVATE FUNCTION DECLARATION */
@@ -46,7 +47,6 @@ static void ADC_private_initGPIOs(void)
 {
     //Enable peripheral clock for GPIOA, GPIOB, and GPIOC
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 
     GPIO_InitTypeDef GPIO_InitStructure;
@@ -60,11 +60,7 @@ static void ADC_private_initGPIOs(void)
 
     GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-    GPIO_InitStructure.GPIO_Pin     = GPIO_Pin_0 | GPIO_Pin_1;
-    
-    GPIO_Init(GPIOB, &GPIO_InitStructure);
-
-    GPIO_InitStructure.GPIO_Pin     = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2;
+    GPIO_InitStructure.GPIO_Pin     = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5;
     
     GPIO_Init(GPIOC, &GPIO_InitStructure);
 }
@@ -80,23 +76,17 @@ static void ADC_private_initADC(void)
     ADC_InitStructure.ADC_ScanConvMode          = ENABLE;
     ADC_InitStructure.ADC_ContinuousConvMode    = ENABLE;
     ADC_InitStructure.ADC_ExternalTrigConvEdge  = ADC_ExternalTrigConvEdge_None;
-    // ADC_InitStructure.ADC_ExternalTrigConv  = ;
     ADC_InitStructure.ADC_DataAlign             = ADC_DataAlign_Right;
-    ADC_InitStructure.ADC_NbrOfConversion     = 13;
+    ADC_InitStructure.ADC_NbrOfConversion       = (uint8_t)ADC_CHANNEL_COUNT;
 
     // Writes the settings above into the the ADC config registers
     ADC_Init(ADC1, &ADC_InitStructure);
-
-    //No ADC Calibration for F4
-    //ADC_GetCalibrationFactor(ADC1);
 
     // Choose which HW ADC channels to sample and the sampling rate.
     for(ADC_channel_E channel = (ADC_channel_E)0U; channel < ADC_CHANNEL_COUNT; channel++)
     {
     	ADC_RegularChannelConfig(ADC1, ADC_softwareChannelToADCChannelMapping[channel], channel + 1, ADC_SampleTime_28Cycles);
     }
-
-    // ADC_EOCOnEachRegularChannelCmd(ADC1, ENABLE);
 
     // Enable the ADC
     ADC_Cmd(ADC1, ENABLE);

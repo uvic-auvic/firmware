@@ -91,8 +91,8 @@ static void ADC_private_initADC(void)
     // Enable the ADC
     ADC_Cmd(ADC1, ENABLE);
 
-    // DMA will not stop after first ADC conversion stops
-    ADC_DMARequestAfterLastTransferCmd(ADC1, ENABLE);
+    // DMA will not stop after first ADC conversion stops (For single ADC mode)
+    //ADC_DMARequestAfterLastTransferCmd(ADC1, ENABLE);
     ADC_DMACmd(ADC1, ENABLE);
 }
 

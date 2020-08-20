@@ -22,13 +22,13 @@ const LED_config_S LED_config =
         {
             .pin = 7,
             .GPIOPort = GPIOB,
-            .initState = LED_STATE_BLINK_NORMAL,
+            .initState = LED_STATE_ON,
         },
         [LED_CHANNEL_GREEN] =
         {
             .pin = 0,
             .GPIOPort = GPIOB,
-            .initState = LED_STATE_ON,
+            .initState = LED_STATE_BLINK_NORMAL,
         },
     },
 };

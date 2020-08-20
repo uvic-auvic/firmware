@@ -49,6 +49,5 @@ void RTOS_run100ms(void)
 
 void RTOS_run1000ms(void)
 {
-    uint16_t adc = ADC_getChannelData(0);
-    debug_writeString("adc: %d", adc);
+
 }

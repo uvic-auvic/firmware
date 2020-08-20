@@ -252,8 +252,6 @@
 									<listOptionValue builtIn="false" value="UART_DEBUG=1"/>
 								</option>
 								<option id="gnu.c.compiler.option.include.paths.1747197074" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/powerboard2/code/app/RTOS}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/powerboard2/code/app}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/data/protocol/protocol}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/utils}&quot;"/>
@@ -264,6 +262,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/STM32F4xx_StdPeriph_Driver/inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/FreeRTOS/FreeRTOS/Source/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/FreeRTOS/FreeRTOS/Source/portable/GCC/ARM_CM4F}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/motorcontroller3/code/app/RTOS}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/motorcontroller3/code/app}&quot;"/>
 								</option>
 								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.70468015" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c"/>
 								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s.447339773" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s"/>
@@ -321,8 +321,9 @@
 							<option id="fr.ac6.managedbuild.option.gnu.cross.fpu.927710532.263113781" name="Floating point hardware" superClass="fr.ac6.managedbuild.option.gnu.cross.fpu.927710532"/>
 							<option id="fr.ac6.managedbuild.option.gnu.cross.floatabi.1992302834.2062478973" name="Floating-point ABI" superClass="fr.ac6.managedbuild.option.gnu.cross.floatabi.1992302834"/>
 							<option id="fr.ac6.managedbuild.option.gnu.cross.instructionSet.1668727758.1033062245" name="Instruction Set" superClass="fr.ac6.managedbuild.option.gnu.cross.instructionSet.1668727758"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="fr.ac6.managedbuild.targetPlatform.gnu.cross" isAbstract="false" osList="all" superClass="fr.ac6.managedbuild.targetPlatform.gnu.cross"/>
 							<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.1138473045" name="MCU GCC Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.201040065">
-								<option id="gnu.c.compiler.option.include.paths.1338627421" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+								<option id="gnu.c.compiler.option.include.paths.1338627421" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/data/protocol/protocol}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/utils}&quot;"/>

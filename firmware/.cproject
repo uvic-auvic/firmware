@@ -311,6 +311,44 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<folderInfo id="fr.ac6.managedbuild.toolchain.gnu.cross.base.680406637.272139944.1086020057.916675390.102662695.475593638" name="/" resourcePath="motorcontroller3">
+						<toolChain id="fr.ac6.managedbuild.toolchain.gnu.cross.base.2107405094" name="Ac6 STM32 MCU GCC" superClass="fr.ac6.managedbuild.toolchain.gnu.cross.base" unusedChildren="">
+							<option id="fr.ac6.managedbuild.option.gnu.cross.prefix.294338160.1720019972" name="Prefix" superClass="fr.ac6.managedbuild.option.gnu.cross.prefix.294338160"/>
+							<option id="fr.ac6.managedbuild.option.gnu.cross.path.898695073.1154145906" name="Path" superClass="fr.ac6.managedbuild.option.gnu.cross.path.898695073"/>
+							<option id="fr.ac6.managedbuild.option.gnu.cross.mcu.1192864326.555634477" name="Mcu" superClass="fr.ac6.managedbuild.option.gnu.cross.mcu.1192864326"/>
+							<option id="fr.ac6.managedbuild.option.gnu.cross.board.1033708587.358591937" name="Board" superClass="fr.ac6.managedbuild.option.gnu.cross.board.1033708587"/>
+							<option id="fr.ac6.managedbuild.option.gnu.cross.core.385898292.2044447095" name="Core" superClass="fr.ac6.managedbuild.option.gnu.cross.core.385898292"/>
+							<option id="fr.ac6.managedbuild.option.gnu.cross.fpu.927710532.263113781" name="Floating point hardware" superClass="fr.ac6.managedbuild.option.gnu.cross.fpu.927710532"/>
+							<option id="fr.ac6.managedbuild.option.gnu.cross.floatabi.1992302834.2062478973" name="Floating-point ABI" superClass="fr.ac6.managedbuild.option.gnu.cross.floatabi.1992302834"/>
+							<option id="fr.ac6.managedbuild.option.gnu.cross.instructionSet.1668727758.1033062245" name="Instruction Set" superClass="fr.ac6.managedbuild.option.gnu.cross.instructionSet.1668727758"/>
+							<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.1138473045" name="MCU GCC Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.201040065">
+								<option id="gnu.c.compiler.option.include.paths.1338627421" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/data/protocol/protocol}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/utils}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/RTOS}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/shared/code/bootloader}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/CMSIS/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/CMSIS/Device/ST/STM32F4xx/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/STM/STM32F4xx_DSP_StdPeriph_Lib_V1.8.0/Libraries/STM32F4xx_StdPeriph_Driver/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/FreeRTOS/FreeRTOS/Source/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/libs/FreeRTOS/FreeRTOS/Source/portable/GCC/ARM_CM4F}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/motorcontroller3/code/app/RTOS}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/firmware/motorcontroller3/code/app}&quot;"/>
+								</option>
+								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.1918161025" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c"/>
+								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s.479039800" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s"/>
+							</tool>
+							<tool id="fr.ac6.managedbuild.tool.gnu.cross.cpp.compiler.599011840" name="MCU G++ Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.cpp.compiler.1820177835"/>
+							<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.linker.1757157940" name="MCU GCC Linker" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.linker.869434879"/>
+							<tool id="fr.ac6.managedbuild.tool.gnu.cross.cpp.linker.1494694735" name="MCU G++ Linker" superClass="fr.ac6.managedbuild.tool.gnu.cross.cpp.linker.1223124731"/>
+							<tool id="fr.ac6.managedbuild.tool.gnu.archiver.1608401407" name="MCU GCC Archiver" superClass="fr.ac6.managedbuild.tool.gnu.archiver.353326046"/>
+							<tool id="fr.ac6.managedbuild.tool.gnu.cross.assembler.1886812900" name="MCU GCC Assembler" superClass="fr.ac6.managedbuild.tool.gnu.cross.assembler.929996063">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.355072444" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.assembler.input.463096934" superClass="fr.ac6.managedbuild.tool.gnu.cross.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
 					<sourceEntries>
 						<entry excluding="deprecated" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name=""/>
 					</sourceEntries>
@@ -348,6 +386,7 @@
 		<configuration configurationName="Power Board - Bootloader">
 			<resource resourceType="PROJECT" workspacePath="/firmware"/>
 		</configuration>
+		<configuration configurationName="Motor Controller 3 - STM32F413 - App"/>
 		<configuration configurationName="Motor Controller - STM32F411 - Bootloader"/>
 		<configuration configurationName="Motor Controller - STM32F411 - App"/>
 	</storageModule>
@@ -359,6 +398,9 @@
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="fr.ac6.managedbuild.toolchain.gnu.cross.base.680406637.272139944;fr.ac6.managedbuild.toolchain.gnu.cross.base.680406637.272139944.;fr.ac6.managedbuild.tool.gnu.cross.c.compiler.358122229;fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.1992774590">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="fr.ac6.managedbuild.toolchain.gnu.cross.base.680406637.272139944.1086020057.916675390.102662695;fr.ac6.managedbuild.toolchain.gnu.cross.base.680406637.272139944.1086020057.916675390.102662695.;fr.ac6.managedbuild.tool.gnu.cross.c.compiler.201040065;fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.70468015">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="fr.ac6.managedbuild.toolchain.gnu.cross.base.680406637.272139944.1086020057.916675390;fr.ac6.managedbuild.toolchain.gnu.cross.base.680406637.272139944.1086020057.916675390.;fr.ac6.managedbuild.tool.gnu.cross.c.compiler.1210167173;fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.1015195703">

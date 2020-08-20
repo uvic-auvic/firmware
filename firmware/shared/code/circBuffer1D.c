@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include "utils.h"
 #include "assert.h"
+#include <string.h>
 
 typedef struct
 {
@@ -129,7 +130,7 @@ uint8_t circBuffer1D_pop(const circBuffer1D_channel_E channel, uint8_t * const d
 	if (channel < CIRCBUFFER1D_CHANNEL_COUNT && circBuffer1D_getSpaceAvailable(channel)< channelData->size)
 	{
 		memset(dataToReturn, 0U, channelData->size - circBuffer1D_getSpaceAvailable(channel) );
-		for (int i=0; i < circBuffer1D_getSpaceAvailable(channel)< channelData->size, i++)
+		for (uint32_t i=0; i < channelData->size - circBuffer1D_getSpaceAvailable(channel); i++)
 		{
 			dataToReturn[i] = circBuffer1D_data.buffer[channelData->tail + channelData->startIndex];
 			channelData->tail++;

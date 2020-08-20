@@ -71,7 +71,6 @@ static void RTOS_private_task1000ms(void)
 
 static void RTOS_private_taskCreationFailedHandler(void)
 {
-	debug_init();
 	debug_writeStringBlocking("Task create failed");
 
 	configASSERT(0U);
@@ -103,6 +102,12 @@ uint32_t RTOS_getTimeElapsedMilliseconds(const uint32_t timeToCompare)
 extern void RTOS_launch(void);
 void RTOS_launch(void)
 {
+	// Use only preempt priority settings. Don't use sub priority
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+
+	// Call the application init functions
+	RTOS_init();
+
 	BaseType_t ret;
 	ret = xTaskCreate((TaskFunction_t)RTOS_private_task1ms,       /* Function that implements the task. */
 					  "1msTask",          /* Text name for the task. */
@@ -151,8 +156,6 @@ void RTOS_launch(void)
 	{
 		RTOS_private_taskCreationFailedHandler();
 	}
-
-	RTOS_init();
 
 	/* Start the scheduler. */
 	vTaskStartScheduler();

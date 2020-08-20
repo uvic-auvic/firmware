@@ -134,9 +134,15 @@ static void CAN_private_CANPeriphInit(void)
     // Hard coded to only use FIFO_0
     // Enable FIFO 0 not empty interrupt
     CAN_ITConfig(CAN_config.HWConfig->CANPeriph, CAN_IT_FMP0, ENABLE);
-	NVIC_SetPriority(interruptHelper_getIRQn_CAN(CAN_config.HWConfig->CANPeriph, CAN_IT_FMP0), 5);
-	NVIC_EnableIRQ(interruptHelper_getIRQn_CAN(CAN_config.HWConfig->CANPeriph, CAN_IT_FMP0));
+
+    NVIC_InitTypeDef NVICInitStruct;
+    NVICInitStruct.NVIC_IRQChannel = interruptHelper_getIRQn_CAN(CAN_config.HWConfig->CANPeriph, CAN_IT_FMP0);
+    NVICInitStruct.NVIC_IRQChannelPreemptionPriority = 5;
+    NVICInitStruct.NVIC_IRQChannelSubPriority = 0; // This value is not used
+    NVICInitStruct.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVICInitStruct);
 }
+
 
 static inline void CAN_private_RXIRQ(CAN_TypeDef * CANx, const uint8_t FIFONumber)
 {

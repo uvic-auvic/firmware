@@ -121,10 +121,25 @@ bool circBuffer1D_push(const circBuffer1D_channel_E channel, const uint8_t * con
 	return ret;
 }
 
+
 uint8_t circBuffer1D_pop(const circBuffer1D_channel_E channel, uint8_t * const dataToReturn)
 {
-	UNUSED(channel);
-	UNUSED(dataToReturn);
-
-	return 0U;
+	uint8_t ret = 0;
+	circBuffer1D_channelData_S * channelData = &circBuffer1D_data.channelData[channel];
+	if (channel < CIRCBUFFER1D_CHANNEL_COUNT && circBuffer1D_getSpaceAvailable(channel)< channelData->size)
+	{
+		memset(dataToReturn, 0U, channelData->size - circBuffer1D_getSpaceAvailable(channel) );
+		for (int i=0; i < circBuffer1D_getSpaceAvailable(channel)< channelData->size, i++)
+		{
+			dataToReturn[i] = circBuffer1D_data.buffer[channelData->tail + channelData->startIndex];
+			channelData->tail++;
+			if (channelData->tail + channelData->startIndex > channelData->size)
+			{
+				channelData->tail -= channelData->size;
+			}
+		}
+		ret = channelData->size - circBuffer1D_getSpaceAvailable(channel);
+		
+	}
+	return ret;
 }

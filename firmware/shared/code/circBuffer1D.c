@@ -145,7 +145,7 @@ bool circBuffer1D_popByte(const circBuffer1D_channel_E channel, uint8_t * const 
 uint8_t circBuffer1D_pop(const circBuffer1D_channel_E channel, uint8_t * const dataToReturn)
 {
 	uint8_t ret = 0;
-	uint8_t* returnData;
+	uint8_t *returnData = 0;
 	circBuffer1D_channelData_S * channelData = &circBuffer1D_data.channelData[channel];
 	if (channel < CIRCBUFFER1D_CHANNEL_COUNT && channelData->empty == false)
 	{

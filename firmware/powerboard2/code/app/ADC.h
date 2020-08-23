@@ -2,10 +2,12 @@
  * ADC.h
  */
 
-#ifndef POWERBOARD1_CODE_APP_ADC_H_
-#define POWERBOARD1_CODE_APP_ADC_H_
+#ifndef ADC_H_
+#define ADC_H_
 
 #include <stdint.h>
+
+#define ADC_TO_PIN_VOLTAGE (3.3/4095)
 
 typedef enum
 {
@@ -30,4 +32,4 @@ typedef enum
 void ADC_init(void);
 uint16_t ADC_getChannelData(const ADC_channel_E channel);
 
-#endif /* POWERBOARD1_CODE_APP_ADC_H_ */
+#endif /* ADC_H_ */

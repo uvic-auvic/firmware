@@ -10,5 +10,5 @@
 extern const circBuffer1D_channelConfig_S circBuffer1D_channelConfig[CIRCBUFFER1D_CHANNEL_COUNT];
 const circBuffer1D_channelConfig_S circBuffer1D_channelConfig[CIRCBUFFER1D_CHANNEL_COUNT] =
 {
-	[CIRCBUFFER1D_CHANNEL_TEST_1] = { .size = 100U }
+	[CIRCBUFFER1D_CHANNEL_TEST_1] = { .size = 8U }
 };

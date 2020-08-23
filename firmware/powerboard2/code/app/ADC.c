@@ -45,28 +45,35 @@ static void ADC_private_initDMA(void);
 /* PRIVATE FUNCTION DEFINITION */
 static void ADC_private_initGPIOs(void)
 {
-    //Enable peripheral clock for GPIOA, GPIOB, and GPIOC
+    //Enable peripheral clock for GPIOA and GPIOC
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 
-    GPIO_InitTypeDef GPIO_InitStructure;
-    GPIO_StructInit(&GPIO_InitStructure);
+    //Init structures for GPIOA and GPIOC
+    GPIO_InitTypeDef GPIOA_InitStructure, GPIOC_InitStructure;
+    GPIO_StructInit(&GPIOA_InitStructure);
+    GPIO_StructInit(&GPIOC_InitStructure);
 
-    GPIO_InitStructure.GPIO_Pin     = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
-    GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_AN;
-    GPIO_InitStructure.GPIO_OType   = GPIO_OType_PP;
-    GPIO_InitStructure.GPIO_Speed   = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_PuPd    = GPIO_PuPd_NOPULL;
+    GPIOA_InitStructure.GPIO_Pin     = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
+    GPIOA_InitStructure.GPIO_Mode    = GPIO_Mode_AN;
+    GPIOA_InitStructure.GPIO_OType   = GPIO_OType_PP;
+    GPIOA_InitStructure.GPIO_Speed   = GPIO_Speed_50MHz;
+    GPIOA_InitStructure.GPIO_PuPd    = GPIO_PuPd_NOPULL;
 
-    GPIO_Init(GPIOA, &GPIO_InitStructure);
+    GPIO_Init(GPIOA, &GPIOA_InitStructure);
 
-    GPIO_InitStructure.GPIO_Pin     = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5;
+    GPIOC_InitStructure.GPIO_Pin     = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5;
+    GPIOC_InitStructure.GPIO_Mode    = GPIO_Mode_AN;
+    GPIOC_InitStructure.GPIO_OType   = GPIO_OType_PP;
+    GPIOC_InitStructure.GPIO_Speed   = GPIO_Speed_50MHz;
+    GPIOC_InitStructure.GPIO_PuPd    = GPIO_PuPd_NOPULL;
     
-    GPIO_Init(GPIOC, &GPIO_InitStructure);
+    GPIO_Init(GPIOC, &GPIOC_InitStructure);
 }
 
 static void ADC_private_initADC(void)
 {
+	//Enable peripheral clock for ADC1
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
 
     ADC_InitTypeDef ADC_InitStructure;
@@ -92,12 +99,13 @@ static void ADC_private_initADC(void)
     ADC_Cmd(ADC1, ENABLE);
 
     // DMA will not stop after first ADC conversion stops (For single ADC mode)
-    //ADC_DMARequestAfterLastTransferCmd(ADC1, ENABLE);
+    ADC_DMARequestAfterLastTransferCmd(ADC1, ENABLE);
     ADC_DMACmd(ADC1, ENABLE);
 }
 
 static void ADC_private_initDMA(void)
 {
+	//Enable peripheral clock for DMA2
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
 
     DMA_InitTypeDef DMA_InitStructure;
@@ -115,6 +123,7 @@ static void ADC_private_initDMA(void)
     DMA_InitStructure.DMA_Mode                  = DMA_Mode_Circular;
     DMA_InitStructure.DMA_Priority              = DMA_Priority_Low;
     DMA_InitStructure.DMA_FIFOMode              = DMA_FIFOMode_Disable;
+    //These doesn't seem to be necessary, we can add them back when we need to
     //DMA_InitStructure.DMA_FIFOThreshold         = DMA_FIFOThreshold_Full;
     //DMA_InitStructure.DMA_MemoryBurst           = DMA_MemoryBurst_Single;
     //DMA_InitStructure.DMA_PeripheralBurst       = DMA_PeripheralBurst_Single;
@@ -140,6 +149,7 @@ void ADC_init(void)
 uint16_t ADC_getChannelData(const ADC_channel_E channel)
 {
     uint16_t ret = 0U;
+    //Check if the channel selected is valid
     if(channel < ADC_CHANNEL_COUNT)
     {
         ret = ADC_data.rawData[channel];

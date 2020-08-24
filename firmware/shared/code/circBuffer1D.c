@@ -54,8 +54,8 @@ uint32_t circBuffer1D_getSpaceAvailable(const circBuffer1D_channel_E channel)
 	if(channel < CIRCBUFFER1D_CHANNEL_COUNT)
 	{
 		circBuffer1D_channelData_S * channelData = &circBuffer1D_data.channelData[channel];
-
-		if(channelData->empty == false && channelData->head == channelData->tail ){
+		if(channelData->empty == false && channelData->head == channelData->tail )
+		{
 			ret = 0;
 		}
 		else if (channelData->empty == true){
@@ -68,7 +68,6 @@ uint32_t circBuffer1D_getSpaceAvailable(const circBuffer1D_channel_E channel)
 		else if(channelData->tail > channelData->head)
 		{
 			ret =channelData->tail - channelData->head;
-		}else {
 		}
 	}
 
@@ -144,16 +143,16 @@ bool circBuffer1D_popByte(const circBuffer1D_channel_E channel, uint8_t * const 
 
 uint8_t circBuffer1D_pop(const circBuffer1D_channel_E channel, uint8_t * const dataToReturn)
 {
-	uint8_t ret = 0;
-	uint8_t *returnData = 0;
 	circBuffer1D_channelData_S * channelData = &circBuffer1D_data.channelData[channel];
+	uint8_t ret = 0;
+	uint8_t returnData[channelData->size] ;
 	if (channel < CIRCBUFFER1D_CHANNEL_COUNT && channelData->empty == false)
 	{
 		uint32_t data_size = channelData->size - circBuffer1D_getSpaceAvailable(channel);
 		memset(dataToReturn, 0U, data_size );
 		for (uint32_t i = 0U; i < data_size; i++)
 		{
-			if (circBuffer1D_popByte(channel, returnData ) == true)
+			if (circBuffer1D_popByte(channel, returnData) == true)
 			{
 			dataToReturn[i]= *returnData;
 			ret++;

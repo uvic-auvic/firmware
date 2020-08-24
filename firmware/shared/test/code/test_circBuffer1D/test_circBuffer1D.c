@@ -18,7 +18,7 @@ Ensure(test_circBuffer1D)
 	uint8_t returnData[8];
 
 	//performs test 2 times with a 1D buffer with size of 8U
-	for(circBuffer1D_channel_E channel = CIRCBUFFER1D_CHANNEL_TEST_1; channel < CIRCBUFFER1D_CHANNEL_COUNT * 2 + 1 ; channel += 2)
+	for(circBuffer1D_channel_E channel = CIRCBUFFER1D_CHANNEL_TEST_1; channel < CIRCBUFFER1D_CHANNEL_COUNT * 2 + 1  ; channel += 2)
     {
 		circBuffer1D_channel_E testChannel = channel % 2;
 
@@ -77,15 +77,17 @@ Ensure(test_circBuffer1D)
 		// Tries to push when the buffer channel is full, checks to ensure failure
 		chk = circBuffer1D_push(testChannel, data, 8U);
 		assert_that(chk, is_equal_to(0U));
-        
+       
 		// Tests getSpaceAvailable to make sure it recognizes a full buffer channel
 		result = circBuffer1D_getSpaceAvailable(testChannel);
 		assert_that(result, is_equal_to(0U));
 
+        
+
 		//Pops all of the slots of the buffer channel, ensures data being popped matches the data pushed
             chk = circBuffer1D_pop(testChannel, returnData);
 		    assert_that(chk, is_equal_to(8U));
-        for(int i = 0; i < 8 ; i++)
+         for(int i = 0; i < 8 ; i++)
         {  
 			assert_that(returnData[i], is_equal_to(2*i+1));
 		}
@@ -93,7 +95,8 @@ Ensure(test_circBuffer1D)
         // Tests getSpaceAvailable to make sure it recognizes an empty buffer channel
 		result = circBuffer1D_getSpaceAvailable(testChannel);
 		assert_that(result, is_equal_to(8U));
-	}
+	
+    }
 }
 
 int main(int argc, char **argv)

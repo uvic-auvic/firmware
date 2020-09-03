@@ -1,4 +1,3 @@
-
 APP_OBJS += \
 $(OUTPUT_DIR)/obj/app/RTOS/RTOS.o \
 $(OUTPUT_DIR)/obj/app/RTOS/RTOS_componentSpecific.o \
@@ -14,6 +13,7 @@ $(OUTPUT_DIR)/obj/app/messageHandler.o \
 $(OUTPUT_DIR)/obj/app/messageHandler_componentSpecific.o \
 $(OUTPUT_DIR)/obj/app/RCCHelper.o \
 $(OUTPUT_DIR)/obj/app/interruptHelper.o \
+$(OUTPUT_DIR)/obj/app/ADC.o \
 
 APP_C_DEPS += $(APP_OBJS:%.o=%.d)
 

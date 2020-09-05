@@ -17,10 +17,10 @@
 //#include "housingMonitor.h"
 
 
-#define VBATT_ENABLE_GPIO		(GPIO_Pin_12)
-#define 5V_ENABLE_GPIO		    (GPIO_Pin_13)
-#define 12V_ENABLE_GPIO			(GPIO_Pin_14)
-#define 16V_ENABLE_GPIO		    (GPIO_Pin_15)
+#define _VBATT_ENABLE_GPIO		(GPIO_Pin_12)
+#define _5V_ENABLE_GPIO		    (GPIO_Pin_13)
+#define _12V_ENABLE_GPIO		(GPIO_Pin_14)
+#define _16V_ENABLE_GPIO		(GPIO_Pin_15)
 
 #define ADC_VALUE_TO_BAT_VOLTAGE(x)	((((10090U * 33) / 10U) * (x)) / 4095U) //mV
 #define ADC_VALUE_TO_CURRENT(x)	((121000U * (x)) / 4095U) //121000mA of current when pin is at 3.3V
@@ -50,7 +50,7 @@ void powerManagement_init(void)
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 
 	GPIO_InitTypeDef GPIO_InitStruct;
-	GPIO_InitStruct.GPIO_Pin = VBATT_ENABLE_GPIO | 5V_ENABLE_GPIO | 12V_ENABLE_GPIO | 16V_ENABLE_GPIO;
+	GPIO_InitStruct.GPIO_Pin = _VBATT_ENABLE_GPIO | _5V_ENABLE_GPIO | _12V_ENABLE_GPIO | _16V_ENABLE_GPIO;
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_2MHz;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
@@ -131,25 +131,25 @@ void powerManagement_setState(const powerManagement_channel_E channel, const boo
             case POWER_MANAGEMENT_CHANNEL_VBATT:
             {
                 //GPIOPort = GPIOC;
-                GPIOPin = VBATT_ENABLE_GPIO;
+                GPIOPin = _VBATT_ENABLE_GPIO;
                 break;
             }
             case POWER_MANAGEMENT_CHANNEL_5V:
             {
                 //GPIOPort = GPIOA;
-                GPIOPin = 5V_ENABLE_GPIO;
+                GPIOPin = _5V_ENABLE_GPIO;
                 break;
             }
             case POWER_MANAGEMENT_CHANNEL_12V:
             {
                 //GPIOPort = GPIOC;
-                GPIOPin = 12V_ENABLE_GPIO;
+                GPIOPin = _12V_ENABLE_GPIO;
                 break;
             }
             case POWER_MANAGEMENT_CHANNEL_16V:
             {
                 //GPIOPort = GPIOC;
-                GPIOPin = 16V_ENABLE_GPIO;
+                GPIOPin = _16V_ENABLE_GPIO;
                 break;
             }
             case POWER_MANAGEMENT_CHANNEL_COUNT:

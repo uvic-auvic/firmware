@@ -21,11 +21,12 @@
 #define _5V_ENABLE_GPIO		    (GPIO_Pin_13)
 #define _12V_ENABLE_GPIO		(GPIO_Pin_14)
 #define _16V_ENABLE_GPIO		(GPIO_Pin_15)
+#define Pulse_GPIO		        (GPIO_Pin_2)
 
-#define ADC_VALUE_TO_BAT_VOLTAGE(x)	((((10090U * 33) / 10U) * (x)) / 4095U) //mV
 #define ADC_VALUE_TO_CURRENT(x)	((121000U * (x)) / 4095U) //121000mA of current when pin is at 3.3V
 
-#define DELAY_BEFORE_POWER_ON_MS   (2000U)
+// Delay time to turn the power on after the board is on
+#define DELAY_BEFORE_POWER_ON_MS   (1000U)
 
 typedef enum
 {
@@ -36,8 +37,6 @@ typedef enum
 typedef struct
 {
     uint32_t currents[POWER_MANAGEMENT_CHANNEL_COUNT];
-    //uint32_t batteryCurrents[POWER_MANAGEMENT_BATTERY_CHANNEL_COUNT];
-    //uint32_t batteryVoltages[POWER_MANAGEMENT_BATTERY_CHANNEL_COUNT];
     powerManagement_state_E state;
     uint32_t initTimestamp;
 } powerManagement_data_S;
@@ -50,12 +49,34 @@ void powerManagement_init(void)
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 
 	GPIO_InitTypeDef GPIO_InitStruct;
-	GPIO_InitStruct.GPIO_Pin = _VBATT_ENABLE_GPIO | _5V_ENABLE_GPIO | _12V_ENABLE_GPIO | _16V_ENABLE_GPIO;
-	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStruct.GPIO_Pin   = _VBATT_ENABLE_GPIO | _5V_ENABLE_GPIO | _12V_ENABLE_GPIO | _16V_ENABLE_GPIO;
+	GPIO_InitStruct.GPIO_Mode  = GPIO_Mode_OUT;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_2MHz;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_InitStruct.GPIO_PuPd  = GPIO_PuPd_NOPULL;
 	GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+	//PD2 is used for giving a pulse to the register
+	GPIO_InitStruct.GPIO_Pin = Pulse_GPIO;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
+	GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+	//Keep PD2 output low after initialization
+	GPIOD->ODR &= ~(Pulse_GPIO);
+
+    // Timer2 Initialization
+    // Timer2 is used for generating pulses on PD2, the frequency is 8MHz
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+
+	TIM_TimeBaseInitTypeDef TIM2_TimeBaseInitStruct;
+	TIM2_TimeBaseInitStruct.TIM_Prescaler         = 12;
+	TIM2_TimeBaseInitStruct.TIM_Period            = 0;
+	TIM2_TimeBaseInitStruct.TIM_CounterMode       = TIM_CounterMode_Up;
+	TIM2_TimeBaseInitStruct.TIM_ClockDivision     = TIM_CKD_DIV1;
+	TIM2_TimeBaseInitStruct.TIM_RepetitionCounter = 0;
+
+	TIM_TimeBaseInit(TIM2, TIM2_TimeBaseInitStruct);
+	TIM_Cmd(TIM2, ENABLE);
 
     powerManagement_data.initTimestamp = RTOS_getTimeMilliseconds();
 }
@@ -66,11 +87,14 @@ void powerManagement_run100ms(void)
     {
         case POWER_MANAGEMENT_STATE_INIT:
         {
-            if(RTOS_getTimeElapsedMilliseconds(powerManagement_data.initTimestamp) > DELAY_BEFORE_POWER_ON_MS)
+            // Waiting for 1s to pass
+        	if(RTOS_getTimeElapsedMilliseconds(powerManagement_data.initTimestamp) > DELAY_BEFORE_POWER_ON_MS)
             {
-                // Turn on VBatt Power by default???
-            	// Not sure what power channel to turn on here
+                // Turn on all the power
                 powerManagement_setState(POWER_MANAGEMENT_CHANNEL_VBATT, true);
+                powerManagement_setState(POWER_MANAGEMENT_CHANNEL_5V, true);
+                powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V, true);
+                powerManagement_setState(POWER_MANAGEMENT_CHANNEL_16V, true);
 
                 powerManagement_data.state = POWER_MANAGEMENT_STATE_RUN;
             }
@@ -79,15 +103,10 @@ void powerManagement_run100ms(void)
         case POWER_MANAGEMENT_STATE_RUN:
         {
             protocol_allMessages_U message;
-            //Obtain Trident's instruction about power
+            // Obtain Trident's instruction about power
             messageHandler_getMessage(MESSAGE_HANDLER_RX_CHANNEL_POWER_ENABLE, &message, NULL);
 
-            //powerManagement_data.batteryVoltages[POWER_MANAGEMENT_BATTERY_CHANNEL_LEFT] = ADC_VALUE_TO_BAT_VOLTAGE(ADC_getChannelData(ADC_CHANNEL_LEFT_BATT_VOLTAGE));
-            //powerManagement_data.batteryVoltages[POWER_MANAGEMENT_BATTERY_CHANNEL_RIGHT] = ADC_VALUE_TO_BAT_VOLTAGE(ADC_getChannelData(ADC_CHANNEL_RIGHT_BATT_VOLTAGE));
-
-            //powerManagement_data.batteryCurrents[POWER_MANAGEMENT_BATTERY_CHANNEL_LEFT] = ADC_VALUE_TO_CURRENT(ADC_getChannelData(ADC_CHANNEL_LEFT_BATT_CURRENT));
-            //powerManagement_data.batteryCurrents[POWER_MANAGEMENT_BATTERY_CHANNEL_RIGHT] = ADC_VALUE_TO_CURRENT(ADC_getChannelData(ADC_CHANNEL_RIGHT_BATT_CURRENT));
-
+            // Control the power according to Trident's orders
             powerManagement_setState(POWER_MANAGEMENT_CHANNEL_VBATT, message.TRIDENT_powerEnable.VBattPowerEnable);
             powerManagement_setState(POWER_MANAGEMENT_CHANNEL_5V, message.TRIDENT_powerEnable._5VPowerEnable);
             powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V, message.TRIDENT_powerEnable._12VPowerEnable);
@@ -119,6 +138,7 @@ void powerManagement_run100ms(void)
     }
 }
 
+// Function that turns on and off the power channels
 void powerManagement_setState(const powerManagement_channel_E channel, const bool newState)
 {
     if(channel < POWER_MANAGEMENT_CHANNEL_COUNT)
@@ -130,25 +150,21 @@ void powerManagement_setState(const powerManagement_channel_E channel, const boo
         {
             case POWER_MANAGEMENT_CHANNEL_VBATT:
             {
-                //GPIOPort = GPIOC;
                 GPIOPin = _VBATT_ENABLE_GPIO;
                 break;
             }
             case POWER_MANAGEMENT_CHANNEL_5V:
             {
-                //GPIOPort = GPIOA;
                 GPIOPin = _5V_ENABLE_GPIO;
                 break;
             }
             case POWER_MANAGEMENT_CHANNEL_12V:
             {
-                //GPIOPort = GPIOC;
                 GPIOPin = _12V_ENABLE_GPIO;
                 break;
             }
             case POWER_MANAGEMENT_CHANNEL_16V:
             {
-                //GPIOPort = GPIOC;
                 GPIOPin = _16V_ENABLE_GPIO;
                 break;
             }
@@ -169,6 +185,9 @@ void powerManagement_setState(const powerManagement_channel_E channel, const boo
             {
                 GPIOPort->ODR &= ~(GPIOPin);
             }
+            // Generating a pulse on pin PD2 to change the values in the register
+            GPIOD->ODR |= Pulse_GPIO;
+            GPIOD->ODR &= ~(Pulse_GPIO);
         }
     }
 }
@@ -186,27 +205,3 @@ uint32_t powerManagement_getCurrent_mA(const powerManagement_channel_E channel)
 
     return ret;
 }
-
-/*uint32_t powerManagement_getBatteryCurrent_mA(const powerManagement_batteryChannel_E channel)
-{
-    uint32_t ret = 0U;
-
-    if(channel < POWER_MANAGEMENT_BATTERY_CHANNEL_COUNT)
-    {
-        ret = powerManagement_data.batteryCurrents[channel];
-    }
-
-    return ret;
-}
-
-uint16_t powerManagement_getBatteryVoltage_mV(const powerManagement_batteryChannel_E channel)
-{
-    uint16_t ret = 0U;
-
-    if(channel < POWER_MANAGEMENT_BATTERY_CHANNEL_COUNT)
-    {
-        ret = powerManagement_data.batteryVoltages[channel];
-    }
-
-    return ret;
-}*/

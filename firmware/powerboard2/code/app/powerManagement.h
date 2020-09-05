@@ -23,7 +23,7 @@ typedef enum
     POWER_MANAGEMENT_CHANNEL_COUNT,
 } powerManagement_channel_E;
 
-/*pedef enum
+/*typedef enum
 {
     POWER_MANAGEMENT_BATTERY_CHANNEL_LEFT,
     POWER_MANAGEMENT_BATTERY_CHANNEL_RIGHT,

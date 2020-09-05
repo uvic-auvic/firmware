@@ -9,7 +9,7 @@
 #include "powerManagement.h"
 
 #include <stdlib.h>
-#include "stm32f0xx.h"
+#include "stm32f4xx.h"
 #include "messageHandler.h"
 #include "protocol.h"
 #include "ADC.h"
@@ -36,8 +36,8 @@ typedef enum
 typedef struct
 {
     uint32_t currents[POWER_MANAGEMENT_CHANNEL_COUNT];
-    uint32_t batteryCurrents[POWER_MANAGEMENT_BATTERY_CHANNEL_COUNT];
-    uint32_t batteryVoltages[POWER_MANAGEMENT_BATTERY_CHANNEL_COUNT];
+    //uint32_t batteryCurrents[POWER_MANAGEMENT_BATTERY_CHANNEL_COUNT];
+    //uint32_t batteryVoltages[POWER_MANAGEMENT_BATTERY_CHANNEL_COUNT];
     powerManagement_state_E state;
     uint32_t initTimestamp;
 } powerManagement_data_S;
@@ -58,7 +58,7 @@ void powerManagement_init(void)
 	GPIO_Init(GPIOC, &GPIO_InitStruct);
 
     powerManagement_data.initTimestamp = RTOS_getTimeMilliseconds();
-}S
+}
 
 void powerManagement_run100ms(void)
 {
@@ -68,8 +68,9 @@ void powerManagement_run100ms(void)
         {
             if(RTOS_getTimeElapsedMilliseconds(powerManagement_data.initTimestamp) > DELAY_BEFORE_POWER_ON_MS)
             {
-                // Turn on system power by default
-                powerManagement_setState(POWER_MANAGEMENT_CHANNEL_SYSTEM, true);
+                // Turn on VBatt Power by default???
+            	// Not sure what power channel to turn on here
+                powerManagement_setState(POWER_MANAGEMENT_CHANNEL_VBATT, true);
 
                 powerManagement_data.state = POWER_MANAGEMENT_STATE_RUN;
             }
@@ -78,17 +79,19 @@ void powerManagement_run100ms(void)
         case POWER_MANAGEMENT_STATE_RUN:
         {
             protocol_allMessages_U message;
-            messageHandler_getMessage(MESSAGE_HANDLER_RX_MESSAGE_CHANNEL_POWER_ENABLE, &message, NULL);
+            //Obtain Trident's instruction about power
+            messageHandler_getMessage(MESSAGE_HANDLER_RX_CHANNEL_POWER_ENABLE, &message, NULL);
 
-            powerManagement_data.batteryVoltages[POWER_MANAGEMENT_BATTERY_CHANNEL_LEFT] = ADC_VALUE_TO_BAT_VOLTAGE(ADC_getChannelData(ADC_CHANNEL_LEFT_BATT_VOLTAGE));
-            powerManagement_data.batteryVoltages[POWER_MANAGEMENT_BATTERY_CHANNEL_RIGHT] = ADC_VALUE_TO_BAT_VOLTAGE(ADC_getChannelData(ADC_CHANNEL_RIGHT_BATT_VOLTAGE));
+            //powerManagement_data.batteryVoltages[POWER_MANAGEMENT_BATTERY_CHANNEL_LEFT] = ADC_VALUE_TO_BAT_VOLTAGE(ADC_getChannelData(ADC_CHANNEL_LEFT_BATT_VOLTAGE));
+            //powerManagement_data.batteryVoltages[POWER_MANAGEMENT_BATTERY_CHANNEL_RIGHT] = ADC_VALUE_TO_BAT_VOLTAGE(ADC_getChannelData(ADC_CHANNEL_RIGHT_BATT_VOLTAGE));
 
-            powerManagement_data.batteryCurrents[POWER_MANAGEMENT_BATTERY_CHANNEL_LEFT] = ADC_VALUE_TO_CURRENT(ADC_getChannelData(ADC_CHANNEL_LEFT_BATT_CURRENT));
-            powerManagement_data.batteryCurrents[POWER_MANAGEMENT_BATTERY_CHANNEL_RIGHT] = ADC_VALUE_TO_CURRENT(ADC_getChannelData(ADC_CHANNEL_RIGHT_BATT_CURRENT));
+            //powerManagement_data.batteryCurrents[POWER_MANAGEMENT_BATTERY_CHANNEL_LEFT] = ADC_VALUE_TO_CURRENT(ADC_getChannelData(ADC_CHANNEL_LEFT_BATT_CURRENT));
+            //powerManagement_data.batteryCurrents[POWER_MANAGEMENT_BATTERY_CHANNEL_RIGHT] = ADC_VALUE_TO_CURRENT(ADC_getChannelData(ADC_CHANNEL_RIGHT_BATT_CURRENT));
 
-            //powerManagement_setState(POWER_MANAGEMENT_CHANNEL_MOTOR, message.POLARIS_powerEnable.motorPowerEnable);
-            //powerManagement_setState(POWER_MANAGEMENT_CHANNEL_5V, message.POLARIS_powerEnable._5VPowerEnable);
-            //powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V_9V, message.POLARIS_powerEnable._12V9VPowerEnable);
+            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_VBATT, message.TRIDENT_powerEnable.VBattPowerEnable);
+            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_5V, message.TRIDENT_powerEnable._5VPowerEnable);
+            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V, message.TRIDENT_powerEnable._12VPowerEnable);
+            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_16V, message.TRIDENT_powerEnable._16VPowerEnable);
 			
 			/*Implement this after housingMonitor code is done
 			//Ckeck if leakage happens in the main housing before turning on power
@@ -170,6 +173,8 @@ void powerManagement_setState(const powerManagement_channel_E channel, const boo
     }
 }
 
+//Waiting for implementing I2C code to measure the current
+//Makes no sense before that don't use it
 uint32_t powerManagement_getCurrent_mA(const powerManagement_channel_E channel)
 {
     uint32_t ret = 0U;
@@ -182,7 +187,7 @@ uint32_t powerManagement_getCurrent_mA(const powerManagement_channel_E channel)
     return ret;
 }
 
-uint32_t powerManagement_getBatteryCurrent_mA(const powerManagement_batteryChannel_E channel)
+/*uint32_t powerManagement_getBatteryCurrent_mA(const powerManagement_batteryChannel_E channel)
 {
     uint32_t ret = 0U;
 
@@ -204,4 +209,4 @@ uint16_t powerManagement_getBatteryVoltage_mV(const powerManagement_batteryChann
     }
 
     return ret;
-}
+}*/

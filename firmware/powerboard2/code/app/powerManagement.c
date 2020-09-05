@@ -75,7 +75,7 @@ void powerManagement_init(void)
 	TIM2_TimeBaseInitStruct.TIM_ClockDivision     = TIM_CKD_DIV1;
 	TIM2_TimeBaseInitStruct.TIM_RepetitionCounter = 0;
 
-	TIM_TimeBaseInit(TIM2, TIM2_TimeBaseInitStruct);
+	TIM_TimeBaseInit(TIM2, &TIM2_TimeBaseInitStruct);
 	TIM_Cmd(TIM2, ENABLE);
 
     powerManagement_data.initTimestamp = RTOS_getTimeMilliseconds();

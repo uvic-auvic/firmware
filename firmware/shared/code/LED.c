@@ -46,7 +46,7 @@ void LED_init(void)
 	for(LED_channel_E channel = (LED_channel_E)0U; channel < LED_CHANNEL_COUNT; channel++)
 	{
 		const LED_channelConfig_S * const channelConfig = &LED_config.channelConfig[channel];
-		
+
 		// Check that the config was done correctly
 		assert(IS_GPIO_ALL_PERIPH(channelConfig->GPIOPort));
 		assert(IS_GPIO_PIN_SOURCE(channelConfig->pin));
@@ -86,14 +86,14 @@ void LED_run100ms(void)
 		{
 			case LED_STATE_ON:
 			{
-				channelConfig->GPIOPort->BSRRL = (uint16_t)BITVALUE(channelConfig->pin);
+				GPIO_SetBits(channelConfig->GPIOPort, (uint16_t)BITVALUE(channelConfig->pin));
 				break;
 			}
 			case LED_STATE_BLINK_NORMAL:
 			{
 				if(RTOS_getTimeElapsedMilliseconds(channelData->lastChangeTimestamp) >= NORMAL_CHANGE_PERIOD_MS)
 				{
-					LED_toggleLED(channel);
+					GPIO_ToggleBits(channelConfig->GPIOPort, (uint16_t)BITVALUE(channelConfig->pin));
 					channelData->lastChangeTimestamp = RTOS_getTimeMilliseconds();
 				}
 				break;
@@ -102,16 +102,15 @@ void LED_run100ms(void)
 			{
 				if(RTOS_getTimeElapsedMilliseconds(channelData->lastChangeTimestamp) >= ALERT_CHANGE_PERIOD_MS)
 				{
-					LED_toggleLED(channel);
+					GPIO_ToggleBits(channelConfig->GPIOPort, (uint16_t)BITVALUE(channelConfig->pin));
 					channelData->lastChangeTimestamp = RTOS_getTimeMilliseconds();
 				}
 				break;
 			}
-
 			case LED_STATE_OFF:
 			default:
 			{
-				channelConfig->GPIOPort->BSRRH = (uint16_t)BITVALUE(channelConfig->pin);
+				GPIO_ResetBits(channelConfig->GPIOPort, (uint16_t)BITVALUE(channelConfig->pin));
 				break;
 			}
 		}
@@ -127,10 +126,22 @@ void LED_setState(const LED_channel_E channel, const LED_state_E newState)
 }
 
 // Avoid using this function. Only use for debugging
-void LED_toggleLED(const LED_channel_E channel)
+void LED_toggleDebug(const LED_channel_E channel)
 {
 	if(channel < LED_CHANNEL_COUNT)
 	{
-		LED_config.channelConfig[channel].GPIOPort->ODR ^= BITVALUE(LED_config.channelConfig[channel].pin);
+		const LED_channelConfig_S * const channelConfig = &LED_config.channelConfig[channel];
+		const bool LEDCurrentState = (channelConfig->GPIOPort->ODR & BITVALUE(channelConfig->pin)) == BITVALUE(channelConfig->pin);
+
+		if(LEDCurrentState)
+		{
+			GPIO_ResetBits(channelConfig->GPIOPort, (uint16_t)BITVALUE(channelConfig->pin));
+			LED_data.channelData[channel].newState = LED_STATE_OFF;
+		}
+		else
+		{
+			GPIO_SetBits(channelConfig->GPIOPort, (uint16_t)BITVALUE(channelConfig->pin));
+			LED_data.channelData[channel].newState = LED_STATE_ON;
+		}
 	}
 }

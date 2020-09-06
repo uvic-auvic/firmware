@@ -21,8 +21,9 @@
 void RTOS_init(void)
 {
     LED_init();
-    circBuffer1D_init();
     debug_init();
+
+    // Put init functions here
     CAN_init();
     messageHandler_init();
 

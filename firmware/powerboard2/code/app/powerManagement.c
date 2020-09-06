@@ -64,21 +64,8 @@ void powerManagement_init(void)
 	//Keep PD2 output low after initialization
 	GPIOD->ODR &= ~(Pulse_GPIO);
 
-    // Timer2 Initialization
-    // Timer2 is used for generating pulses on PD2, the frequency is 8MHz
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
-
-	TIM_TimeBaseInitTypeDef TIM2_TimeBaseInitStruct;
-	TIM2_TimeBaseInitStruct.TIM_Prescaler         = 12;
-	TIM2_TimeBaseInitStruct.TIM_Period            = 0;
-	TIM2_TimeBaseInitStruct.TIM_CounterMode       = TIM_CounterMode_Up;
-	TIM2_TimeBaseInitStruct.TIM_ClockDivision     = TIM_CKD_DIV1;
-	TIM2_TimeBaseInitStruct.TIM_RepetitionCounter = 0;
-
-	TIM_TimeBaseInit(TIM2, &TIM2_TimeBaseInitStruct);
-	TIM_Cmd(TIM2, ENABLE);
-
-    powerManagement_data.initTimestamp = RTOS_getTimeMilliseconds();
+	powerManagement_data.state = POWER_MANAGEMENT_STATE_INIT;
+	powerManagement_data.initTimestamp = RTOS_getTimeMilliseconds();
 }
 
 void powerManagement_run100ms(void)
@@ -96,13 +83,19 @@ void powerManagement_run100ms(void)
                 powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V, true);
                 powerManagement_setState(POWER_MANAGEMENT_CHANNEL_16V, true);
 
+                // PD2 pulse: transition from low to high to write to the register
+                GPIOD->ODR |= Pulse_GPIO;
+
                 powerManagement_data.state = POWER_MANAGEMENT_STATE_RUN;
             }
             break;
         }
         case POWER_MANAGEMENT_STATE_RUN:
         {
-            protocol_allMessages_U message;
+        	//PD2 pulse: set PD2 to low at the beginning of run state
+        	GPIOD->ODR &= ~(Pulse_GPIO);
+
+        	protocol_allMessages_U message;
             // Obtain Trident's instruction about power
             messageHandler_getMessage(MESSAGE_HANDLER_RX_CHANNEL_POWER_ENABLE, &message, NULL);
 
@@ -111,6 +104,8 @@ void powerManagement_run100ms(void)
             powerManagement_setState(POWER_MANAGEMENT_CHANNEL_5V, message.TRIDENT_powerEnable._5VPowerEnable);
             powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V, message.TRIDENT_powerEnable._12VPowerEnable);
             powerManagement_setState(POWER_MANAGEMENT_CHANNEL_16V, message.TRIDENT_powerEnable._16VPowerEnable);
+
+
 			
 			/*Implement this after housingMonitor code is done
 			//Ckeck if leakage happens in the main housing before turning on power
@@ -129,6 +124,9 @@ void powerManagement_run100ms(void)
 				powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V_9V, message.POLARIS_powerEnable._12V9VPowerEnable);
 			}*/
 
+            // PD2 pulse: transition from low to high to write to the register
+            GPIOD->ODR |= Pulse_GPIO;
+
             break;
         }
         default:
@@ -143,7 +141,6 @@ void powerManagement_setState(const powerManagement_channel_E channel, const boo
 {
     if(channel < POWER_MANAGEMENT_CHANNEL_COUNT)
     {
-        GPIO_TypeDef * GPIOPort = GPIOC;
         uint16_t GPIOPin = 0;
 
         switch(channel)
@@ -179,15 +176,12 @@ void powerManagement_setState(const powerManagement_channel_E channel, const boo
         {
             if(newState == true)
             {
-                GPIOPort->ODR |= GPIOPin;
+                GPIOC->ODR |= GPIOPin;
             }
             else
             {
-                GPIOPort->ODR &= ~(GPIOPin);
+                GPIOC->ODR &= ~(GPIOPin);
             }
-            // Generating a pulse on pin PD2 to change the values in the register
-            GPIOD->ODR |= Pulse_GPIO;
-            GPIOD->ODR &= ~(Pulse_GPIO);
         }
     }
 }

@@ -14,7 +14,7 @@
 #include "protocol.h"
 #include "ADC.h"
 #include "RTOS.h"
-//#include "housingMonitor.h"
+#include "housingMonitor.h"
 
 
 #define _VBATT_ENABLE_GPIO		(GPIO_Pin_12)

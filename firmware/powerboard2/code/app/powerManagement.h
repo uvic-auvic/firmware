@@ -25,7 +25,6 @@ typedef enum
 
 void powerManagement_init(void);
 void powerManagement_run100ms(void);
-void powerManagement_setState(const powerManagement_channel_E channel, const bool newState);
 uint32_t powerManagement_getCurrent_mA(const powerManagement_channel_E channel);
 
 

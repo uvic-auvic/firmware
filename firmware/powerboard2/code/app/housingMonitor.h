@@ -14,6 +14,7 @@ typedef enum
 	HOUSINGMONITOR_HOUSINGSTATUS_LEAK = 1,
 } housingMonitor_housingStatus_E;
 
+void housingMonitor_init(void);
 housingMonitor_housingStatus_E housingMonitor_getHousingStatus(void);
 void housingMonitor_run(void);
 

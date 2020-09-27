@@ -42,6 +42,7 @@ typedef struct
 } powerManagement_data_S;
 
 static powerManagement_data_S powerManagement_data;
+static void powerManagement_setState(const powerManagement_channel_E channel, const bool newState);
 
 void powerManagement_init(void)
 {
@@ -51,7 +52,7 @@ void powerManagement_init(void)
 	GPIO_InitTypeDef GPIO_InitStruct;
 	GPIO_InitStruct.GPIO_Pin   = _VBATT_ENABLE_GPIO | _5V_ENABLE_GPIO | _12V_ENABLE_GPIO | _16V_ENABLE_GPIO;
 	GPIO_InitStruct.GPIO_Mode  = GPIO_Mode_OUT;
-	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStruct.GPIO_PuPd  = GPIO_PuPd_NOPULL;
 	GPIO_Init(GPIOC, &GPIO_InitStruct);
@@ -77,52 +78,31 @@ void powerManagement_run100ms(void)
             // Waiting for 1s to pass
         	if(RTOS_getTimeElapsedMilliseconds(powerManagement_data.initTimestamp) > DELAY_BEFORE_POWER_ON_MS)
             {
-                // Turn on all the power
-                powerManagement_setState(POWER_MANAGEMENT_CHANNEL_VBATT, true);
-                powerManagement_setState(POWER_MANAGEMENT_CHANNEL_5V, true);
-                powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V, true);
-                powerManagement_setState(POWER_MANAGEMENT_CHANNEL_16V, true);
-
-                // PD2 pulse: transition from low to high to write to the register
-                GPIOD->ODR |= Pulse_GPIO;
-
                 powerManagement_data.state = POWER_MANAGEMENT_STATE_RUN;
             }
             break;
         }
         case POWER_MANAGEMENT_STATE_RUN:
         {
-        	//PD2 pulse: set PD2 to low at the beginning of run state
+        	// PD2 pulse: set PD2 to low at the beginning of run state
         	GPIOD->ODR &= ~(Pulse_GPIO);
 
-        	protocol_allMessages_U message;
-            // Obtain Trident's instruction about power
-            messageHandler_getMessage(MESSAGE_HANDLER_RX_CHANNEL_POWER_ENABLE, &message, NULL);
-
-            // Control the power according to Trident's orders
-            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_VBATT, message.TRIDENT_powerEnable.VBattPowerEnable);
-            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_5V, message.TRIDENT_powerEnable._5VPowerEnable);
-            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V, message.TRIDENT_powerEnable._12VPowerEnable);
-            powerManagement_setState(POWER_MANAGEMENT_CHANNEL_16V, message.TRIDENT_powerEnable._16VPowerEnable);
-
-
-			
-			/*Implement this after housingMonitor code is done
 			//Ckeck if leakage happens in the main housing before turning on power
-			housingMonitor_housing_E Main_housing = HOUSINGMONITOR_HOUSING_MAIN;
-			if (housingMonitor_getHousingStatus(Main_housing) == HOUSINGMONITOR_HOUSINGSTATUS_LEAK)
+			if (housingMonitor_getHousingStatus() == HOUSINGMONITOR_HOUSINGSTATUS_LEAK)
 			{
-				powerManagement_setState(POWER_MANAGEMENT_CHANNEL_MOTOR, false);
+				powerManagement_setState(POWER_MANAGEMENT_CHANNEL_VBATT, false);
 				powerManagement_setState(POWER_MANAGEMENT_CHANNEL_5V, false);
-				powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V_9V, false);
+				powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V, false);
+				powerManagement_setState(POWER_MANAGEMENT_CHANNEL_16V, false);
 			}
-			//No leakage. If power enable is true, turn on the power.
+			//No leakage. Turn on the power.
 			else 
 			{
-				powerManagement_setState(POWER_MANAGEMENT_CHANNEL_MOTOR, message.POLARIS_powerEnable.motorPowerEnable);
-				powerManagement_setState(POWER_MANAGEMENT_CHANNEL_5V, message.POLARIS_powerEnable._5VPowerEnable);
-				powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V_9V, message.POLARIS_powerEnable._12V9VPowerEnable);
-			}*/
+				powerManagement_setState(POWER_MANAGEMENT_CHANNEL_VBATT, true);
+				powerManagement_setState(POWER_MANAGEMENT_CHANNEL_5V, true);
+				powerManagement_setState(POWER_MANAGEMENT_CHANNEL_12V, true);
+				powerManagement_setState(POWER_MANAGEMENT_CHANNEL_16V, true);
+			}
 
             // PD2 pulse: transition from low to high to write to the register
             GPIOD->ODR |= Pulse_GPIO;
@@ -137,7 +117,7 @@ void powerManagement_run100ms(void)
 }
 
 // Function that turns on and off the power channels
-void powerManagement_setState(const powerManagement_channel_E channel, const bool newState)
+static void powerManagement_setState(const powerManagement_channel_E channel, const bool newState)
 {
     if(channel < POWER_MANAGEMENT_CHANNEL_COUNT)
     {

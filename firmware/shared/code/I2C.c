@@ -12,8 +12,8 @@
 #include "stm32f4xx.h"
 
 // I2C SDA and SCL pins
-#define _I2C_SDA_GPIO  (GPIO_PIN_9) // PC9
-#define _I2C_SCL_GPIO  (GPIO_PIN_8) // PA8
+#define _I2C_SDA_GPIO  (GPIO_Pin_9) // PC9
+#define _I2C_SCL_GPIO  (GPIO_Pin_8) // PA8
 
 // I2C sendBuffer size
 #define _I2C_BUFFER_SIZE 8
@@ -23,7 +23,7 @@ typedef enum{
 	I2C_STATE_RECEIVE, // Read
 }I2C_state;
 
-// Global variables and their initilization
+// Global variables and their initialization
 I2C_state I2C_state_S = I2C_STATE_RECEIVE;
 
 uint8_t slave_address = 0x1;
@@ -77,6 +77,22 @@ void I2C_init(void)
 
 	// Enable I2C3
 	I2C_Cmd(I2C3, ENABLE);
+
+	// Enable event interrupts & buffer interrupts
+	I2C_ITConfig(I2C3, I2C_IT_EVT, ENABLE);
+	I2C_ITConfig(I2C3, I2C_IT_BUF, ENABLE);
+
+	// NVIC Init
+	NVIC_InitTypeDef NVIC_Init_Struct;
+	NVIC_Init_Struct.NVIC_IRQChannel                   = I2C3_EV_IRQn;
+	NVIC_Init_Struct.NVIC_IRQChannelCmd                = ENABLE;
+	NVIC_Init_Struct.NVIC_IRQChannelPreemptionPriority = 0;
+	NVIC_Init_Struct.NVIC_IRQChannelSubPriority        = 0;
+	NVIC_Init(&NVIC_Init_Struct);
+
+	// Set priority for ISR and enable ISR
+	NVIC_SetPriority(I2C3_EV_IRQn, 0);
+	NVIC_EnableIRQ(I2C3_EV_IRQn);
 }
 
 bool I2C_send(I2C_channel_E channel, const uint8_t * const data, const uint8_t length)
@@ -110,7 +126,7 @@ bool I2C_receive(I2C_channel_E channel, const uint8_t * const data, const uint8_
 }
 
 // See stm32f413 programming manual P855-861
-void I2C_run(void)
+void I2C3_EV_IRQHandler(void)
 {
 	// Check Start condition
 	if ((I2C3->SR1 & I2C_SR1_SB) == I2C_SR1_SB)

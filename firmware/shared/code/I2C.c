@@ -100,7 +100,7 @@ bool I2C_send(I2C_channel_E channel, const uint8_t * data, const uint8_t length)
 	// Check if I2C is being used currently
 	if ((data_length != 0) || ((I2C3->SR2 & I2C_SR2_BUSY) == I2C_SR2_BUSY))
 		return false;
-	sendBuffer = data;
+	sendBuffer = (uint8_t *)data;
 	if (sendBuffer != data)
 		return false;
 	I2C_state_S = I2C_STATE_SEND;
@@ -115,7 +115,7 @@ bool I2C_receive(I2C_channel_E channel, const uint8_t * data, const uint8_t leng
 	// Check if I2C is being used currently
 	if ((data_length != 0) || ((I2C3->SR2 & I2C_SR2_BUSY) == I2C_SR2_BUSY))
 		return false;
-	receiveBuffer = data;
+	receiveBuffer = (uint8_t *)data;
 	if (receiveBuffer != data)
 		return false;
 	I2C_state_S = I2C_STATE_RECEIVE;
@@ -140,7 +140,7 @@ void I2C3_EV_IRQHandler(void)
 		I2C3->SR2;
 		if (I2C_state_S == I2C_STATE_SEND)
 		{
-			I2C_SendData(I2C3, &sendBuffer);
+			I2C_SendData(I2C3, *sendBuffer);
 			sendBuffer ++;
 			data_length --;
 		}
@@ -158,7 +158,7 @@ void I2C3_EV_IRQHandler(void)
 	{
 		if (data_length > 0)
 		{
-			I2C_SendData(I2C3, &sendBuffer);
+			I2C_SendData(I2C3, *sendBuffer);
 			sendBuffer ++;
 			data_length --;
 		}

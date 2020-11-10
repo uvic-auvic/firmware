@@ -95,7 +95,7 @@ void I2C_init(void)
 	NVIC_EnableIRQ(I2C3_EV_IRQn);
 }
 
-bool I2C_send(I2C_channel_E channel, const uint8_t * const data, const uint8_t length)
+bool I2C_send(I2C_channel_E channel, const uint8_t * data, const uint8_t length)
 {
 	// Check if I2C is being used currently
 	if ((data_length != 0) || ((I2C3->SR2 & I2C_SR2_BUSY) == I2C_SR2_BUSY))
@@ -110,7 +110,7 @@ bool I2C_send(I2C_channel_E channel, const uint8_t * const data, const uint8_t l
 	return true;
 }
 
-bool I2C_receive(I2C_channel_E channel, const uint8_t * const data, const uint8_t length)
+bool I2C_receive(I2C_channel_E channel, const uint8_t * data, const uint8_t length)
 {
 	// Check if I2C is being used currently
 	if ((data_length != 0) || ((I2C3->SR2 & I2C_SR2_BUSY) == I2C_SR2_BUSY))

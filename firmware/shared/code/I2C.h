@@ -16,7 +16,7 @@
 void I2C_init(void);
 
 //to run in one of the RTOS tasks - sends messages from send buffer - reads messages on receive buffer
-void I2C_run(void);
+void I2C_run_test(void);
 
 //places data on send buffer - returns true/false based on success/fail
 bool I2C_send(I2C_channel_E channel, const uint8_t * const data, const uint8_t length);

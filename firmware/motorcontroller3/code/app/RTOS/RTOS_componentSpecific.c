@@ -13,7 +13,7 @@
 #include "CAN.h"
 #include "messageHandler.h"
 #include "string.h"
-
+#include "SPI.h"
 /*
  * If a new FreeRTOS task is needed, create it here so that there is one place where
  * all the tasks are created
@@ -37,7 +37,7 @@ void RTOS_run1ms(void)
 
 void RTOS_run10ms(void)
 {
-
+	SPI_run();
 }
 
 void RTOS_run100ms(void)

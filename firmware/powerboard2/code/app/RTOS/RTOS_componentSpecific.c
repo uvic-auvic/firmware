@@ -51,5 +51,7 @@ void RTOS_run100ms(void)
 
 void RTOS_run1000ms(void)
 {
-	I2C_run_test();
+	uint8_t data = 0b10101010;
+	uint8_t* a = &data;
+	I2C_send(I2C_CHANNEL_VBATT, a, 1);
 }

@@ -73,7 +73,7 @@ void I2C_init(void)
 	I2C_Init_Struct.I2C_DutyCycle           = I2C_DutyCycle_2;
 	I2C_Init_Struct.I2C_Mode                = I2C_Mode_I2C;
 	I2C_Init_Struct.I2C_OwnAddress1         = 0x0;
-	I2C_Init(I2C1, &I2C_Init_Struct);
+	I2C_Init(I2C2, &I2C_Init_Struct);
 
 	// Enable I2C3
 	I2C_Cmd(I2C2, ENABLE);
@@ -86,20 +86,18 @@ void I2C_init(void)
 	NVIC_InitTypeDef NVIC_Init_Struct;
 	NVIC_Init_Struct.NVIC_IRQChannel                   = I2C2_EV_IRQn;
 	NVIC_Init_Struct.NVIC_IRQChannelCmd                = ENABLE;
-	NVIC_Init_Struct.NVIC_IRQChannelPreemptionPriority = 0;
+	NVIC_Init_Struct.NVIC_IRQChannelPreemptionPriority = 5;
 	NVIC_Init_Struct.NVIC_IRQChannelSubPriority        = 0;
 	NVIC_Init(&NVIC_Init_Struct);
 
 	// Set priority for ISR and enable ISR
-	NVIC_SetPriority(I2C2_EV_IRQn, 0);
+	//NVIC_SetPriority(I2C2_EV_IRQn, 0);
 	NVIC_EnableIRQ(I2C2_EV_IRQn);
 }
 
-bool I2C_send(I2C_channel_E channel, const uint8_t * data, const uint8_t length)
+bool I2C_send(I2C_channel_E channel, uint8_t * data, const uint8_t length)
 {
-	sendBuffer = (uint8_t *)data;
-	if (sendBuffer != data)
-		return false;
+	sendBuffer = data;
 	I2C_state_S = I2C_STATE_SEND;
 	slave_address = I2C_channelToAddressMapping[channel];
 	data_length = length;
@@ -113,8 +111,6 @@ bool I2C_receive(I2C_channel_E channel, const uint8_t * data, const uint8_t leng
 	/*if ((data_length != 0) || ((I2C2->SR2 & I2C_SR2_BUSY) == I2C_SR2_BUSY))
 		return false;*/
 	receiveBuffer = (uint8_t *)data;
-	if (receiveBuffer != data)
-		return false;
 	I2C_state_S = I2C_STATE_RECEIVE;
 	slave_address = I2C_channelToAddressMapping[channel];
 	data_length = length;
@@ -122,7 +118,7 @@ bool I2C_receive(I2C_channel_E channel, const uint8_t * data, const uint8_t leng
 	return true;
 }
 
-void I2C_run_test(void)
+/*void I2C_run_test(void)
 {
 	I2C_state_S = I2C_STATE_SEND;
 	slave_address = 0x1;
@@ -130,7 +126,7 @@ void I2C_run_test(void)
 	sendBuffer = &data;
 	data_length = 1;
 	I2C_GenerateSTART(I2C2, ENABLE);
-}
+}*/
 
 // See stm32f413 programming manual P855-861
 void I2C2_EV_IRQHandler(void)

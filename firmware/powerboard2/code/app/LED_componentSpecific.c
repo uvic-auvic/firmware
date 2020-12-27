@@ -16,13 +16,13 @@ const LED_config_S LED_config =
         {
             .pin = 14,
             .GPIOPort = GPIOB,
-            .initState = LED_STATE_ON,
+            .initState = LED_STATE_OFF,
         },
         [LED_CHANNEL_BLUE] =
         {
             .pin = 7,
             .GPIOPort = GPIOB,
-            .initState = LED_STATE_ON,
+            .initState = LED_STATE_OFF,
         },
         [LED_CHANNEL_GREEN] =
         {

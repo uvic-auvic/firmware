@@ -37,7 +37,7 @@ static I2C_data_S I2C_send_data;
 static I2C_data_S I2C_receive_data;
 static I2C_state_S I2C_state = I2C_STATE_RECEIVE;
 
-uint8_t slave_address = 0x1;
+uint8_t slave_address = 0x0;
 
 // Length of the data to be sent or received (in bytes)
 volatile uint8_t data_length = 0;

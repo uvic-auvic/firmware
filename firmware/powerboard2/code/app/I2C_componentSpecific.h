@@ -9,6 +9,7 @@
 #define I2C_COMPONENTSPECIFIC_H_
 
 #include <stdint.h>
+#include <stdlib.h>
 
 //To be updated
 typedef enum

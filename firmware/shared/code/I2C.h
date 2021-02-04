@@ -24,4 +24,6 @@ bool I2C_send(I2C_channel_E channel, const uint8_t * const data, const uint8_t l
 //receives I2C message and places on receive buffer
 bool I2C_receive(I2C_channel_E channel, const uint8_t * const data, const uint8_t length);
 
+bool is_idle();
+
 #endif /* I2C_H_ */

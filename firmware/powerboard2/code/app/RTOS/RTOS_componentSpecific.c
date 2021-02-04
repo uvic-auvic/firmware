@@ -47,11 +47,16 @@ void RTOS_run10ms(void)
 void RTOS_run100ms(void)
 {
     LED_run100ms();
+    //I2C_receive(I2C_CHANNEL_VBATT, 0, 1);
 }
 
 void RTOS_run1000ms(void)
 {
-	uint8_t data = 0b10101010;
-	uint8_t* a = &data;
-	I2C_send(I2C_CHANNEL_VBATT, a, 1);
+	uint8_t data[] = {0x1, 0b01000000};
+	uint8_t* a = &data[0];
+	I2C_send(I2C_CHANNEL_VBATT, a, 2);
+	if (is_idle()){
+		I2C_receive(I2C_CHANNEL_VBATT, 0, 1);
+		LED_toggleLED(LED_CHANNEL_RED);
+	}
 }

@@ -10,7 +10,7 @@
 
 //To be updated
 static const uint8_t I2C_Address[I2C_CHANNEL_COUNT] = {
-	[I2C_CHANNEL_VBATT] = 0x11,
+	[I2C_CHANNEL_VBATT] = 0b1001101,
 	[I2C_CHANNEL_5V]    = 0x2,
 	[I2C_CHANNEL_12V]   = 0x3,
 	[I2C_CHANNEL_16V]   = 0x4,

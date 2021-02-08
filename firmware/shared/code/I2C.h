@@ -15,6 +15,9 @@
 //initialize I2C pins and peripheral for component
 void I2C_init(void);
 
+// Set up I2C peripharal
+void I2C_setup(void);
+
 //to run in one of the RTOS tasks - sends messages from send buffer - reads messages on receive buffer
 void I2C_run_test(void);
 

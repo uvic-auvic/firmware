@@ -77,6 +77,23 @@ void I2C_init(void)
 	GPIO_PinAFConfig(GPIOF, GPIO_PinSource1, GPIO_AF_I2C2);
 
 
+	I2C_setup();
+
+	// NVIC Init
+	NVIC_InitTypeDef NVIC_Init_Struct;
+	NVIC_Init_Struct.NVIC_IRQChannel                   = I2C2_EV_IRQn;
+	NVIC_Init_Struct.NVIC_IRQChannelCmd                = ENABLE;
+	NVIC_Init_Struct.NVIC_IRQChannelPreemptionPriority = 5;
+	NVIC_Init_Struct.NVIC_IRQChannelSubPriority        = 0;
+	NVIC_Init(&NVIC_Init_Struct);
+
+	// Set priority for ISR and enable ISR
+	//NVIC_SetPriority(I2C2_EV_IRQn, 0);
+	NVIC_EnableIRQ(I2C2_EV_IRQn);
+}
+
+void I2C_setup(void)
+{
 	// I2C2 Init
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);
 
@@ -101,22 +118,9 @@ void I2C_init(void)
 	// Enable event interrupts, buffer interrupts, and error interrupt (for acknowledge failure)
 	I2C_ITConfig(I2C2, I2C_IT_EVT, ENABLE);
 	I2C_ITConfig(I2C2, I2C_IT_BUF, ENABLE);
-	//I2C_ITConfig(I2C2, I2C_IT_ERR, ENABLE);
 
 	// Enable I2C2
 	I2C_Cmd(I2C2, ENABLE);
-
-	// NVIC Init
-	NVIC_InitTypeDef NVIC_Init_Struct;
-	NVIC_Init_Struct.NVIC_IRQChannel                   = I2C2_EV_IRQn;
-	NVIC_Init_Struct.NVIC_IRQChannelCmd                = ENABLE;
-	NVIC_Init_Struct.NVIC_IRQChannelPreemptionPriority = 5;
-	NVIC_Init_Struct.NVIC_IRQChannelSubPriority        = 0;
-	NVIC_Init(&NVIC_Init_Struct);
-
-	// Set priority for ISR and enable ISR
-	//NVIC_SetPriority(I2C2_EV_IRQn, 0);
-	NVIC_EnableIRQ(I2C2_EV_IRQn);
 }
 
 bool I2C_send(I2C_channel_E channel, const uint8_t * data, const uint8_t length)
@@ -129,11 +133,7 @@ bool I2C_send(I2C_channel_E channel, const uint8_t * data, const uint8_t length)
 		slave_address = I2C_channelToAddressMapping(channel);
 		data_length = length;
 		I2C_GenerateSTART(I2C2, ENABLE);
-
-		// Checking the busy bit after setting the start bit is safe
-		if ((I2C2->SR2 & I2C_SR2_BUSY) == I2C_SR2_BUSY)
-			return false;
-		else return true;
+		return true;
 	}
 	else return false;
 }
@@ -148,10 +148,7 @@ bool I2C_receive(I2C_channel_E channel, const uint8_t * data, const uint8_t leng
 		slave_address = I2C_channelToAddressMapping(channel);
 		data_length = length;
 		I2C_GenerateSTART(I2C2, ENABLE);
-
-		if ((I2C2->SR2 & I2C_SR2_BUSY) == I2C_SR2_BUSY)
-			return false;
-		else return true;
+		return true;
 	}
 	else return false;
 }
@@ -161,15 +158,6 @@ bool is_idle()
 	if (I2C_state != I2C_STATE_IDLE) return false;
 	else return true;
 }
-/*void I2C_run_test(void)
-{
-	I2C_state_S = I2C_STATE_SEND;
-	slave_address = 0x1;
-	uint8_t data = 0b10101010;
-	sendBuffer = &data;
-	data_length = 1;
-	I2C_GenerateSTART(I2C2, ENABLE);
-}*/
 
 // See stm32f413 programming manual P855-861
 void I2C2_EV_IRQHandler(void)
@@ -178,7 +166,9 @@ void I2C2_EV_IRQHandler(void)
 	if ((I2C2->SR1 & I2C_SR1_SB) == I2C_SR1_SB)
 	{
 		// LSB is the r/w bit
-		I2C_Send7bitAddress(I2C2, (slave_address << I2C_OAR1_ADD0), (uint8_t)I2C_state);
+		//I2C_Send7bitAddress(I2C2, (slave_address << I2C_OAR1_ADD0), (uint8_t)I2C_state);
+		uint8_t addr = (slave_address << I2C_OAR1_ADD0) + (uint8_t)I2C_state;
+		I2C2->DR = addr;
 	}
 	// Waits for address sent bit to be set
 	else if ((I2C2->SR1 & I2C_SR1_ADDR) == I2C_SR1_ADDR)
@@ -214,8 +204,10 @@ void I2C2_EV_IRQHandler(void)
 		else
 		{
 			data_count = 0; // Clear counter
+			if (I2C_state != I2C_STATE_IDLE){
+				I2C_GenerateSTOP(I2C2, ENABLE);
+			} // Generate a stop condition
 			I2C_state = I2C_STATE_IDLE;
-			I2C_GenerateSTOP(I2C2, ENABLE); // Generate a stop condition
 		}
 	}
 	// Receiving data from slave
@@ -243,5 +235,10 @@ void I2C2_EV_IRQHandler(void)
 		data_length = 0;
 		LED_toggleLED(LED_CHANNEL_RED);
 		I2C_GenerateSTOP(I2C2, ENABLE); // Generate a stop condition
+		I2C_ITConfig(I2C2, I2C_IT_EVT, DISABLE);
+		I2C_ITConfig(I2C2, I2C_IT_BUF, DISABLE);
+		I2C_Cmd(I2C2, DISABLE);
+		I2C_DeInit(I2C2);
+		I2C_setup();
 	}
 }

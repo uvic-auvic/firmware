@@ -27,7 +27,7 @@ typedef struct
 	uint8_t Buffer[_I2C_BUFFER_SIZE];
 } I2C_data_S;
 
-// Adding an idle state because the BUSY bit in SR2 is hard to deal with
+// Adding an idle state because reading the BUSY bit in SR2 can cause problems
 typedef enum{
 	I2C_STATE_SEND,    // Write
 	I2C_STATE_RECEIVE, // Read
@@ -43,9 +43,6 @@ uint8_t slave_address = 0x0;
 
 // Length of the data to be sent or received (in bytes)
 volatile uint8_t data_length = 0;
-
-// Data counter, 0 when a process finished or not started
-volatile uint8_t data_count = 0;
 
 // Pointer to the buffers
 uint8_t* sendBufferPtr;
@@ -76,7 +73,7 @@ void I2C_init(void)
 	GPIO_PinAFConfig(GPIOF, GPIO_PinSource0, GPIO_AF_I2C2);
 	GPIO_PinAFConfig(GPIOF, GPIO_PinSource1, GPIO_AF_I2C2);
 
-
+	// I2C peripheral init
 	I2C_setup();
 
 	// NVIC Init
@@ -115,7 +112,7 @@ void I2C_setup(void)
 	I2C_Init_Struct.I2C_OwnAddress1         = 0x0;
 	I2C_Init(I2C2, &I2C_Init_Struct);
 
-	// Enable event interrupts, buffer interrupts, and error interrupt (for acknowledge failure)
+	// Enable event interrupts and buffer interrupts
 	I2C_ITConfig(I2C2, I2C_IT_EVT, ENABLE);
 	I2C_ITConfig(I2C2, I2C_IT_BUF, ENABLE);
 
@@ -125,9 +122,12 @@ void I2C_setup(void)
 
 bool I2C_send(I2C_channel_E channel, const uint8_t * data, const uint8_t length)
 {
+	// Check the validity of message
 	if((data != NULL) && (length != 0) && (length <= _I2C_BUFFER_SIZE))
 	{
+		// Check the availability of I2C
 		if ((data_length != 0) || (I2C_state != I2C_STATE_IDLE)) return false;
+
 		memcpy(I2C_send_data.Buffer, data, length);
 		I2C_state = I2C_STATE_SEND;
 		slave_address = I2C_channelToAddressMapping(channel);
@@ -140,9 +140,12 @@ bool I2C_send(I2C_channel_E channel, const uint8_t * data, const uint8_t length)
 
 bool I2C_receive(I2C_channel_E channel, const uint8_t * data, const uint8_t length)
 {
+	// Check the validity of message
 	if((data != NULL) && (length != 0) && (length <= _I2C_BUFFER_SIZE))
 	{
+		// Check the availability of I2C
 		if ((data_length != 0) || (I2C_state != I2C_STATE_IDLE)) return false;
+
 		memcpy(I2C_receive_data.Buffer, data, length);
 		I2C_state = I2C_STATE_RECEIVE;
 		slave_address = I2C_channelToAddressMapping(channel);
@@ -166,14 +169,13 @@ void I2C2_EV_IRQHandler(void)
 	if ((I2C2->SR1 & I2C_SR1_SB) == I2C_SR1_SB)
 	{
 		// LSB is the r/w bit
-		//I2C_Send7bitAddress(I2C2, (slave_address << I2C_OAR1_ADD0), (uint8_t)I2C_state);
-		uint8_t addr = (slave_address << I2C_OAR1_ADD0) + (uint8_t)I2C_state;
-		I2C2->DR = addr;
+		I2C_Send7bitAddress(I2C2, (slave_address << I2C_OAR1_ADD0), (uint8_t)I2C_state);
+		//I2C2->DR = (slave_address << I2C_OAR1_ADD0) + (uint8_t)I2C_state;
 	}
 	// Waits for address sent bit to be set
 	else if ((I2C2->SR1 & I2C_SR1_ADDR) == I2C_SR1_ADDR)
 	{
-		// Clearing ADDR bit by reading SR1 (line 101) and then reading SR2
+		// Clearing ADDR bit by reading SR1 and then reading SR2
 		I2C2->SR2;
 		if (I2C_state == I2C_STATE_SEND)
 		{
@@ -203,10 +205,10 @@ void I2C2_EV_IRQHandler(void)
 		}
 		else
 		{
-			data_count = 0; // Clear counter
+			// Generate a stop condition ONLY ONCE
 			if (I2C_state != I2C_STATE_IDLE){
 				I2C_GenerateSTOP(I2C2, ENABLE);
-			} // Generate a stop condition
+			}
 			I2C_state = I2C_STATE_IDLE;
 		}
 	}
@@ -223,18 +225,16 @@ void I2C2_EV_IRQHandler(void)
 		}
 		if (data_length == 0)
 		{
-			data_count = 0;
 			I2C_state = I2C_STATE_IDLE;
 		}
 	}
 	// Error checking: acknowledge failure
 	else if ((I2C2->SR1 & I2C_SR1_AF) == I2C_SR1_AF)
 	{
-		// Stop I2C, do this transfer again later
-		data_count = 0;
+		// Stop everything, reinit I2C
 		data_length = 0;
-		LED_toggleLED(LED_CHANNEL_RED);
-		I2C_GenerateSTOP(I2C2, ENABLE); // Generate a stop condition
+		//LED_toggleLED(LED_CHANNEL_RED);
+		I2C_GenerateSTOP(I2C2, ENABLE);
 		I2C_ITConfig(I2C2, I2C_IT_EVT, DISABLE);
 		I2C_ITConfig(I2C2, I2C_IT_BUF, DISABLE);
 		I2C_Cmd(I2C2, DISABLE);

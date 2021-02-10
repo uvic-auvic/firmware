@@ -51,6 +51,12 @@ void RTOS_run100ms(void)
 
 void RTOS_run1000ms(void)
 {
+	/*
+	 * Test case: Send instructions to the sensor and then read the data from the slave
+	 *            First and second data are messages to access and write to the slave's register
+	 *            Third data is junk, slave will respond with a NACK
+	 *            length = 2 for normal operation, length = 3 to test acknowledge failure error handling
+	 */
 	uint8_t data[] = {0x1, 0b0100000, 0b0};
 	uint8_t* a = &data[0];
 	I2C_send(I2C_CHANNEL_VBATT, a, 2);

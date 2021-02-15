@@ -11,6 +11,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "stm32f4xx.h"
+#include "LED.h"
 
 // I2C SDA and SCL pins
 #define _I2C_SDA_GPIO  (GPIO_Pin_9) // PC9
@@ -73,7 +74,7 @@ void I2C_init(void)
 	// I2C peripheral init
 	I2C_setup();
 
-	// NVIC Init
+	// NVIC Init for event interrupt
 	NVIC_InitTypeDef NVIC_Init_Struct;
 	NVIC_Init_Struct.NVIC_IRQChannel                   = I2C2_EV_IRQn;
 	NVIC_Init_Struct.NVIC_IRQChannelCmd                = ENABLE;
@@ -81,9 +82,17 @@ void I2C_init(void)
 	NVIC_Init_Struct.NVIC_IRQChannelSubPriority        = 0;
 	NVIC_Init(&NVIC_Init_Struct);
 
+	// NVIC Init for error interrupt
+	NVIC_Init_Struct.NVIC_IRQChannel                   = I2C2_ER_IRQn;
+	NVIC_Init_Struct.NVIC_IRQChannelCmd                = ENABLE;
+	NVIC_Init_Struct.NVIC_IRQChannelPreemptionPriority = 4;
+	NVIC_Init_Struct.NVIC_IRQChannelSubPriority        = 0;
+	NVIC_Init(&NVIC_Init_Struct);
+
 	// Set priority for ISR and enable ISR
 	//NVIC_SetPriority(I2C2_EV_IRQn, 0);
 	NVIC_EnableIRQ(I2C2_EV_IRQn);
+	NVIC_EnableIRQ(I2C2_ER_IRQn);
 }
 
 void I2C_setup(void)
@@ -122,6 +131,7 @@ void I2C_setup(void)
 	// Enable event interrupts and buffer interrupts
 	I2C_ITConfig(I2C2, I2C_IT_EVT, ENABLE);
 	I2C_ITConfig(I2C2, I2C_IT_BUF, ENABLE);
+	I2C_ITConfig(I2C2, I2C_IT_ERR, ENABLE);
 
 	// Enable I2C2
 	I2C_Cmd(I2C2, ENABLE);
@@ -235,16 +245,27 @@ void I2C2_EV_IRQHandler(void)
 			I2C_state = I2C_STATE_IDLE;
 		}
 	}
-	// Error checking: acknowledge failure
-	else if ((I2C2->SR1 & I2C_SR1_AF) == I2C_SR1_AF)
+}
+
+void I2C2_ER_IRQHandler(void)
+{
+	// Error handling: acknowledge failure
+	if ((I2C2->SR1 & I2C_SR1_AF) == I2C_SR1_AF)
 	{
 		// Stop everything, re-init I2C
 		data_length = 0;
-		I2C_GenerateSTOP(I2C2, ENABLE);
+		// Generate a stop condition ONLY ONCE
+		if (I2C_state != I2C_STATE_IDLE){
+			I2C_GenerateSTOP(I2C2, ENABLE);
+		}
+		// For debugging: toggle the red LED
+		LED_toggleLED(LED_CHANNEL_RED);
+		I2C_state = I2C_STATE_IDLE;
 		I2C_ITConfig(I2C2, I2C_IT_EVT, DISABLE);
 		I2C_ITConfig(I2C2, I2C_IT_BUF, DISABLE);
+		I2C_ITConfig(I2C2, I2C_IT_ERR, DISABLE);
 		I2C_Cmd(I2C2, DISABLE);
 		I2C_DeInit(I2C2);
 		I2C_setup();
-	}
+		}
 }

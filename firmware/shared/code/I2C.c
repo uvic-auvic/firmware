@@ -247,12 +247,13 @@ void I2C2_EV_IRQHandler(void)
 	}
 }
 
+// See stm32f413 programming manual P860
 void I2C2_ER_IRQHandler(void)
 {
 	// Error handling: acknowledge failure
 	if ((I2C2->SR1 & I2C_SR1_AF) == I2C_SR1_AF)
 	{
-		// Stop everything, re-init I2C
+		// Stop current transaction
 		data_length = 0;
 		// Generate a stop condition ONLY ONCE
 		if (I2C_state != I2C_STATE_IDLE){
@@ -261,11 +262,7 @@ void I2C2_ER_IRQHandler(void)
 		// For debugging: toggle the red LED
 		LED_toggleLED(LED_CHANNEL_RED);
 		I2C_state = I2C_STATE_IDLE;
-		I2C_ITConfig(I2C2, I2C_IT_EVT, DISABLE);
-		I2C_ITConfig(I2C2, I2C_IT_BUF, DISABLE);
-		I2C_ITConfig(I2C2, I2C_IT_ERR, DISABLE);
-		I2C_Cmd(I2C2, DISABLE);
-		I2C_DeInit(I2C2);
-		I2C_setup();
+		// Clear the AF flag
+		I2C_ClearFlag(I2C2, I2C_FLAG_AF);
 		}
 }

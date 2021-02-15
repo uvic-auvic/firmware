@@ -11,9 +11,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include "stm32f4xx.h"
-//#include "FreeRTOS.h"
-//#include "task.h"
-#include "LED.h"
 
 // I2C SDA and SCL pins
 #define _I2C_SDA_GPIO  (GPIO_Pin_9) // PC9
@@ -94,10 +91,20 @@ void I2C_setup(void)
 	// I2C2 Init
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);
 
-	// Reset I2C after a delay
-	// If you want to know why, it's because I2C won't work unless doing so.
+	/*
+	 * Reset I2C after a delay: After enabling the RCC clock, the BUSY bit in the SR2 register
+	 *                          became 1, which means the peripheral cannot start any data
+	 *                          transaction. According to STM32 documents and resources on
+	 *                          Google, this could be a silicon defect, and reseting the RCC
+	 *                          clock after a small delay is the current work-around.
+	 * (https://community.st.com/s/question/0D50X00009XkYxY/stm32f105rc-i2c2-always-busy)
+	 *
+	 * 15 is the minimum value of delay that ensures I2C's functioning for now.
+	 * If the BUSY bit cannot be reset, increase the delay time.
+	 * DO NOT check BUSY bit in SR2 in the code!!! It will then be set FOREVER!!!
+	 */
 	int i = 0;
-	while (i < 20){
+	while (i < 15){
 		i++;
 	}
 	RCC_APB1PeriphResetCmd(RCC_APB1Periph_I2C2, ENABLE);
@@ -231,9 +238,8 @@ void I2C2_EV_IRQHandler(void)
 	// Error checking: acknowledge failure
 	else if ((I2C2->SR1 & I2C_SR1_AF) == I2C_SR1_AF)
 	{
-		// Stop everything, reinit I2C
+		// Stop everything, re-init I2C
 		data_length = 0;
-		//LED_toggleLED(LED_CHANNEL_RED);
 		I2C_GenerateSTOP(I2C2, ENABLE);
 		I2C_ITConfig(I2C2, I2C_IT_EVT, DISABLE);
 		I2C_ITConfig(I2C2, I2C_IT_BUF, DISABLE);

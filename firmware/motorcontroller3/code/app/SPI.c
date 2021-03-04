@@ -52,18 +52,18 @@ void initSPI()
 
 void SPI_run(void)
 {
-	uint8_t * dataToSend;
+	uint16_t dataToSend;
 	if(circBuffer2D_getSpaceAvailable(SPI4_TX) <= 16U)
 	{
-		circBuffer2D_pop(SPI4_TX, dataToSend);
-		SPI_I2S_SendData(SPI4, (uint16_t)&dataToSend);
+		circBuffer2D_pop(SPI4_TX, (uint8_t*)&dataToSend);
+		SPI_I2S_SendData(SPI4, (uint16_t)(dataToSend));
 	}
 
-	uint16_t * dataReceived;
+	uint16_t dataReceived;
 	if(circBuffer2D_getSpaceAvailable(SPI4_RX))
 	{
-		&dataReceived = SPI_I2S_ReceiveData(SPI4);
-		circBuffer2D_push(SPI4_RX, dataReceived, 2U);
+		dataReceived = SPI_I2S_ReceiveData(SPI4);
+		circBuffer2D_push(SPI4_RX, (uint8_t*)&dataReceived, 2U);
 	}
 }
 
@@ -81,7 +81,7 @@ bool SPI_send(circBuffer2D_channel_E channel, const uint8_t * const data, const 
 	return ret;
 }
 
-bool SPI_receive(circBuffer2D_channel_E channel, const uint8_t * data, const uint8_t length)
+bool SPI_receive(circBuffer2D_channel_E channel,  uint8_t * const data, const uint8_t length)
 {
 
 	bool ret = false;
@@ -94,7 +94,7 @@ bool SPI_receive(circBuffer2D_channel_E channel, const uint8_t * data, const uin
 	return ret;
 }
 
-bool SPI_sendAndReceive(circBuffer2D_channel_E channel, const uint8_t * const data, const uint8_t length)
+bool SPI_sendAndReceive(circBuffer2D_channel_E channel,  uint8_t * const data, const uint8_t length)
 {
 
 	bool retSend = false;

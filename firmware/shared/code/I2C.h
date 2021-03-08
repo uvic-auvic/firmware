@@ -10,7 +10,31 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "stm32f4xx.h"
 #include "I2C_componentSpecific.h"
+
+typedef struct
+{
+	// SDA Pin Info
+	GPIO_TypeDef*	SDAPort;
+	uint8_t 		SDAPin;
+
+	// SCL Pin Info
+	GPIO_TypeDef*	SCLPort;
+	uint8_t 		SCLPin;
+
+	// I2C Peripheral
+	I2C_TypeDef*    I2CPeriph;
+	uint8_t         I2CAFNum;
+	IRQn_Type       I2CEVIRQ;
+	IRQn_Type       I2CERIRQ;
+
+} I2C_HWConfig_S;
+
+typedef struct
+{
+	const I2C_HWConfig_S * const HWConfig;
+} I2C_config_S;
 
 // Initialize I2C pins and peripheral for component
 void I2C_init(void);

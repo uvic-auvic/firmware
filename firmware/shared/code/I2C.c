@@ -8,9 +8,10 @@
  */
 
 #include "I2C.h"
+#include "assert.h"
+#include "RCCHelper.h"
 #include <string.h>
 #include <stdlib.h>
-#include "stm32f4xx.h"
 #include "LED.h"
 
 // I2C SDA and SCL pins
@@ -33,6 +34,8 @@ typedef enum{
 }I2C_state_S;
 
 // Global variables and their initialization
+extern const I2C_config_S I2C_config;
+
 static I2C_data_S I2C_send_data;
 static I2C_data_S I2C_receive_data;
 static I2C_state_S I2C_state = I2C_STATE_IDLE;
@@ -48,57 +51,66 @@ uint8_t* receiveBufferPtr;
 
 void I2C_init(void)
 {
+	// Check that all configs are valid
+	assert(IS_GPIO_PIN_SOURCE(I2C_config.HWConfig->SDAPin));
+	assert(IS_GPIO_ALL_PERIPH(I2C_config.HWConfig->SDAPort));
+	assert(IS_GPIO_PIN_SOURCE(I2C_config.HWConfig->SCLPin));
+	assert(IS_GPIO_ALL_PERIPH(I2C_config.HWConfig->SCLPort));
+	assert(IS_I2C_ALL_PERIPH(I2C_config.HWConfig->I2CPeriph));
+
 	// GPIO Init
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOF, ENABLE);
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+	RCCHelper_clockCmd(I2C_config.HWConfig->SDAPort, ENABLE);
+	if (I2C_config.HWConfig->SDAPort != I2C_config.HWConfig->SCLPort)
+	{
+		RCCHelper_clockCmd(I2C_config.HWConfig->SCLPort, ENABLE);
+	}
 
 	GPIO_InitTypeDef GPIO_InitStruct;
-	GPIO_InitStruct.GPIO_Pin   = GPIO_Pin_0;
+	GPIO_InitStruct.GPIO_Pin   = I2C_config.HWConfig->SDAPin;
 	GPIO_InitStruct.GPIO_Mode  = GPIO_Mode_AF;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_OD;
 	GPIO_InitStruct.GPIO_PuPd  = GPIO_PuPd_UP;
-	GPIO_Init(GPIOF, &GPIO_InitStruct);
+	GPIO_Init(I2C_config.HWConfig->SDAPort, &GPIO_InitStruct);
 
-	GPIO_InitStruct.GPIO_Pin   = GPIO_Pin_1;
+	GPIO_InitStruct.GPIO_Pin   = I2C_config.HWConfig->SCLPin;
 	GPIO_InitStruct.GPIO_Mode  = GPIO_Mode_AF;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_OD;
 	GPIO_InitStruct.GPIO_PuPd  = GPIO_PuPd_UP;
-	GPIO_Init(GPIOF, &GPIO_InitStruct);
+	GPIO_Init(I2C_config.HWConfig->SCLPort, &GPIO_InitStruct);
 
 	// Alternative function config for SDA and SCL
-	GPIO_PinAFConfig(GPIOF, GPIO_PinSource0, GPIO_AF_I2C2);
-	GPIO_PinAFConfig(GPIOF, GPIO_PinSource1, GPIO_AF_I2C2);
+	GPIO_PinAFConfig(I2C_config.HWConfig->SDAPort, I2C_config.HWConfig->SDAPin, I2C_config.HWConfig->I2CAFNum);
+	GPIO_PinAFConfig(I2C_config.HWConfig->SCLPort, I2C_config.HWConfig->SCLPin, I2C_config.HWConfig->I2CAFNum);
 
 	// I2C peripheral init
 	I2C_setup();
 
 	// NVIC Init for event interrupt
 	NVIC_InitTypeDef NVIC_Init_Struct;
-	NVIC_Init_Struct.NVIC_IRQChannel                   = I2C2_EV_IRQn;
+	NVIC_Init_Struct.NVIC_IRQChannel                   = I2C_config.HWConfig->I2CEVIRQ;
 	NVIC_Init_Struct.NVIC_IRQChannelCmd                = ENABLE;
 	NVIC_Init_Struct.NVIC_IRQChannelPreemptionPriority = 5;
 	NVIC_Init_Struct.NVIC_IRQChannelSubPriority        = 0;
 	NVIC_Init(&NVIC_Init_Struct);
 
 	// NVIC Init for error interrupt
-	NVIC_Init_Struct.NVIC_IRQChannel                   = I2C2_ER_IRQn;
+	NVIC_Init_Struct.NVIC_IRQChannel                   = I2C_config.HWConfig->I2CERIRQ;
 	NVIC_Init_Struct.NVIC_IRQChannelCmd                = ENABLE;
 	NVIC_Init_Struct.NVIC_IRQChannelPreemptionPriority = 4;
 	NVIC_Init_Struct.NVIC_IRQChannelSubPriority        = 0;
 	NVIC_Init(&NVIC_Init_Struct);
 
 	// Set priority for ISR and enable ISR
-	//NVIC_SetPriority(I2C2_EV_IRQn, 0);
-	NVIC_EnableIRQ(I2C2_EV_IRQn);
-	NVIC_EnableIRQ(I2C2_ER_IRQn);
+	NVIC_EnableIRQ(I2C_config.HWConfig->I2CEVIRQ);
+	NVIC_EnableIRQ(I2C_config.HWConfig->I2CERIRQ);
 }
 
 void I2C_setup(void)
 {
 	// I2C2 Init
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);
+	RCCHelper_clockCmd(I2C_config.HWConfig->I2CPeriph, ENABLE);
 
 	/*
 	 * Reset I2C after a delay: After enabling the RCC clock, the BUSY bit in the SR2 register
@@ -116,8 +128,8 @@ void I2C_setup(void)
 	while (i < 15){
 		i++;
 	}
-	RCC_APB1PeriphResetCmd(RCC_APB1Periph_I2C2, ENABLE);
-	RCC_APB1PeriphResetCmd(RCC_APB1Periph_I2C2, DISABLE);
+	RCCHelper_clockCmd(I2C_config.HWConfig->I2CPeriph, ENABLE);
+	RCCHelper_clockCmd(I2C_config.HWConfig->I2CPeriph, DISABLE);
 
 	I2C_InitTypeDef I2C_Init_Struct;
 	I2C_Init_Struct.I2C_ClockSpeed          = 50000; // Any requirement for I2C clock speed?
@@ -126,51 +138,59 @@ void I2C_setup(void)
 	I2C_Init_Struct.I2C_DutyCycle           = I2C_DutyCycle_2;
 	I2C_Init_Struct.I2C_Mode                = I2C_Mode_I2C;
 	I2C_Init_Struct.I2C_OwnAddress1         = 0x0;
-	I2C_Init(I2C2, &I2C_Init_Struct);
+	I2C_Init(I2C_config.HWConfig->I2CPeriph, &I2C_Init_Struct);
 
 	// Enable event interrupts and buffer interrupts
-	I2C_ITConfig(I2C2, I2C_IT_EVT, ENABLE);
-	I2C_ITConfig(I2C2, I2C_IT_BUF, ENABLE);
-	I2C_ITConfig(I2C2, I2C_IT_ERR, ENABLE);
+	I2C_ITConfig(I2C_config.HWConfig->I2CPeriph, I2C_IT_EVT, ENABLE);
+	I2C_ITConfig(I2C_config.HWConfig->I2CPeriph, I2C_IT_BUF, ENABLE);
+	I2C_ITConfig(I2C_config.HWConfig->I2CPeriph, I2C_IT_ERR, ENABLE);
 
 	// Enable I2C2
-	I2C_Cmd(I2C2, ENABLE);
+	// This doesn't work, PE cannot be set
+	//I2C_Cmd(I2C_config.HWConfig->I2CPeriph, ENABLE);
+	I2C_config.HWConfig->I2CPeriph->CR1 |= I2C_CR1_PE;
 }
 
 bool I2C_send(I2C_channel_E channel, const uint8_t * data, const uint8_t length)
 {
+	bool task_delivery = false;
+
 	// Check the validity of message
 	if((data != NULL) && (length != 0) && (length <= _I2C_BUFFER_SIZE))
 	{
 		// Check the availability of I2C
-		if ((data_length != 0) || (I2C_state != I2C_STATE_IDLE)) return false;
+		if ((data_length == 0) && (I2C_state == I2C_STATE_IDLE)) {
 
-		memcpy(I2C_send_data.Buffer, data, length);
-		I2C_state = I2C_STATE_SEND;
-		slave_address = I2C_channelToAddressMapping(channel);
-		data_length = length;
-		I2C_GenerateSTART(I2C2, ENABLE);
-		return true;
+			memcpy(I2C_send_data.Buffer, data, length);
+			I2C_state = I2C_STATE_SEND;
+			slave_address = I2C_channelToAddressMapping(channel);
+			data_length = length;
+			I2C_GenerateSTART(I2C_config.HWConfig->I2CPeriph, ENABLE);
+			task_delivery = true;
+		}
 	}
-	else return false;
+	return task_delivery;
 }
 
 bool I2C_receive(I2C_channel_E channel, const uint8_t * data, const uint8_t length)
 {
+	bool task_delivery = false;
+
 	// Check the validity of message
 	if((data != NULL) && (length != 0) && (length <= _I2C_BUFFER_SIZE))
 	{
 		// Check the availability of I2C
-		if ((data_length != 0) || (I2C_state != I2C_STATE_IDLE)) return false;
+		if ((data_length == 0) && (I2C_state == I2C_STATE_IDLE)) {
 
-		memcpy(I2C_receive_data.Buffer, data, length);
-		I2C_state = I2C_STATE_RECEIVE;
-		slave_address = I2C_channelToAddressMapping(channel);
-		data_length = length;
-		I2C_GenerateSTART(I2C2, ENABLE);
-		return true;
+			memcpy(I2C_receive_data.Buffer, data, length);
+			I2C_state = I2C_STATE_RECEIVE;
+			slave_address = I2C_channelToAddressMapping(channel);
+			data_length = length;
+			I2C_GenerateSTART(I2C_config.HWConfig->I2CPeriph, ENABLE);
+			task_delivery = true;
+		}
 	}
-	else return false;
+	return task_delivery;
 }
 
 bool is_idle()
@@ -180,24 +200,23 @@ bool is_idle()
 }
 
 // See stm32f413 programming manual P855-861
-void I2C2_EV_IRQHandler(void)
+static inline void I2C_private_TxRxIRQ(I2C_TypeDef * I2Cx)
 {
 	// Check Start condition
-	if ((I2C2->SR1 & I2C_SR1_SB) == I2C_SR1_SB)
+	if ((I2Cx->SR1 & I2C_SR1_SB) == I2C_SR1_SB)
 	{
 		// LSB is the r/w bit
-		I2C_Send7bitAddress(I2C2, (slave_address << I2C_OAR1_ADD0), (uint8_t)I2C_state);
-		//I2C2->DR = (slave_address << I2C_OAR1_ADD0) + (uint8_t)I2C_state;
+		I2C_Send7bitAddress(I2Cx, (slave_address << I2C_OAR1_ADD0), (uint8_t)I2C_state);
 	}
 	// Waits for address sent bit to be set
-	else if ((I2C2->SR1 & I2C_SR1_ADDR) == I2C_SR1_ADDR)
+	else if ((I2Cx->SR1 & I2C_SR1_ADDR) == I2C_SR1_ADDR)
 	{
 		// Clearing ADDR bit by reading SR1 and then reading SR2
-		I2C2->SR2;
+		I2Cx->SR2;
 		if (I2C_state == I2C_STATE_SEND)
 		{
 			sendBufferPtr = &I2C_send_data.Buffer[0];
-			I2C_SendData(I2C2, *sendBufferPtr);
+			I2C_SendData(I2Cx, *sendBufferPtr);
 			sendBufferPtr ++;
 			data_length --;
 		}
@@ -207,16 +226,16 @@ void I2C2_EV_IRQHandler(void)
 			if (data_length == 1)
 			{
 				I2C2->CR1 &= ~(I2C_CR1_ACK);
-				I2C_GenerateSTOP(I2C2, ENABLE); // Generate a stop condition
+				I2C_GenerateSTOP(I2Cx, ENABLE); // Generate a stop condition
 			}
 		}
 	}
 	// Sending data to slave
-	else if ((I2C2->SR1 & I2C_SR1_TXE) == I2C_SR1_TXE)
+	else if ((I2Cx->SR1 & I2C_SR1_TXE) == I2C_SR1_TXE)
 	{
 		if (data_length > 0)
 		{
-			I2C_SendData(I2C2, *sendBufferPtr);
+			I2C_SendData(I2Cx, *sendBufferPtr);
 			sendBufferPtr ++;
 			data_length --;
 		}
@@ -224,21 +243,21 @@ void I2C2_EV_IRQHandler(void)
 		{
 			// Generate a stop condition ONLY ONCE
 			if (I2C_state != I2C_STATE_IDLE){
-				I2C_GenerateSTOP(I2C2, ENABLE);
+				I2C_GenerateSTOP(I2Cx, ENABLE);
 			}
 			I2C_state = I2C_STATE_IDLE;
 		}
 	}
 	// Receiving data from slave
-	else if ((I2C2->SR1 & I2C_SR1_RXNE) == I2C_SR1_RXNE)
+	else if ((I2Cx->SR1 & I2C_SR1_RXNE) == I2C_SR1_RXNE)
 	{
-		*receiveBufferPtr = I2C_ReceiveData(I2C2);
+		*receiveBufferPtr = I2C_ReceiveData(I2Cx);
 		receiveBufferPtr ++;
 		data_length --;
 		if (data_length == 1)
 		{
-			I2C2->CR1 &= ~(I2C_CR1_ACK);
-			I2C_GenerateSTOP(I2C2, ENABLE); // Generate a stop condition
+			I2Cx->CR1 &= ~(I2C_CR1_ACK);
+			I2C_GenerateSTOP(I2Cx, ENABLE); // Generate a stop condition
 		}
 		if (data_length == 0)
 		{
@@ -248,21 +267,45 @@ void I2C2_EV_IRQHandler(void)
 }
 
 // See stm32f413 programming manual P860
-void I2C2_ER_IRQHandler(void)
+static inline void I2C_private_ERIRQ(I2C_TypeDef * I2Cx)
 {
 	// Error handling: acknowledge failure
-	if ((I2C2->SR1 & I2C_SR1_AF) == I2C_SR1_AF)
+	if ((I2Cx->SR1 & I2C_SR1_AF) == I2C_SR1_AF)
 	{
 		// Stop current transaction
 		data_length = 0;
 		// Generate a stop condition ONLY ONCE
 		if (I2C_state != I2C_STATE_IDLE){
-			I2C_GenerateSTOP(I2C2, ENABLE);
+			I2C_GenerateSTOP(I2Cx, ENABLE);
 		}
 		// For debugging: toggle the red LED
 		LED_toggleLED(LED_CHANNEL_RED);
 		I2C_state = I2C_STATE_IDLE;
 		// Clear the AF flag
-		I2C_ClearFlag(I2C2, I2C_FLAG_AF);
+		I2C_ClearFlag(I2Cx, I2C_FLAG_AF);
 		}
+}
+
+void I2C1_EV_IRQHandler(void){
+	I2C_private_TxRxIRQ(I2C1);
+}
+
+void I2C2_EV_IRQHandler(void){
+	I2C_private_TxRxIRQ(I2C2);
+}
+
+void I2C3_EV_IRQHandler(void){
+	I2C_private_TxRxIRQ(I2C3);
+}
+
+void I2C1_ER_IRQHandler(void){
+	I2C_private_ERIRQ(I2C1);
+}
+
+void I2C2_ER_IRQHandler(void){
+	I2C_private_ERIRQ(I2C2);
+}
+
+void I2C3_ER_IRQHandler(void){
+	I2C_private_ERIRQ(I2C3);
 }

@@ -14,11 +14,11 @@ static const I2C_HWConfig_S I2C_HWConfig =
 {
 		// SDA Pin Info
 		.SDAPort   = GPIOF,
-		.SDAPin    = GPIO_Pin_0,
+		.SDAPin    = 0,
 
 		// SCL Pin Info
 		.SCLPort   = GPIOF,
-		.SCLPin    = GPIO_Pin_1,
+		.SCLPin    = 1,
 
 		// I2C Peripheral
 		.I2CPeriph = I2C2,

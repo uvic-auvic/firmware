@@ -12,4 +12,6 @@
 
 void RCCHelper_clockCmd(const void * const periph, const FunctionalState newState);
 
+void RCCHelper_resetCmd(const void * const periph, const FunctionalState newState);
+
 #endif /* SHARED_CODE_RCCHELPER_H_ */

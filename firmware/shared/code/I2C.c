@@ -9,6 +9,7 @@
 
 #include "I2C.h"
 #include "assert.h"
+#include "utils.h"
 #include "RCCHelper.h"
 #include <string.h>
 #include <stdlib.h>
@@ -66,14 +67,15 @@ void I2C_init(void)
 	}
 
 	GPIO_InitTypeDef GPIO_InitStruct;
-	GPIO_InitStruct.GPIO_Pin   = I2C_config.HWConfig->SDAPin;
+	GPIO_StructInit(&GPIO_InitStruct);
+	GPIO_InitStruct.GPIO_Pin   = BITVALUE(I2C_config.HWConfig->SDAPin);
 	GPIO_InitStruct.GPIO_Mode  = GPIO_Mode_AF;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_OD;
 	GPIO_InitStruct.GPIO_PuPd  = GPIO_PuPd_UP;
 	GPIO_Init(I2C_config.HWConfig->SDAPort, &GPIO_InitStruct);
 
-	GPIO_InitStruct.GPIO_Pin   = I2C_config.HWConfig->SCLPin;
+	GPIO_InitStruct.GPIO_Pin   = BITVALUE(I2C_config.HWConfig->SCLPin);
 	GPIO_InitStruct.GPIO_Mode  = GPIO_Mode_AF;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_OD;
@@ -128,10 +130,13 @@ void I2C_setup(void)
 	while (i < 15){
 		i++;
 	}
-	RCCHelper_clockCmd(I2C_config.HWConfig->I2CPeriph, ENABLE);
-	RCCHelper_clockCmd(I2C_config.HWConfig->I2CPeriph, DISABLE);
+	//RCCHelper_resetCmd(I2C_config.HWConfig->I2CPeriph, DISABLE);
+	//(I2C_config.HWConfig->I2CPeriph, ENABLE);
+	RCC_APB1PeriphResetCmd(RCC_APB1Periph_I2C2, ENABLE);
+	RCC_APB1PeriphResetCmd(RCC_APB1Periph_I2C2, DISABLE);
 
 	I2C_InitTypeDef I2C_Init_Struct;
+	I2C_StructInit(&I2C_Init_Struct);
 	I2C_Init_Struct.I2C_ClockSpeed          = 50000; // Any requirement for I2C clock speed?
 	I2C_Init_Struct.I2C_Ack                 = I2C_Ack_Enable;
 	I2C_Init_Struct.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;

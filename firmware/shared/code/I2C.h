@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "stm32f4xx.h"
+#include "protocol.h"
 #include "I2C_componentSpecific.h"
 
 typedef struct
@@ -34,6 +35,7 @@ typedef struct
 typedef struct
 {
 	const I2C_HWConfig_S * const HWConfig;
+	void(*messageReceivedCallback)(const protocol_MID_E messageID, const protocol_allMessages_U * const message);
 } I2C_config_S;
 
 // Initialize I2C pins and peripheral for component

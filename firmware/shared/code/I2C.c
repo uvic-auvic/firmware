@@ -130,10 +130,8 @@ void I2C_setup(void)
 	while (i < 15){
 		i++;
 	}
-	//RCCHelper_resetCmd(I2C_config.HWConfig->I2CPeriph, DISABLE);
-	//(I2C_config.HWConfig->I2CPeriph, ENABLE);
-	RCC_APB1PeriphResetCmd(RCC_APB1Periph_I2C2, ENABLE);
-	RCC_APB1PeriphResetCmd(RCC_APB1Periph_I2C2, DISABLE);
+	RCCHelper_resetCmd(I2C_config.HWConfig->I2CPeriph, ENABLE);
+	RCCHelper_resetCmd(I2C_config.HWConfig->I2CPeriph, DISABLE);
 
 	I2C_InitTypeDef I2C_Init_Struct;
 	I2C_StructInit(&I2C_Init_Struct);

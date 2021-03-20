@@ -66,6 +66,7 @@ static CAN_data_S CAN_data;
 static void CAN_private_GPIOInit(void);
 static void CAN_private_CANPeriphInit(void);
 static inline void CAN_private_RXIRQ(CAN_TypeDef * CANx, const uint8_t FIFONumber);
+static bool CAN_private_isMailboxEmpty(CAN_TypeDef * CAN, const CAN_TXMailbox_E TXMailbox);
 
 /* PRIVATE FUNCTION DEFINITION */
 static void CAN_private_GPIOInit(void)
@@ -113,7 +114,8 @@ static void CAN_private_CANPeriphInit(void)
     CANInitStruct.CAN_BS2 = CAN_BS2_1tq; // Specifies the number of time quanta in Bit Segment 2
 
     // CANInitStruct.CAN_Mode = CAN_Mode_Normal;
-    CANInitStruct.CAN_Mode = CAN_Mode_Silent_LoopBack; // Used for testing
+    CANInitStruct.CAN_Mode = CAN_Mode_LoopBack; // Used for testing
+    // CANInitStruct.CAN_Mode = CAN_Mode_Silent_LoopBack; // Used for testing
     CANInitStruct.CAN_TTCM = DISABLE; // Time triggered communication mode
     CANInitStruct.CAN_ABOM = DISABLE; // Automatic bus-off management
     CANInitStruct.CAN_AWUM = DISABLE; // Automatic wake-up mode
@@ -171,6 +173,47 @@ static inline void CAN_private_RXIRQ(CAN_TypeDef * CANx, const uint8_t FIFONumbe
     }
 }
 
+static bool CAN_private_isMailboxEmpty(CAN_TypeDef * CAN, const CAN_TXMailbox_E TXMailbox)
+{
+    bool ret = false;
+
+    switch (TXMailbox)
+    {
+        case CAN_TX_MAILBOX_0:
+        {
+            if((CAN->TSR & CAN_TSR_TME0) == CAN_TSR_TME0)
+            {
+                ret = true;
+            }
+            break;
+        }
+        case CAN_TX_MAILBOX_1:
+        {
+            if((CAN->TSR & CAN_TSR_TME1) == CAN_TSR_TME1)
+            {
+                ret = true;
+            }
+            break;
+        }
+        case CAN_TX_MAILBOX_2:
+        {
+            if((CAN->TSR & CAN_TSR_TME2) == CAN_TSR_TME2)
+            {
+                ret = true;
+            }
+            break;
+        }
+        case CAN_TX_MAILBOX_COUNT:
+        default:
+        {
+            ret = true;
+            break;
+        }
+    }
+
+    return ret;
+}
+
 /* PUBLIC FUNCTIONS */
 void CAN_init(void)
 {
@@ -190,43 +233,50 @@ bool CAN_sendMessage(const protocol_MID_E messageID, const protocol_allMessages_
     if(CAN_data.state == CAN_STATE_READY)
     {
         CAN_TypeDef * CAN = CAN_config.HWConfig->CANPeriph;
-        CAN_TXMailbox_E TXMailbox;
+        CAN_TXMailbox_E TXMailbox = (CAN_TXMailbox_E)0U;
 
-        // Select one empty transmit mailbox
-        if ((CAN->TSR & CAN_TSR_TME0) == CAN_TSR_TME0)
+        for(;TXMailbox < CAN_TX_MAILBOX_COUNT; TXMailbox++)
         {
-            TXMailbox = CAN_TX_MAILBOX_0;
-        }
-        else if ((CAN->TSR & CAN_TSR_TME1) == CAN_TSR_TME1)
-        {
-            TXMailbox = CAN_TX_MAILBOX_1;
-        }
-        else if ((CAN->TSR & CAN_TSR_TME2) == CAN_TSR_TME2)
-        {
-            TXMailbox = CAN_TX_MAILBOX_2;
-        }
-        else
-        {
-            TXMailbox = CAN_TX_MAILBOX_COUNT;
+            const protocol_MID_E IDInMailbox = CAN->sTxMailBox[TXMailbox].TIR >> 21;
+            if(IDInMailbox == messageID)
+            {
+                if(CAN_private_isMailboxEmpty(CAN, TXMailbox) == false)
+                {
+                    // Message ID is already in a mailbox waiting to be transmitted.
+                    // TODO: Do we want to abort the current transmission and put the new data in the mailbox?
+                    break;
+                }
+            }
         }
 
-        if(TXMailbox < CAN_TX_MAILBOX_COUNT)
+        if(TXMailbox == CAN_TX_MAILBOX_COUNT)
         {
-            // Program the message ID, RTR=0, IDE=0, Standard ID
-            CAN->sTxMailBox[TXMailbox].TIR = (messageID << 21) & CAN_TI0R_STID;
+            for(TXMailbox = 0U; TXMailbox < CAN_TX_MAILBOX_COUNT; TXMailbox++)
+            {
+                if(CAN_private_isMailboxEmpty(CAN, TXMailbox))
+                {
+                    break;
+                }
+            }
 
-            // Program the data length (DLC) into the register
-            CAN->sTxMailBox[TXMailbox].TDTR &= ~(CAN_TDT0R_DLC);
-            CAN->sTxMailBox[TXMailbox].TDTR |= dataLength;
+            if(TXMailbox < CAN_TX_MAILBOX_COUNT)
+            {
+                // Program the message ID, RTR=0, IDE=0, Standard ID
+                CAN->sTxMailBox[TXMailbox].TIR = (messageID << 21) & CAN_TI0R_STID;
 
-            // Fill in the data to transmit in the data registers
-            CAN->sTxMailBox[TXMailbox].TDLR = ((const uint32_t * const)message)[0U];
-            CAN->sTxMailBox[TXMailbox].TDHR = ((const uint32_t * const)message)[1U];
+                // Program the data length (DLC) into the register
+                CAN->sTxMailBox[TXMailbox].TDTR &= ~(CAN_TDT0R_DLC);
+                CAN->sTxMailBox[TXMailbox].TDTR |= dataLength;
 
-            // Request transmission
-            CAN->sTxMailBox[TXMailbox].TIR |= CAN_TI0R_TXRQ;
+                // Fill in the data to transmit in the data registers
+                CAN->sTxMailBox[TXMailbox].TDLR = ((const uint32_t * const)message)[0U];
+                CAN->sTxMailBox[TXMailbox].TDHR = ((const uint32_t * const)message)[1U];
+                
+                // Request transmission
+                CAN->sTxMailBox[TXMailbox].TIR |= CAN_TI0R_TXRQ;
 
-            ret = true;
+                ret = true;
+            }
         }
     }
 
@@ -273,6 +323,7 @@ void CAN_filterAdd(const protocol_MID_E messageID, const uint16_t filterNumber)
     CAN_FilterInit(CAN_config.HWConfig->CANPeriph, &CANFilterStruct);
 }
 
+// We only use FIFO 0 for now.
 void CAN1_RX0_IRQHandler(void)
 {
     CAN_private_RXIRQ(CAN1, CAN_FIFO0);

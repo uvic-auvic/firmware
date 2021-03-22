@@ -47,8 +47,8 @@ void I2C_setup(void);
 // Place data on send buffer - returns true/false based on success/fail
 bool I2C_send(I2C_channel_E channel, const uint8_t * const data, const uint8_t length);
 
-// Receive I2C message and places on receive buffer
-bool I2C_receive(I2C_channel_E channel, const uint8_t * const data, const uint8_t length);
+// Receive mode - inform I2C the length of the data to be received
+bool I2C_receive(I2C_channel_E channel, const uint8_t length);
 
 // Function to check if I2C is available
 bool is_idle();

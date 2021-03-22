@@ -28,6 +28,12 @@ static const I2C_HWConfig_S I2C_HWConfig =
 		.I2CERIRQ  = I2C2_ER_IRQn,
 };
 
+static void I2C_messageReceivedCallback(const protocol_MID_E messageID, const protocol_allMessages_U * const message)
+{
+	messageHandler_messageReceivedCallback(messageID, message);
+}
+
+
 extern const I2C_config_S I2C_config;
 const I2C_config_S I2C_config =
 {
@@ -47,7 +53,3 @@ uint8_t I2C_channelToAddressMapping(I2C_channel_E channel){
 	return I2C_Address[channel];
 }
 
-static void I2C_messageReceivedCallback(const protocol_MID_E messageID, const protocol_allMessages_U * const message)
-{
-	messageHandler_messageReceivedCallback(messageID, message);
-}

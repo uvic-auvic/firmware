@@ -61,5 +61,5 @@ void RTOS_run1000ms(void)
 	uint8_t* a = &data[0];
 	I2C_send(I2C_CHANNEL_VBATT, a, 4);
 	while (!is_idle()){}
-	I2C_receive(I2C_CHANNEL_VBATT, a, 1);
+	I2C_receive(I2C_CHANNEL_VBATT, 1);
 }

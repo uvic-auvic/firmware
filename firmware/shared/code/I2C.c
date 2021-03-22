@@ -22,9 +22,22 @@
 // I2C sendBuffer size
 #define _I2C_BUFFER_SIZE    (10U)
 
+// Data structure for global variables that aren't config or state
 typedef struct
 {
-	uint8_t Buffer[_I2C_BUFFER_SIZE];
+	// Buffers for sending and receiving data
+	uint8_t sendBuffer[_I2C_BUFFER_SIZE];
+	uint8_t receiveBuffer[_I2C_BUFFER_SIZE];
+
+	// Slave's channel and address information
+	I2C_channel_E slaveChannel;
+	uint8_t slaveAddress;
+
+	// Length of the data to be sent or received (in bytes)
+	uint8_t dataLength;
+
+	// Pointer for the buffers (for convenience reason)
+	uint8_t* bufferPtr;
 } I2C_data_S;
 
 // Adding an idle state because reading the BUSY bit in SR2 can cause problems
@@ -37,18 +50,18 @@ typedef enum{
 // Global variables and their initialization
 extern const I2C_config_S I2C_config;
 
-static I2C_data_S I2C_send_data;
-static I2C_data_S I2C_receive_data;
 static I2C_state_S I2C_state = I2C_STATE_IDLE;
 
-uint8_t slave_address = 0x0;
+static I2C_data_S I2C_data =
+{
+	{0x0},
+	{0x0},
+	0,
+	0x0,
+	0x0,
+	0x0
+};
 
-// Length of the data to be sent or received (in bytes)
-volatile uint8_t data_length = 0;
-
-// Pointer to the buffers
-uint8_t* sendBufferPtr;
-uint8_t* receiveBufferPtr;
 
 void I2C_init(void)
 {
@@ -162,12 +175,13 @@ bool I2C_send(I2C_channel_E channel, const uint8_t * data, const uint8_t length)
 	if((data != NULL) && (length != 0) && (length <= _I2C_BUFFER_SIZE))
 	{
 		// Check the availability of I2C
-		if ((data_length == 0) && (I2C_state == I2C_STATE_IDLE)) {
+		if ((I2C_data.dataLength == 0) && (I2C_state == I2C_STATE_IDLE)) {
 
-			memcpy(I2C_send_data.Buffer, data, length);
+			memcpy(I2C_data.sendBuffer, data, length);
 			I2C_state = I2C_STATE_SEND;
-			slave_address = I2C_channelToAddressMapping(channel);
-			data_length = length;
+			I2C_data.slaveChannel = channel;
+			I2C_data.slaveAddress = I2C_channelToAddressMapping(channel);
+			I2C_data.dataLength = length;
 			I2C_GenerateSTART(I2C_config.HWConfig->I2CPeriph, ENABLE);
 			task_delivery = true;
 		}
@@ -175,20 +189,21 @@ bool I2C_send(I2C_channel_E channel, const uint8_t * data, const uint8_t length)
 	return task_delivery;
 }
 
-bool I2C_receive(I2C_channel_E channel, const uint8_t * data, const uint8_t length)
+bool I2C_receive(I2C_channel_E channel, const uint8_t length)
 {
 	bool task_delivery = false;
 
 	// Check the validity of message
-	if((data != NULL) && (length != 0) && (length <= _I2C_BUFFER_SIZE))
+	if((length != 0) && (length <= _I2C_BUFFER_SIZE))
 	{
 		// Check the availability of I2C
-		if ((data_length == 0) && (I2C_state == I2C_STATE_IDLE)) {
+		if ((I2C_data.dataLength == 0) && (I2C_state == I2C_STATE_IDLE)) {
 
-			memcpy(I2C_receive_data.Buffer, data, length);
+			memset(I2C_data.receiveBuffer, 0, sizeof(I2C_data.receiveBuffer)); // Empty the receive buffer
 			I2C_state = I2C_STATE_RECEIVE;
-			slave_address = I2C_channelToAddressMapping(channel);
-			data_length = length;
+			I2C_data.slaveChannel = channel;
+			I2C_data.slaveAddress = I2C_channelToAddressMapping(channel);
+			I2C_data.dataLength = length;
 			I2C_GenerateSTART(I2C_config.HWConfig->I2CPeriph, ENABLE);
 			task_delivery = true;
 		}
@@ -209,7 +224,7 @@ static inline void I2C_private_TxRxIRQ(I2C_TypeDef * I2Cx)
 	if ((I2Cx->SR1 & I2C_SR1_SB) == I2C_SR1_SB)
 	{
 		// LSB is the r/w bit
-		I2C_Send7bitAddress(I2Cx, (slave_address << I2C_OAR1_ADD0), (uint8_t)I2C_state);
+		I2C_Send7bitAddress(I2Cx, (I2C_data.slaveAddress << I2C_OAR1_ADD0), (uint8_t)I2C_state);
 	}
 	// Waits for address sent bit to be set
 	else if ((I2Cx->SR1 & I2C_SR1_ADDR) == I2C_SR1_ADDR)
@@ -218,15 +233,15 @@ static inline void I2C_private_TxRxIRQ(I2C_TypeDef * I2Cx)
 		I2Cx->SR2;
 		if (I2C_state == I2C_STATE_SEND)
 		{
-			sendBufferPtr = &I2C_send_data.Buffer[0];
-			I2C_SendData(I2Cx, *sendBufferPtr);
-			sendBufferPtr ++;
-			data_length --;
+			I2C_data.bufferPtr = &I2C_data.sendBuffer[0];
+			I2C_SendData(I2Cx, *I2C_data.bufferPtr);
+			I2C_data.bufferPtr ++;
+			I2C_data.dataLength --;
 		}
 		else if (I2C_state == I2C_STATE_RECEIVE)
 		{
-			receiveBufferPtr = &I2C_receive_data.Buffer[0];
-			if (data_length == 1)
+			I2C_data.bufferPtr = &I2C_data.receiveBuffer[0];
+			if (I2C_data.dataLength == 1)
 			{
 				I2C2->CR1 &= ~(I2C_CR1_ACK);
 				I2C_GenerateSTOP(I2Cx, ENABLE); // Generate a stop condition
@@ -236,11 +251,11 @@ static inline void I2C_private_TxRxIRQ(I2C_TypeDef * I2Cx)
 	// Sending data to slave
 	else if ((I2Cx->SR1 & I2C_SR1_TXE) == I2C_SR1_TXE)
 	{
-		if (data_length > 0)
+		if (I2C_data.dataLength > 0)
 		{
-			I2C_SendData(I2Cx, *sendBufferPtr);
-			sendBufferPtr ++;
-			data_length --;
+			I2C_SendData(I2Cx, *I2C_data.bufferPtr);
+			I2C_data.bufferPtr ++;
+			I2C_data.dataLength --;
 		}
 		else
 		{
@@ -254,18 +269,25 @@ static inline void I2C_private_TxRxIRQ(I2C_TypeDef * I2Cx)
 	// Receiving data from slave
 	else if ((I2Cx->SR1 & I2C_SR1_RXNE) == I2C_SR1_RXNE)
 	{
-		*receiveBufferPtr = I2C_ReceiveData(I2Cx);
-		receiveBufferPtr ++;
-		data_length --;
-		if (data_length == 1)
+		*I2C_data.bufferPtr = I2C_ReceiveData(I2Cx);
+		I2C_data.dataLength --;
+		if (I2C_data.dataLength == 1)
 		{
 			I2Cx->CR1 &= ~(I2C_CR1_ACK);
 			I2C_GenerateSTOP(I2Cx, ENABLE); // Generate a stop condition
 		}
-		if (data_length == 0)
+		if (I2C_data.dataLength == 0)
 		{
 			I2C_state = I2C_STATE_IDLE;
 		}
+		if (I2C_config.messageReceivedCallback != NULL)
+		{
+			protocol_MID_E messageID =  (protocol_MID_E)0x0;
+			uint32_t receivedData = (uint32_t)*I2C_data.bufferPtr;
+			I2C_config.messageReceivedCallback(messageID, (protocol_allMessages_U *)receivedData);
+		}
+		// Get ready to receive next data
+		I2C_data.bufferPtr ++;
 	}
 }
 
@@ -276,7 +298,7 @@ static inline void I2C_private_ERIRQ(I2C_TypeDef * I2Cx)
 	if ((I2Cx->SR1 & I2C_SR1_AF) == I2C_SR1_AF)
 	{
 		// Stop current transaction
-		data_length = 0;
+		I2C_data.dataLength = 0;
 		// Generate a stop condition ONLY ONCE
 		if (I2C_state != I2C_STATE_IDLE){
 			I2C_GenerateSTOP(I2Cx, ENABLE);

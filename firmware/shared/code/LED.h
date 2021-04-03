@@ -38,6 +38,6 @@ typedef struct
 void LED_init(void);
 void LED_run100ms(void);
 void LED_setState(const LED_channel_E channel, const LED_state_E newState);
-void LED_toggleLED(const LED_channel_E channel);
+void LED_toggleDebug(const LED_channel_E channel);
 
 #endif /* LED_H_ */

@@ -23,6 +23,9 @@
 // Returns the greater of the two value, x and y
 #define MAX_OF(x, y)      ( (x) > (y) ? x : y )
 
+// Return x if x is under the limit, returns limit otherwise
+#define LIMIT(x, limit)   (((x) <= (limit)) ? (x) : (limit))
+
 // BIT MANIPULATION
 
 // Returns the a 1 in the bit position specificied by x

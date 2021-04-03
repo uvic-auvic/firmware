@@ -17,6 +17,11 @@ static const debug_HWConfig_S debug_HWConfig =
 
 	// UART
 	.UARTPeriph = USART6,
+
+	// DMA
+	.DMAPeriph = DMA2,
+	.TXDMAStream = DMA2_Stream7,
+	.TXDMAChannel = DMA_Channel_5,
 };
 
 extern const debug_config_S debug_config;

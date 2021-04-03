@@ -32,13 +32,18 @@
 typedef struct
 {
 	// GPIO
-	GPIO_TypeDef *	GPIOPort;
-	uint8_t 		rxPin;
-	uint8_t 		txPin;
-	uint8_t			AFNumber;
+	GPIO_TypeDef * GPIOPort;
+	uint8_t 	   rxPin; // RX Not implemented yet
+	uint8_t 	   txPin;
+	uint8_t		   AFNumber;
 
 	// UART
 	USART_TypeDef * UARTPeriph;
+
+	// DMA
+	DMA_TypeDef        * DMAPeriph;
+	DMA_Stream_TypeDef * TXDMAStream;
+	uint32_t 			 TXDMAChannel;
 
 } debug_HWConfig_S;
 

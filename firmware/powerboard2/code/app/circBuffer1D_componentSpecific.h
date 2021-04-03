@@ -12,7 +12,6 @@
 
 typedef enum
 {
-	CIRCBUFFER1D_CHANNEL_DEBUG_TX,
 
 	CIRCBUFFER1D_CHANNEL_COUNT
 } circBuffer1D_channel_E;

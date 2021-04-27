@@ -9,6 +9,7 @@
 
 #include "I2C.h"
 #include "assert.h"
+#include "debug.h"
 #include "utils.h"
 #include "RCCHelper.h"
 #include <string.h>
@@ -282,7 +283,8 @@ static inline void I2C_private_TxRxIRQ(I2C_TypeDef * I2Cx)
 		}
 		if (I2C_config.messageReceivedCallback != NULL)
 		{
-			protocol_MID_E messageID =  (protocol_MID_E)0x0;
+			// Not quite sure about the ID here
+			protocol_MID_E messageID =  (protocol_MID_E)0;
 			uint32_t receivedData = (uint32_t)*I2C_data.bufferPtr;
 			I2C_config.messageReceivedCallback(messageID, (protocol_allMessages_U *)receivedData);
 		}

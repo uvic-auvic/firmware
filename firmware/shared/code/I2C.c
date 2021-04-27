@@ -14,7 +14,6 @@
 #include "RCCHelper.h"
 #include <string.h>
 #include <stdlib.h>
-#include "LED.h"
 
 // I2C SDA and SCL pins
 #define _I2C_SDA_GPIO  (GPIO_Pin_9) // PC9
@@ -305,8 +304,6 @@ static inline void I2C_private_ERIRQ(I2C_TypeDef * I2Cx)
 		if (I2C_state != I2C_STATE_IDLE){
 			I2C_GenerateSTOP(I2Cx, ENABLE);
 		}
-		// For debugging: toggle the red LED
-		LED_toggleLED(LED_CHANNEL_RED);
 		I2C_state = I2C_STATE_IDLE;
 		// Clear the AF flag
 		I2C_ClearFlag(I2Cx, I2C_FLAG_AF);

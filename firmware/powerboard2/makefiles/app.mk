@@ -16,6 +16,8 @@ $(OUTPUT_DIR)/obj/app/interruptHelper.o \
 $(OUTPUT_DIR)/obj/app/ADC.o \
 $(OUTPUT_DIR)/obj/app/powerManagement.o \
 $(OUTPUT_DIR)/obj/app/housingMonitor.o \
+$(OUTPUT_DIR)/obj/app/I2C.o \
+$(OUTPUT_DIR)/obj/app/I2C_componentSpecific.o \
 
 APP_C_DEPS += $(APP_OBJS:%.o=%.d)
 

@@ -10,13 +10,13 @@
 static const debug_HWConfig_S debug_HWConfig =
 {
 	// GPIO
-	.rxPin = 12,
-	.txPin = 11,
-	.GPIOPort = GPIOA,
-	.AFNumber = GPIO_AF_USART6,
+	.rxPin = 9,
+	.txPin = 8,
+	.GPIOPort = GPIOD,
+	.AFNumber = GPIO_AF_USART3,
 
 	// UART
-	.UARTPeriph = USART6,
+	.UARTPeriph = USART3,
 };
 
 extern const debug_config_S debug_config;

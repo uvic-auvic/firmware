@@ -14,6 +14,7 @@
 #include "messageHandler.h"
 #include "string.h"
 #include "ADC.h"
+#include "I2C.h"
 
 /*
  * If a new FreeRTOS task is needed, create it here so that there is one place where
@@ -27,6 +28,7 @@ void RTOS_init(void)
     ADC_init();
     CAN_init();
     messageHandler_init();
+    I2C_init();
 
     debug_writeStringBlocking("*** POWER BOARD 2 ***");
     debug_writeStringBlocking("Initialization Complete");

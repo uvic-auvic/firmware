@@ -9,7 +9,6 @@
 
 #include "I2C.h"
 #include "assert.h"
-#include "debug.h"
 #include "utils.h"
 #include "RCCHelper.h"
 #include <string.h>

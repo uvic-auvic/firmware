@@ -18,7 +18,7 @@ typedef enum
 	SPI_CHANNEL_COUNT
 } SPI_channel_E;
 
-void initSPI(void);
+void SPI_init(void);
 void SPI_run(void);
 bool SPI_send(circBuffer2D_channel_E, const uint8_t * const data, const uint8_t length);
 bool SPI_receive(circBuffer2D_channel_E,  uint8_t * const data, const uint8_t length);

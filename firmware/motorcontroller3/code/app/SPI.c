@@ -20,18 +20,47 @@
 #include "SPI.h"
 
 
-void initSPI()
+void SPI_init()
 {
 
-	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOEEN;
+	/*RCC->AHB1ENR |= RCC_AHB1ENR_GPIOEEN;
 	RCC->APB2ENR |= RCC_APB2ENR_SPI4EN;
 
 	GPIOE->MODER |= GPIO_MODER_MODER2_1 | GPIO_MODER_MODER4_1
 										| GPIO_MODER_MODER5_1
 										| GPIO_MODER_MODER6_1;
 
-	GPIOE->AFR[0] |= ((uint32_t)0x05550500); //enable GPIO alternate function 5 for GPIO w/ appropriate pins
+	GPIOE->AFR[0] |= ((uint32_t)0x05550500); //enable GPIO alternate function 5 for GPIO w/ appropriate pins*/
 
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
+
+	//Init structures for GPIOA and GPIOC
+	GPIO_InitTypeDef GPIOA_InitStructure, GPIOD_InitStructure;
+	GPIO_StructInit(&GPIOA_InitStructure);
+	GPIO_StructInit(&GPIOD_InitStructure);
+
+	GPIOA_InitStructure.GPIO_Pin     = GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
+	GPIOA_InitStructure.GPIO_Mode    = GPIO_Mode_AF;
+	GPIOA_InitStructure.GPIO_OType   = GPIO_OType_PP;
+	GPIOA_InitStructure.GPIO_Speed   = GPIO_Speed_50MHz;
+	GPIOA_InitStructure.GPIO_PuPd    = GPIO_PuPd_NOPULL;
+
+	GPIO_Init(GPIOA, &GPIOA_InitStructure);
+
+	GPIOD_InitStructure.GPIO_Pin     = GPIO_Pin_14;
+	GPIOD_InitStructure.GPIO_Mode    = GPIO_Mode_AF;
+	GPIOD_InitStructure.GPIO_OType   = GPIO_OType_PP;
+	GPIOD_InitStructure.GPIO_Speed   = GPIO_Speed_50MHz;
+	GPIOD_InitStructure.GPIO_PuPd    = GPIO_PuPd_NOPULL;
+
+	GPIO_Init(GPIOD, &GPIOD_InitStructure);
+
+	GPIO_PinAFConfig(GPIOA, GPIO_PinSource5, GPIO_AF_SPI1);
+	GPIO_PinAFConfig(GPIOA, GPIO_PinSource6, GPIO_AF_SPI1);
+	GPIO_PinAFConfig(GPIOA, GPIO_PinSource7, GPIO_AF_SPI1);
+	GPIO_PinAFConfig(GPIOD, GPIO_PinSource14, GPIO_AF_SPI1);
 
 	SPI_InitTypeDef initSPI;
 
@@ -44,9 +73,9 @@ void initSPI()
 		initSPI.SPI_CPOL = SPI_CPOL_Low;
 		initSPI.SPI_CRCPolynomial = 7;
 		initSPI.SPI_NSS = SPI_NSS_Soft;
-		SPI_Init(SPI4, &initSPI);
+		SPI_Init(SPI1, &initSPI);
 
-		SPI_Cmd(SPI4, ENABLE);
+		SPI_Cmd(SPI1, ENABLE);
 
 }
 

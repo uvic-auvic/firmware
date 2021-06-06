@@ -26,6 +26,9 @@ void RTOS_init(void)
     CAN_init();
     messageHandler_init();
 
+    circBuffer2D_init();
+    SPI_init();
+
     debug_writeStringBlocking("*** MOTOR CONTROLLER 3 ***");
     debug_writeStringBlocking("Initialization Complete");
 }

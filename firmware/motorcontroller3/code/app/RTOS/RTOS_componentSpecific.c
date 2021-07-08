@@ -41,6 +41,7 @@ void RTOS_run1ms(void)
 void RTOS_run10ms(void)
 {
 	SPI_run();
+
 }
 
 void RTOS_run100ms(void)

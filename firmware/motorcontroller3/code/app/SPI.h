@@ -21,7 +21,7 @@ typedef enum
 void SPI_init(void);
 void SPI_run(void);
 bool SPI_send(circBuffer2D_channel_E, const uint8_t * const data, const uint8_t length);
-bool SPI_receive(circBuffer2D_channel_E,  uint8_t * const data, const uint8_t length);
+//bool SPI_receive(circBuffer2D_channel_E,  uint8_t * const data, const uint8_t length);
 bool SPI_sendAndReceive(circBuffer2D_channel_E channel,  uint8_t * const data, const uint8_t length);
 
 #endif /* MOTORCONTROLLER2_CODE_APP_SPI_H_ */

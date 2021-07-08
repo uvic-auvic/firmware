@@ -22,7 +22,7 @@
 
 void SPI_init()
 {
-
+	// Carter's code of initiating GPIOs
 	/*RCC->AHB1ENR |= RCC_AHB1ENR_GPIOEEN;
 	RCC->APB2ENR |= RCC_APB2ENR_SPI4EN;
 
@@ -41,6 +41,7 @@ void SPI_init()
 	GPIO_StructInit(&GPIOA_InitStructure);
 	GPIO_StructInit(&GPIOD_InitStructure);
 
+	//
 	GPIOA_InitStructure.GPIO_Pin     = GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
 	GPIOA_InitStructure.GPIO_Mode    = GPIO_Mode_AF;
 	GPIOA_InitStructure.GPIO_OType   = GPIO_OType_PP;
@@ -64,18 +65,18 @@ void SPI_init()
 
 	SPI_InitTypeDef initSPI;
 
-		initSPI.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16;
-		initSPI.SPI_DataSize = SPI_DataSize_8b;
-		initSPI.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
-		initSPI.SPI_FirstBit = SPI_FirstBit_LSB;
-		initSPI.SPI_Mode = SPI_Mode_Master;
-		initSPI.SPI_CPHA = SPI_CPHA_1Edge;
-		initSPI.SPI_CPOL = SPI_CPOL_Low;
-		initSPI.SPI_CRCPolynomial = 7;
-		initSPI.SPI_NSS = SPI_NSS_Soft;
-		SPI_Init(SPI1, &initSPI);
+	initSPI.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16;
+	initSPI.SPI_DataSize = SPI_DataSize_8b;
+	initSPI.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+	initSPI.SPI_FirstBit = SPI_FirstBit_LSB;
+	initSPI.SPI_Mode = SPI_Mode_Master;
+	initSPI.SPI_CPHA = SPI_CPHA_1Edge;
+	initSPI.SPI_CPOL = SPI_CPOL_Low;
+	initSPI.SPI_CRCPolynomial = 7;
+	initSPI.SPI_NSS = SPI_NSS_Soft;
+	SPI_Init(SPI1, &initSPI);
 
-		SPI_Cmd(SPI1, ENABLE);
+	SPI_Cmd(SPI1, ENABLE);
 
 }
 
@@ -85,16 +86,19 @@ void SPI_run(void)
 	if(circBuffer2D_getSpaceAvailable(SPI4_TX) <= 16U)
 	{
 		circBuffer2D_pop(SPI4_TX, (uint8_t*)&dataToSend);
-		SPI_I2S_SendData(SPI4, (uint16_t)(dataToSend));
+		while(!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+		SPI_I2S_SendData(SPI1, (uint16_t)(dataToSend));
 	}
 
 	uint16_t dataReceived;
 	if(circBuffer2D_getSpaceAvailable(SPI4_RX))
 	{
-		dataReceived = SPI_I2S_ReceiveData(SPI4);
+		while(!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+		dataReceived = SPI_I2S_ReceiveData(SPI1);
 		circBuffer2D_push(SPI4_RX, (uint8_t*)&dataReceived, 2U);
 	}
 }
+
 
 bool SPI_send(circBuffer2D_channel_E channel, const uint8_t * const data, const uint8_t length)
 {
@@ -110,7 +114,9 @@ bool SPI_send(circBuffer2D_channel_E channel, const uint8_t * const data, const 
 	return ret;
 }
 
-bool SPI_receive(circBuffer2D_channel_E channel,  uint8_t * const data, const uint8_t length)
+
+// It seems that this function is not really needed
+/*bool SPI_receive(circBuffer2D_channel_E channel,  uint8_t * const data, const uint8_t length)
 {
 
 	bool ret = false;
@@ -121,7 +127,7 @@ bool SPI_receive(circBuffer2D_channel_E channel,  uint8_t * const data, const ui
 	}
 
 	return ret;
-}
+}*/
 
 bool SPI_sendAndReceive(circBuffer2D_channel_E channel,  uint8_t * const data, const uint8_t length)
 {
@@ -142,4 +148,3 @@ bool SPI_sendAndReceive(circBuffer2D_channel_E channel,  uint8_t * const data, c
 
 	return retSend && retReceive;
 }
-

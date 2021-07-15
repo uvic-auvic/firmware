@@ -114,21 +114,6 @@ bool SPI_send(circBuffer2D_channel_E channel, const uint8_t * const data, const 
 	return ret;
 }
 
-
-// It seems that this function is not really needed
-/*bool SPI_receive(circBuffer2D_channel_E channel,  uint8_t * const data, const uint8_t length)
-{
-
-	bool ret = false;
-
-	if((channel < CIRCBUFFER2D_CHANNEL_COUNT) && (data != NULL) && (length > 0))
-	{
-		ret = circBuffer2D_pop(channel, data);
-	}
-
-	return ret;
-}*/
-
 bool SPI_sendAndReceive(circBuffer2D_channel_E channel,  uint8_t * const data, const uint8_t length)
 {
 
@@ -140,11 +125,10 @@ bool SPI_sendAndReceive(circBuffer2D_channel_E channel,  uint8_t * const data, c
 		retSend = true;
 	}
 
-	if(SPI_receive(channel, data, length))
+	SPI_run();
+	if (circBuffer2D_getSpaceAvailable(SPI4_RX) < 16U)
 	{
-		retSend = true;
+		retReceive = true;
 	}
-
-
 	return retSend && retReceive;
 }

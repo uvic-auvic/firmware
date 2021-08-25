@@ -16,6 +16,7 @@ $(OUTPUT_DIR)/obj/app/messageHandler.o \
 $(OUTPUT_DIR)/obj/app/messageHandler_componentSpecific.o \
 $(OUTPUT_DIR)/obj/app/RCCHelper.o \
 $(OUTPUT_DIR)/obj/app/interruptHelper.o \
+$(OUTPUT_DIR)/obj/app/SPI_componentSpecific.o \
 $(OUTPUT_DIR)/obj/app/SPI.o \
 
 APP_C_DEPS += $(APP_OBJS:%.o=%.d)

@@ -27,7 +27,7 @@ void RTOS_init(void)
     messageHandler_init();
 
     circBuffer2D_init();
-    SPI_init();
+    //SPI_init();
 
     debug_writeStringBlocking("*** MOTOR CONTROLLER 3 ***");
     debug_writeStringBlocking("Initialization Complete");
@@ -40,7 +40,7 @@ void RTOS_run1ms(void)
 
 void RTOS_run10ms(void)
 {
-	SPI_run();
+	//SPI_run();
 
 }
 

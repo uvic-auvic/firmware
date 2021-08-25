@@ -10,8 +10,8 @@
 
 typedef enum
 {
-	SPI4_RX,
-	SPI4_TX,
+	SPI_RX,
+	SPI_TX,
 
 	CIRCBUFFER2D_CHANNEL_COUNT
 } circBuffer2D_channel_E;

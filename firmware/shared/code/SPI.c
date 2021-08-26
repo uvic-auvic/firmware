@@ -36,7 +36,7 @@ void SPI_init()
 	assert(IS_GPIO_ALL_PERIPH(SPI_config.HWConfig->MOSIPort));
 	assert(IS_GPIO_PIN_SOURCE(SPI_config.HWConfig->CSPin));
 	assert(IS_GPIO_ALL_PERIPH(SPI_config.HWConfig->CSPort));
-	assert(IS_GPIO_ALL_PERIPH(SPI_config.HWConfig->SPIPeriph));
+	assert(IS_SPI_ALL_PERIPH(SPI_config.HWConfig->SPIPeriph));
 
 	// Enable clocks for GPIO ports and SPI peripheral
 	RCCHelper_clockCmd(SPI_config.HWConfig->SCKPort, ENABLE);

@@ -17,16 +17,6 @@ extern const SPI_config_S SPI_config;
 
 void SPI_init()
 {
-	// Carter's code of initiating GPIOs
-	/*RCC->AHB1ENR |= RCC_AHB1ENR_GPIOEEN;
-	RCC->APB2ENR |= RCC_APB2ENR_SPI4EN;
-
-	GPIOE->MODER |= GPIO_MODER_MODER2_1 | GPIO_MODER_MODER4_1
-										| GPIO_MODER_MODER5_1
-										| GPIO_MODER_MODER6_1;
-
-	GPIOE->AFR[0] |= ((uint32_t)0x05550500); //enable GPIO alternate function 5 for GPIO w/ appropriate pins*/
-
 	// Check that all configs are valid
 	assert(IS_GPIO_PIN_SOURCE(SPI_config.HWConfig->SCKPin));
 	assert(IS_GPIO_ALL_PERIPH(SPI_config.HWConfig->SCKPort));

@@ -1,0 +1,29 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "all",
+            "type": "shell",
+            "command": "make -j4 all",
+            "problemMatcher": {
+				"base": "$gcc",
+				"fileLocation": "absolute"
+			}
+        },
+        {
+            "label": "motorcontroller2 app",
+            "type": "shell",
+            "command": "make -j4 motorcontroller2 TARGET=app",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": {
+				"base": "$gcc",
+				"fileLocation": ["relative", "${workspaceFolder}/motorcontroller2/makefiles"]
+			}
+        }
+    ]
+}

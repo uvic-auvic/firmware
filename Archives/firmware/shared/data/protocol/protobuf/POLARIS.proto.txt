@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package POLARIS;
+
+message deviceInfo_M
+{
+	uint32 deviceName = 1;
+}
+
+message boardVitals_M
+{
+	uint32 voltage = 1;
+	uint32 current = 2;
+}
+
+message motorSetSpeed_M
+{
+	uint32	motorNumber = 1;
+	oneof subMessage
+	{
+		uint32 rpm = 2;
+		uint32 percent = 3;
+	}
+}
+
+message allMessages_M
+{
+	oneof subMessage
+	{
+		// Motor Controller messages
+		deviceInfo_M MC_deviceInfo = 1;
+		boardVitals_M MC_boardVitals = 2;
+
+		// Power board messages
+		deviceInfo_M PB_deviceInfo = 21;
+
+		// Jetson messages
+		deviceInfo_M JETSON_deviceInfo = 41;
+		motorSetSpeed_M JETSON_motorSetSpeed = 42;
+
+		// Other boards. First message must start with a multiple of 20 +1
+	}
+}

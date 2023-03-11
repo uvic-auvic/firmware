@@ -143,7 +143,7 @@
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Cfg"/>
 						<entry excluding="CMSIS/Device/ST/STM32F4xx/Include/exclude from build|FreeRTOS/Source/portable/GCC/TriCore_1782|FreeRTOS/Source/portable/GCC/STR75x|FreeRTOS/Source/portable/GCC/RX700v3_DPFPU|FreeRTOS/Source/portable/GCC/RX600v2|FreeRTOS/Source/portable/GCC/RX600|FreeRTOS/Source/portable/GCC/RX200|FreeRTOS/Source/portable/GCC/RX100|FreeRTOS/Source/portable/GCC/RL78|FreeRTOS/Source/portable/GCC/RISC-V|FreeRTOS/Source/portable/GCC/PPC440_Xilinx|FreeRTOS/Source/portable/GCC/PPC405_Xilinx|FreeRTOS/Source/portable/GCC/NiosII|FreeRTOS/Source/portable/GCC/MSP430F449|FreeRTOS/Source/portable/GCC/MicroBlazeV9|FreeRTOS/Source/portable/GCC/MicroBlazeV8|FreeRTOS/Source/portable/GCC/MicroBlaze|FreeRTOS/Source/portable/GCC/MCF5235|FreeRTOS/Source/portable/GCC/IA32_flat|FreeRTOS/Source/portable/GCC/HCS12|FreeRTOS/Source/portable/GCC/H8S2329|FreeRTOS/Source/portable/GCC/CORTUS_APS3|FreeRTOS/Source/portable/GCC/ColdFire_V2|FreeRTOS/Source/portable/GCC/AVR32_UC3|FreeRTOS/Source/portable/GCC/AVR_Mega0|FreeRTOS/Source/portable/GCC/AVR_AVRDx|FreeRTOS/Source/portable/GCC/ATMega323|FreeRTOS/Source/portable/GCC/ARM7_LPC23xx|FreeRTOS/Source/portable/GCC/ARM7_LPC2000|FreeRTOS/Source/portable/GCC/ARM7_AT91SAM7S|FreeRTOS/Source/portable/GCC/ARM7_AT91FR40008|FreeRTOS/Source/portable/GCC/ARM_CRx_No_GIC|FreeRTOS/Source/portable/GCC/ARM_CR5|FreeRTOS/Source/portable/GCC/ARM_CM85_NTZ|FreeRTOS/Source/portable/GCC/ARM_CM85|FreeRTOS/Source/portable/GCC/ARM_CM7|FreeRTOS/Source/portable/GCC/ARM_CM55_NTZ|FreeRTOS/Source/portable/GCC/ARM_CM55|FreeRTOS/Source/portable/GCC/ARM_CM4_MPU|FreeRTOS/Source/portable/GCC/ARM_CM33_NTZ|FreeRTOS/Source/portable/GCC/ARM_CM33|FreeRTOS/Source/portable/GCC/ARM_CM3_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3|FreeRTOS/Source/portable/GCC/ARM_CM23_NTZ|FreeRTOS/Source/portable/GCC/ARM_CM23|FreeRTOS/Source/portable/GCC/ARM_CM0|FreeRTOS/Source/portable/GCC/ARM_CA9|FreeRTOS/Source/portable/GCC/ARM_CA53_64_BIT_SRE|FreeRTOS/Source/portable/GCC/ARM_CA53_64_BIT|FreeRTOS/Source/portable/MemMang/heap_5.c|FreeRTOS/Source/portable/MemMang/heap_3.c|FreeRTOS/Source/portable/MemMang/heap_2.c|FreeRTOS/Source/portable/MemMang/heap_1.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="Inc"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry excluding="System/I2C.c|Application/Sensors/SI7021.c|Application/Sensors/INA226.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -253,7 +253,7 @@
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Cfg"/>
 						<entry excluding="STM32F4xx_HAL_Driver|CMSIS|FreeRTOS" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry excluding="System/I2C.c|Application/Sensors/SI7021.c|Application/Sensors/INA226.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

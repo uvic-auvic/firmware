@@ -7,9 +7,39 @@
 
 #include "System/RCC.h"
 
+extern void RCC_EnableGpioClk(GPIO_TypeDef * GPIOx){
+	if(GPIOx == GPIOA){
+		 RCC_AHB1ENR(RCC_AHB1ENR_GPIOAEN);
+	} else if(GPIOx == GPIOB){
+		 RCC_AHB1ENR(RCC_AHB1ENR_GPIOBEN);
+	} else if(GPIOx == GPIOC){
+		 RCC_AHB1ENR(RCC_AHB1ENR_GPIOCEN);
+	} else if(GPIOx == GPIOD){
+		 RCC_AHB1ENR(RCC_AHB1ENR_GPIODEN);
+	} else if(GPIOx == GPIOE){
+		 RCC_AHB1ENR(RCC_AHB1ENR_GPIOEEN);
+	} else if(GPIOx == GPIOF){
+		 RCC_AHB1ENR(RCC_AHB1ENR_GPIOFEN);
+	} else if(GPIOx == GPIOG){
+		 RCC_AHB1ENR(RCC_AHB1ENR_GPIOGEN);
+	} else if(GPIOx == GPIOH){
+		 RCC_AHB1ENR(RCC_AHB1ENR_GPIOHEN);
+	}
+}
+
+extern void RCC_EnableI2cClk(I2C_TypeDef * I2Cx){
+	if(I2Cx == I2C1){
+		RCC_APB1ENR(RCC_APB1ENR_I2C1EN);
+	} else if(I2Cx == I2C2){
+		RCC_APB1ENR(RCC_APB1ENR_I2C2EN);
+	} else if(I2Cx == I2C3){
+		RCC_APB1ENR(RCC_APB1ENR_I2C3EN);
+	}
+}
+
 void RCC_AHB1ENR(uint32_t Peripheral){
 	RCC->AHB1ENR |= Peripheral;
-	// introduce latency for clock. do this by polling the bit. This is required because of the race condition.
+	// Poll until the clock is enabled to avoid race condition.
 	while(!(RCC->AHB1ENR & Peripheral)){
 		// Do Nothing
 	}

@@ -3,9 +3,8 @@
 
 #include <stm32f413xx.h>
 #include <stdint.h>
+#include <assert.h>
 
-
-#include "Toolbox/Dict.h"
 #include "System/RCC.h"
 
 // TODO: Implement Pin Locking
@@ -96,7 +95,7 @@ typedef enum {
 
 typedef struct __attribute__((__packed__)) {
 	GPIO_Pin PIN;
-	volatile GPIO_TypeDef* GPIOx;
+	GPIO_TypeDef* GPIOx;
 } GPIO_Channel;
 
 /***************************************************************************//**
@@ -112,7 +111,6 @@ typedef struct __attribute__((__packed__)) {
 GPIO_Channel GPIO_Init(GPIO_Pin Pin, GPIO_TypeDef* GPIOx, uint32_t MODER,
 		uint32_t PUPDR, uint32_t OSPEEDR, uint32_t AF, uint16_t OTYPER);
 
-void GPIO_DeInit(GPIO_Channel* Channel);
 GPIO_State GPIO_ReadPin(GPIO_Channel* Channel);
 void GPIO_WritePin(GPIO_Channel* Channel, GPIO_State State);
 void GPIO_TogglePin(GPIO_Channel* Channel);

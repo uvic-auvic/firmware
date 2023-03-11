@@ -11,24 +11,20 @@
 #include <stm32f413xx.h>
 #include <stdint.h>
 
+extern void RCC_EnableGpioClk(GPIO_TypeDef * GPIOx);
+extern void RCC_EnableI2cClk(I2C_TypeDef * I2Cx);
 
 
 
-
-
-#define CHEAT_CODE
-
-
+/* Internal Use Only */
 void RCC_AHB1ENR(uint32_t Peripheral);
 void RCC_AHB1RSTR(uint32_t Peripheral);
 void RCC_APB1ENR(uint32_t Peripheral);
 void RCC_APB2ENR(uint32_t Peripheral);
 
-#ifdef CHEAT_CODE
-/* Cheat Codes - Dirty Fixes to Problems*/
-/* We ideally dont want to enable all the clocks because it draws more current. The solution to this is create a lookup table or dict that maps the GPIO address to the RCC address for the pin. */
+
+
+/* Do not use these */
 void RCC_EnableAllGpioClk(void);
 void RCC_ResetAllGpioClk(void);
-#endif
-
 #endif /* SYSTEM_RCC_H_ */

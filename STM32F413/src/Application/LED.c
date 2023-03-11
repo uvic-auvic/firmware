@@ -21,16 +21,16 @@ LED_Channel LED_Init(GPIO_Pin PIN, GPIO_TypeDef* GPIOx, LED_Color LED, LED_Blink
 	return LEDx;
 }
 
-void set_Blink_Off(LED_Channel *LEDx){
+extern void set_Blink_Off(LED_Channel *LEDx){
 	LEDx->BLINK = BLINK_OFF;
 }
-void set_Blink_Slow(LED_Channel *LEDx){
+extern void set_Blink_Slow(LED_Channel *LEDx){
 	LEDx->BLINK = BLINK_SLOW;
 }
-void set_Blink_Normal(LED_Channel *LEDx){
+extern void set_Blink_Normal(LED_Channel *LEDx){
 	LEDx->BLINK = BLINK_NORMAL;
 }
-void set_Blink_Fast(LED_Channel *LEDx){
+extern void set_Blink_Fast(LED_Channel *LEDx){
 	LEDx->BLINK = BLINK_FAST;
 }
 extern void LED_On(LED_Channel *LEDx){
@@ -45,3 +45,13 @@ extern void LED_Toggle(LED_Channel *LEDx){
 	LEDx->STATE ^= LEDx->STATE;
 	GPIO_TogglePin(&(LEDx->CHANNEL));
 }
+
+void vBlinkyLedTask( void *pvParameters ) {
+	LED_Channel *LED = (LED_Channel *)pvParameters;
+
+	for( ;; ) {
+		LED_Toggle(LED);
+		vTaskDelay(pdMS_TO_TICKS(LED->BLINK));
+	}
+}
+

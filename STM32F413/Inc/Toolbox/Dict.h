@@ -13,7 +13,7 @@
 typedef struct {
     char *key;
     void *value;
-    struct Dict_Tool *next;
+    struct TOOL_Dict *next;
 } TOOL_Dict;
 
 /*Create and initialize an empty dictionary. Think carefully about what the single argument to this method should be. This method should allocate the entire dictionary -- including the struct. Be careful here.

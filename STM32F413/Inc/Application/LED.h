@@ -2,6 +2,9 @@
 #define __LED_H_
 
 #include "System/GPIO.h"
+// RTOS Kernel Includes
+#include <FreeRTOS.h>
+#include <task.h>
 
 typedef enum {
 	LED_RESET = 0,
@@ -21,10 +24,10 @@ typedef enum {
 } LED_Color;
 
 typedef enum {
-	BLINK_OFF = 0,
-	BLINK_SLOW,
-	BLINK_NORMAL,
-	BLINK_FAST,
+	BLINK_OFF = 0U,
+	BLINK_SLOW = 1000U, // 1s
+	BLINK_NORMAL = 100U, // 100ms
+	BLINK_FAST = 50U, // 50ms
 	BLINK_COUNT,
 } LED_Blink;
 
@@ -46,7 +49,11 @@ void set_Blink_Slow(LED_Channel *LEDx);
 void set_Blink_Normal(LED_Channel *LEDx);
 void set_Blink_Fast(LED_Channel *LEDx);
 
-// Generic RTOS Task (Node) that contains the LED
-
+// RTOS Tasks
+/***************************************************************************//**
+ * vBlinkyLedTask - Blinks LED according to configuration
+ * @param LED_Channel* gLED_x
+ ******************************************************************************/
+void vBlinkyLedTask( void *pvParameters );
 
 #endif /*__LED_H_*/

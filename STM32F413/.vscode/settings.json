@@ -1,0 +1,17 @@
+{
+    "cmake.configureOnOpen": false,
+    "files.associations": {
+        "bit": "c",
+        "compare": "c",
+        "cstddef": "c",
+        "limits": "c",
+        "type_traits": "c",
+        "xutility": "c",
+        "stdint.h": "c",
+        "stm32f413xx.h": "c",
+        "si7021.h": "c",
+        "ina226.h": "c",
+        "i2c.h": "c",
+        "core_cm4.h": "c"
+    }
+}
